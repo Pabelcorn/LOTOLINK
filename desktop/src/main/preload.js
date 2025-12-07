@@ -15,6 +15,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getVersion: () => ipcRenderer.invoke('get-version'),
   getPlatform: () => ipcRenderer.invoke('get-platform'),
   
+  // Window controls
+  close: () => ipcRenderer.send('window-close'),
+  minimize: () => ipcRenderer.send('window-minimize'),
+  maximize: () => ipcRenderer.send('window-maximize'),
+  
   // Navigation events
   onNavigate: (callback) => {
     ipcRenderer.on('navigate', (event, page) => callback(page));

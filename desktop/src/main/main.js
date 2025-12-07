@@ -326,6 +326,29 @@ ipcMain.handle('get-platform', () => {
   return process.platform;
 });
 
+// Window control handlers
+ipcMain.on('window-close', () => {
+  if (mainWindow) {
+    mainWindow.close();
+  }
+});
+
+ipcMain.on('window-minimize', () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+});
+
+ipcMain.on('window-maximize', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
+
 // App event handlers
 app.whenReady().then(createWindow);
 
