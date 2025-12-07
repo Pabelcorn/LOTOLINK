@@ -252,6 +252,10 @@
       cursor: pointer;
       text-decoration: none;
       position: relative;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
     }
     
     .sidebar-nav-item:hover {
@@ -1581,45 +1585,45 @@
     </div>
     
     <nav class="sidebar-nav">
-      <a href="#" onclick="return false" class="sidebar-nav-item active" data-view="home">
+      <button class="sidebar-nav-item active" data-view="home">
         <i class="fas fa-home"></i>
         <span>Inicio</span>
-      </a>
-      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="play">
+      </button>
+      <button class="sidebar-nav-item" data-view="play">
         <i class="fas fa-play"></i>
         <span>Jugar</span>
-      </a>
-      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="loterias">
+      </button>
+      <button class="sidebar-nav-item" data-view="loterias">
         <i class="fas fa-dice"></i>
         <span>Loterías</span>
-      </a>
-      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="bancas">
+      </button>
+      <button class="sidebar-nav-item" data-view="bancas">
         <i class="fas fa-store"></i>
         <span>Bancas</span>
-      </a>
-      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="tickets">
+      </button>
+      <button class="sidebar-nav-item" data-view="tickets">
         <i class="fas fa-ticket-alt"></i>
         <span>Mis Tickets</span>
-      </a>
-      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="results">
+      </button>
+      <button class="sidebar-nav-item" data-view="results">
         <i class="fas fa-trophy"></i>
         <span>Resultados</span>
-      </a>
+      </button>
       
       <div class="sidebar-divider"></div>
       
-      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="wallet">
+      <button class="sidebar-nav-item" data-view="wallet">
         <i class="fas fa-wallet"></i>
         <span>Wallet</span>
-      </a>
-      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="profile">
+      </button>
+      <button class="sidebar-nav-item" data-view="profile">
         <i class="fas fa-user"></i>
         <span>Mi Perfil</span>
-      </a>
-      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="settings">
+      </button>
+      <button class="sidebar-nav-item" data-view="settings">
         <i class="fas fa-cog"></i>
         <span>Configuración</span>
-      </a>
+      </button>
     </nav>
   </div>
 
@@ -4988,6 +4992,25 @@
       };
 
       useEffect(() => { document.documentElement.classList.toggle('dark', theme === 'dark'); localStorage.setItem('ll_theme', theme); }, [theme]);
+      
+      // Expose global toggleDarkMode for desktop titlebar
+      useEffect(() => {
+        window.toggleDarkMode = () => {
+          setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+        };
+        return () => { delete window.toggleDarkMode; };
+      }, []);
+      
+      // Listen for desktop sidebar navigation
+      useEffect(() => {
+        const handleDesktopNav = (e) => {
+          const { view } = e.detail;
+          if (view) setView(view);
+        };
+        window.addEventListener('desktopNavigate', handleDesktopNav);
+        return () => window.removeEventListener('desktopNavigate', handleDesktopNav);
+      }, []);
+      
       useEffect(() => localStorage.setItem("ll_cart", JSON.stringify(cart)), [cart]);
       useEffect(() => localStorage.setItem("ll_cart_banca", JSON.stringify(cartBanca)), [cartBanca]);
       
@@ -7088,9 +7111,13 @@
     /* --- ELECTRON DESKTOP INTEGRATION --- */
     (function() {
       // Detect if running in Electron
-      const isElectron = navigator.userAgent.toLowerCase().includes('electron') || 
-                        window.process?.type === 'renderer' ||
-                        window.electronAPI !== undefined;
+      function isElectronEnvironment() {
+        return navigator.userAgent.toLowerCase().includes('electron') || 
+               window.process?.type === 'renderer' ||
+               window.electronAPI !== undefined;
+      }
+      
+      const isElectron = isElectronEnvironment();
       
       if (isElectron) {
         console.log('🖥️ Running in Electron - Desktop mode enabled');
@@ -7123,14 +7150,8 @@
             // Add active class to clicked item
             item.classList.add('active');
             
-            // Trigger view change in React app
-            const viewButton = document.querySelector(`[data-view="${view}"]`);
-            if (viewButton && viewButton !== item) {
-              viewButton.click();
-            }
-            
-            // Alternative: dispatch custom event
-            window.dispatchEvent(new CustomEvent('navigate', { detail: { view } }));
+            // Dispatch custom event for React app to handle
+            window.dispatchEvent(new CustomEvent('desktopNavigate', { detail: { view } }));
           });
         });
         
