@@ -47,14 +47,16 @@
        ======================================== */
     
     :root {
-      /* Premium Color Palette - Apple inspired */
-      --primary: #0071e3;
-      --primary-dark: #0077ED;
-      --primary-light: #42a5f5;
+      /* Premium Color Palette - Enhanced for Desktop Glassmorphism */
+      --primary: #7C3AED;
+      --primary-dark: #6D28D9;
+      --primary-light: #A78BFA;
       --success: #34c759;
       --warning: #ff9f0a;
       --danger: #ff3b30;
-      --purple: #af52de;
+      --purple: #7C3AED;
+      --pink: #EC4899;
+      --blue: #0071e3;
       
       /* Neutral Grays - Apple style */
       --gray-50: #fafafa;
@@ -65,24 +67,37 @@
       --gray-500: #6e6e73;
       --gray-600: #1d1d1f;
       
-      /* Glass Effect */
-      --glass-bg: rgba(255, 255, 255, 0.72);
-      --glass-border: rgba(255, 255, 255, 0.18);
-      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      /* Premium Glassmorphism Effects - Enhanced */
+      --glass-bg: rgba(255, 255, 255, 0.65);
+      --glass-bg-strong: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --glass-shadow: 0 8px 32px rgba(124, 58, 237, 0.12);
+      --glass-shadow-hover: 0 12px 48px rgba(124, 58, 237, 0.18);
+      --glass-blur: blur(24px);
+      --glass-blur-strong: blur(40px);
       
-      /* Premium Shadows */
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
-      --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+      /* Premium Shadows with Color */
+      --shadow-sm: 0 2px 8px rgba(124, 58, 237, 0.08);
+      --shadow-md: 0 4px 16px rgba(124, 58, 237, 0.12);
+      --shadow-lg: 0 12px 48px rgba(124, 58, 237, 0.16);
+      --shadow-xl: 0 24px 64px rgba(124, 58, 237, 0.20);
+      --shadow-colored-purple: 0 8px 32px rgba(124, 58, 237, 0.25);
+      --shadow-colored-pink: 0 8px 32px rgba(236, 72, 153, 0.25);
+      --shadow-colored-blue: 0 8px 32px rgba(0, 113, 227, 0.25);
       
-      /* Border Radius - Apple style */
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-xl: 20px;
-      --radius-2xl: 24px;
+      /* Enhanced Border Radius - More Rounded for Desktop */
+      --radius-sm: 12px;
+      --radius-md: 16px;
+      --radius-lg: 20px;
+      --radius-xl: 24px;
+      --radius-2xl: 32px;
+      --radius-3xl: 40px;
       --radius-full: 9999px;
+      
+      /* Desktop Layout */
+      --sidebar-width: 240px;
+      --titlebar-height: 40px;
+      --statusbar-height: 32px;
     }
 
     * {
@@ -92,13 +107,239 @@
     body { 
       -webkit-font-smoothing: antialiased; 
       -moz-osx-font-smoothing: grayscale;
-      background: linear-gradient(180deg, #f5f5f7 0%, #ffffff 100%);
+      background: linear-gradient(135deg, #E0E7FF 0%, #F5F3FF 25%, #FDF4FF 50%, #FCE7F3 75%, #FEF3F2 100%);
       letter-spacing: -0.01em;
+      margin: 0;
+      padding: 0;
     }
     
-    /* Premium Button Styles */
+    /* ========================================
+       DESKTOP APP - GLASSMORPHISM PREMIUM
+       Electron detection and desktop-specific styles
+       ======================================== */
+    
+    /* Detect Electron environment */
+    .is-electron body {
+      overflow: hidden;
+    }
+    
+    /* Desktop Title Bar - Draggable Region */
+    .desktop-titlebar {
+      display: none;
+      height: var(--titlebar-height);
+      -webkit-app-region: drag;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: var(--glass-blur-strong) saturate(180%);
+      -webkit-backdrop-filter: var(--glass-blur-strong) saturate(180%);
+      border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+    }
+    
+    .is-electron .desktop-titlebar {
+      display: flex;
+    }
+    
+    .titlebar-drag {
+      -webkit-app-region: drag;
+    }
+    
+    .titlebar-no-drag {
+      -webkit-app-region: no-drag;
+    }
+    
+    /* Traffic Lights (macOS style) */
+    .traffic-lights {
+      display: flex;
+      gap: 8px;
+      -webkit-app-region: no-drag;
+    }
+    
+    .traffic-light {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .traffic-light.close { background: #ff5f57; }
+    .traffic-light.minimize { background: #ffbd2e; }
+    .traffic-light.maximize { background: #28ca42; }
+    
+    .traffic-light:hover {
+      opacity: 0.8;
+      transform: scale(1.1);
+    }
+    
+    /* Desktop Sidebar Navigation */
+    .desktop-sidebar {
+      display: none;
+      position: fixed;
+      left: 0;
+      top: var(--titlebar-height);
+      bottom: var(--statusbar-height);
+      width: var(--sidebar-width);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: var(--glass-blur-strong) saturate(180%);
+      -webkit-backdrop-filter: var(--glass-blur-strong) saturate(180%);
+      border-right: 1px solid rgba(124, 58, 237, 0.1);
+      padding: 24px 16px;
+      overflow-y: auto;
+      z-index: 100;
+      box-shadow: 4px 0 24px rgba(124, 58, 237, 0.08);
+    }
+    
+    .is-electron .desktop-sidebar {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      padding: 0 8px;
+    }
+    
+    .sidebar-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      box-shadow: var(--shadow-colored-purple);
+    }
+    
+    .sidebar-logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-lg);
+      color: var(--gray-500);
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      cursor: pointer;
+      text-decoration: none;
+      position: relative;
+    }
+    
+    .sidebar-nav-item:hover {
+      background: rgba(124, 58, 237, 0.08);
+      color: var(--primary);
+      transform: translateX(2px);
+    }
+    
+    .sidebar-nav-item.active {
+      background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%);
+      color: white;
+      box-shadow: var(--shadow-colored-purple);
+    }
+    
+    .sidebar-nav-item i {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+    
+    .sidebar-divider {
+      height: 1px;
+      background: rgba(0, 0, 0, 0.06);
+      margin: 16px 0;
+    }
+    
+    /* Desktop Status Bar */
+    .desktop-statusbar {
+      display: none;
+      height: var(--statusbar-height);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: var(--glass-blur) saturate(180%);
+      -webkit-backdrop-filter: var(--glass-blur) saturate(180%);
+      border-top: 1px solid rgba(124, 58, 237, 0.1);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 12px;
+      color: var(--gray-500);
+    }
+    
+    .is-electron .desktop-statusbar {
+      display: flex;
+    }
+    
+    .statusbar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 2px rgba(52, 199, 89, 0.2);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(52, 199, 89, 0.2); }
+      50% { box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.1); }
+    }
+    
+    /* Desktop Main Content with Sidebar */
+    .is-electron .desktop-main-content {
+      margin-left: var(--sidebar-width);
+      margin-top: var(--titlebar-height);
+      margin-bottom: var(--statusbar-height);
+      height: calc(100vh - var(--titlebar-height) - var(--statusbar-height));
+      overflow-y: auto;
+    }
+    
+    /* Hide mobile header and nav when in desktop mode */
+    .is-electron .lg\:hidden {
+      display: none !important;
+    }
+    
+    /* Premium Button Styles - Purple Theme */
     .btn-apple-primary {
-      background: linear-gradient(180deg, #0077ED 0%, #0071e3 100%);
+      background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
       color: white;
       border: none;
       padding: 12px 24px;
@@ -106,60 +347,124 @@
       font-weight: 600;
       font-size: 15px;
       letter-spacing: -0.01em;
-      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-      box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35);
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: var(--shadow-colored-purple);
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-apple-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .btn-apple-primary:hover::before {
+      opacity: 1;
     }
     .btn-apple-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(0, 113, 227, 0.45);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(124, 58, 237, 0.35);
     }
     .btn-apple-primary:active {
       transform: scale(0.98);
+      animation: buttonPress 0.15s ease-out;
+    }
+    
+    @keyframes buttonPress {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.97); }
+      100% { transform: scale(1); }
     }
     
     .btn-apple-secondary {
-      background: rgba(0, 0, 0, 0.05);
+      background: rgba(124, 58, 237, 0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       color: var(--primary);
-      border: none;
+      border: 1.5px solid rgba(124, 58, 237, 0.2);
       padding: 12px 24px;
       border-radius: var(--radius-full);
       font-weight: 600;
       font-size: 15px;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
     }
     .btn-apple-secondary:hover {
-      background: rgba(0, 113, 227, 0.1);
+      background: rgba(124, 58, 237, 0.15);
+      border-color: rgba(124, 58, 237, 0.4);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
 
-    /* Glass Morphism Cards */
+    /* Glass Morphism Cards - Enhanced for Desktop */
     .glass-card {
       background: var(--glass-bg);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-lg);
+      backdrop-filter: var(--glass-blur) saturate(180%);
+      -webkit-backdrop-filter: var(--glass-blur) saturate(180%);
+      border: 1.5px solid var(--glass-border);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--glass-shadow);
+      transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+      position: relative;
+    }
+    
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    }
+    
+    .glass-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--glass-shadow-hover);
+      border-color: rgba(167, 139, 250, 0.5);
     }
     
     .premium-card {
-      background: white;
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(0, 0, 0, 0.04);
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    .premium-card:hover {
+      background: var(--glass-bg-strong);
+      backdrop-filter: var(--glass-blur-strong) saturate(200%);
+      -webkit-backdrop-filter: var(--glass-blur-strong) saturate(200%);
+      border-radius: var(--radius-2xl);
       box-shadow: var(--shadow-lg);
-      transform: translateY(-2px);
+      border: 1.5px solid rgba(124, 58, 237, 0.15);
+      transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .premium-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    }
+    
+    .premium-card:hover {
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-4px) scale(1.01);
+      border-color: rgba(167, 139, 250, 0.4);
     }
 
-    /* Premium Header */
+    /* Premium Header - Enhanced Glassmorphism */
     .premium-header {
-      background: rgba(255, 255, 255, 0.72);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: var(--glass-blur-strong) saturate(180%);
+      -webkit-backdrop-filter: var(--glass-blur-strong) saturate(180%);
+      border-bottom: 1px solid rgba(124, 58, 237, 0.1);
     }
 
     /* Elegant Modal Backdrop */
@@ -169,31 +474,70 @@
       -webkit-backdrop-filter: blur(8px);
     }
 
-    /* Modo Oscuro - Premium Dark */
+    /* Modo Oscuro - Premium Dark with Purple Theme */
     .dark body { 
-      background: linear-gradient(180deg, #000000 0%, #1c1c1e 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #4c1d95 75%, #581c87 100%);
       color: #f5f5f7; 
     }
-    .dark .dark\:bg-slate-800 { background-color: #1c1c1e; }
-    .dark .dark\:bg-slate-900 { background-color: #000000; }
+    .dark .dark\:bg-slate-800 { background-color: rgba(30, 41, 59, 0.8); backdrop-filter: var(--glass-blur); }
+    .dark .dark\:bg-slate-900 { background-color: rgba(15, 23, 42, 0.8); backdrop-filter: var(--glass-blur); }
     .dark .dark\:text-gray-100 { color: #f5f5f7; }
     .dark .dark\:text-gray-300 { color: #a1a1a6; }
     .dark .dark\:text-gray-500 { color: #6e6e73; }
-    .dark .dark\:border-gray-700 { border-color: #38383a; }
+    .dark .dark\:border-gray-700 { border-color: rgba(167, 139, 250, 0.2); }
     
     .dark .premium-header {
-      background: rgba(28, 28, 30, 0.85);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: var(--glass-blur-strong) saturate(180%);
+      -webkit-backdrop-filter: var(--glass-blur-strong) saturate(180%);
+      border-bottom: 1px solid rgba(167, 139, 250, 0.2);
     }
     
     .dark .glass-card {
-      background: rgba(28, 28, 30, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(30, 41, 59, 0.55);
+      backdrop-filter: var(--glass-blur) saturate(180%);
+      -webkit-backdrop-filter: var(--glass-blur) saturate(180%);
+      border: 1.5px solid rgba(167, 139, 250, 0.2);
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.18);
+    }
+    .dark .glass-card:hover {
+      border-color: rgba(167, 139, 250, 0.4);
+      box-shadow: 0 12px 48px rgba(124, 58, 237, 0.25);
     }
     
     .dark .premium-card {
-      background: #1c1c1e;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: var(--glass-blur-strong) saturate(200%);
+      -webkit-backdrop-filter: var(--glass-blur-strong) saturate(200%);
+      border: 1.5px solid rgba(167, 139, 250, 0.25);
+      box-shadow: 0 12px 48px rgba(124, 58, 237, 0.2);
+    }
+    .dark .premium-card:hover {
+      border-color: rgba(167, 139, 250, 0.5);
+      box-shadow: 0 24px 64px rgba(124, 58, 237, 0.3);
+    }
+    
+    .dark .desktop-titlebar,
+    .dark .desktop-sidebar,
+    .dark .desktop-statusbar {
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: var(--glass-blur-strong) saturate(180%);
+      -webkit-backdrop-filter: var(--glass-blur-strong) saturate(180%);
+      border-color: rgba(167, 139, 250, 0.2);
+    }
+    
+    .dark .sidebar-nav-item {
+      color: var(--gray-400);
+    }
+    
+    .dark .sidebar-nav-item:hover {
+      background: rgba(167, 139, 250, 0.15);
+      color: #A78BFA;
+    }
+    
+    .dark .sidebar-nav-item.active {
+      background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%);
+      color: white;
     }
     
     /* ========================================
@@ -1209,7 +1553,101 @@
 </head>
 <body class="min-h-screen text-gray-900 antialiased">
 
-  <div id="root"></div>
+  <!-- Desktop Title Bar (shows only in Electron) -->
+  <div class="desktop-titlebar">
+    <div class="flex items-center gap-3">
+      <div class="traffic-lights">
+        <div class="traffic-light close" onclick="if(window.electronAPI) window.electronAPI.close()"></div>
+        <div class="traffic-light minimize" onclick="if(window.electronAPI) window.electronAPI.minimize()"></div>
+        <div class="traffic-light maximize" onclick="if(window.electronAPI) window.electronAPI.maximize()"></div>
+      </div>
+      <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">LotoLink — Premium Lottery App</span>
+    </div>
+    <div class="titlebar-no-drag flex items-center gap-4 text-sm text-gray-500">
+      <span id="desktop-time"></span>
+      <button onclick="toggleDarkMode()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">
+        <span class="dark-mode-icon">🌙</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Desktop Sidebar Navigation (shows only in Electron) -->
+  <div class="desktop-sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        🎟️
+      </div>
+      <div class="sidebar-logo-text">LotoLink</div>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a href="#" onclick="return false" class="sidebar-nav-item active" data-view="home">
+        <i class="fas fa-home"></i>
+        <span>Inicio</span>
+      </a>
+      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="play">
+        <i class="fas fa-play"></i>
+        <span>Jugar</span>
+      </a>
+      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="loterias">
+        <i class="fas fa-dice"></i>
+        <span>Loterías</span>
+      </a>
+      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="bancas">
+        <i class="fas fa-store"></i>
+        <span>Bancas</span>
+      </a>
+      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="tickets">
+        <i class="fas fa-ticket-alt"></i>
+        <span>Mis Tickets</span>
+      </a>
+      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="results">
+        <i class="fas fa-trophy"></i>
+        <span>Resultados</span>
+      </a>
+      
+      <div class="sidebar-divider"></div>
+      
+      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="wallet">
+        <i class="fas fa-wallet"></i>
+        <span>Wallet</span>
+      </a>
+      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="profile">
+        <i class="fas fa-user"></i>
+        <span>Mi Perfil</span>
+      </a>
+      <a href="#" onclick="return false" class="sidebar-nav-item" data-view="settings">
+        <i class="fas fa-cog"></i>
+        <span>Configuración</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Desktop Status Bar (shows only in Electron) -->
+  <div class="desktop-statusbar">
+    <div class="flex items-center gap-4">
+      <div class="statusbar-item">
+        <div class="status-dot"></div>
+        <span>En línea</span>
+      </div>
+      <div class="statusbar-item">
+        <i class="fas fa-server text-xs"></i>
+        <span id="desktop-status-version">v1.0.0</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="statusbar-item">
+        <i class="fas fa-sync-alt text-xs"></i>
+        <span id="desktop-last-sync">Sincronizado</span>
+      </div>
+      <div class="statusbar-item">
+        <span id="desktop-status-time"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <div id="root" class="desktop-main-content"></div>
 
   <!-- React Libraries -->
   <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
@@ -6646,6 +7084,81 @@
     }
 
     ReactDOM.render(<LotoLinkApp />, document.getElementById('root'));
+
+    /* --- ELECTRON DESKTOP INTEGRATION --- */
+    (function() {
+      // Detect if running in Electron
+      const isElectron = navigator.userAgent.toLowerCase().includes('electron') || 
+                        window.process?.type === 'renderer' ||
+                        window.electronAPI !== undefined;
+      
+      if (isElectron) {
+        console.log('🖥️ Running in Electron - Desktop mode enabled');
+        document.documentElement.classList.add('is-electron');
+        
+        // Update time in titlebar and statusbar
+        function updateDesktopTime() {
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+          const dateStr = now.toLocaleDateString('es-DO', { weekday: 'short', day: 'numeric', month: 'short' });
+          
+          const titleTime = document.getElementById('desktop-time');
+          const statusTime = document.getElementById('desktop-status-time');
+          
+          if (titleTime) titleTime.textContent = timeStr;
+          if (statusTime) statusTime.textContent = dateStr + ' ' + timeStr;
+        }
+        
+        updateDesktopTime();
+        setInterval(updateDesktopTime, 1000);
+        
+        // Handle sidebar navigation
+        document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const view = item.dataset.view;
+            
+            // Remove active class from all items
+            document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
+            // Add active class to clicked item
+            item.classList.add('active');
+            
+            // Trigger view change in React app
+            const viewButton = document.querySelector(`[data-view="${view}"]`);
+            if (viewButton && viewButton !== item) {
+              viewButton.click();
+            }
+            
+            // Alternative: dispatch custom event
+            window.dispatchEvent(new CustomEvent('navigate', { detail: { view } }));
+          });
+        });
+        
+        // Listen for React view changes to update sidebar
+        window.addEventListener('viewChanged', (e) => {
+          const view = e.detail?.view;
+          if (view) {
+            document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+              if (item.dataset.view === view) {
+                item.classList.add('active');
+              } else {
+                item.classList.remove('active');
+              }
+            });
+          }
+        });
+        
+        // Set version from Electron if available
+        if (window.electronAPI && window.electronAPI.getVersion) {
+          window.electronAPI.getVersion().then(version => {
+            const versionEl = document.getElementById('desktop-status-version');
+            if (versionEl) versionEl.textContent = 'v' + version;
+          });
+        }
+      } else {
+        console.log('🌐 Running in browser - Web mode');
+      }
+    })();
 
     /* --- MAP INIT LOGIC (Improved from MVP) --- */
     setInterval(() => {
