@@ -74,3 +74,4 @@ k8s/secrets/
 
 # Generated integration packages
 lotolink-integration-package-*.zip
+*.backup
