@@ -41,7 +41,7 @@
     ],
     "extraResources": [
       {
-        "from": "../index.html",
+        "from": "src/renderer/index.html",
         "to": "index.html"
       },
       {
