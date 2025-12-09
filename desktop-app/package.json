@@ -69,8 +69,6 @@
       "darkModeSupport": true,
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
-      "entitlements": null,
-      "entitlementsInherit": null,
       "type": "distribution"
     },
     "linux": {

@@ -157,39 +157,66 @@ if [ -d "dist" ]; then
     echo ""
     
     # Windows
-    if [ "$BUILD_WINDOWS" = true ] && ls dist/*.exe 2>/dev/null 1>&2; then
-        echo -e "${BLUE}Windows:${NC}"
+    if [ "$BUILD_WINDOWS" = true ]; then
+        WIN_FILES_FOUND=false
         for file in dist/*.exe; do
             if [ -f "$file" ]; then
-                SIZE=$(du -h "$file" | cut -f1)
-                echo -e "  $(basename "$file") ($SIZE)"
+                WIN_FILES_FOUND=true
+                break
             fi
         done
-        echo ""
+        if [ "$WIN_FILES_FOUND" = true ]; then
+            echo -e "${BLUE}Windows:${NC}"
+            for file in dist/*.exe; do
+                if [ -f "$file" ]; then
+                    SIZE=$(du -h "$file" | cut -f1)
+                    echo -e "  $(basename "$file") ($SIZE)"
+                fi
+            done
+            echo ""
+        fi
     fi
     
     # macOS
-    if [ "$BUILD_MACOS" = true ] && (ls dist/*.dmg 2>/dev/null 1>&2 || ls dist/*.zip 2>/dev/null 1>&2); then
-        echo -e "${BLUE}macOS:${NC}"
-        for file in dist/*.dmg dist/*.zip 2>/dev/null; do
+    if [ "$BUILD_MACOS" = true ]; then
+        MAC_FILES_FOUND=false
+        for file in dist/*.dmg dist/*.zip; do
             if [ -f "$file" ]; then
-                SIZE=$(du -h "$file" | cut -f1)
-                echo -e "  $(basename "$file") ($SIZE)"
+                MAC_FILES_FOUND=true
+                break
             fi
         done
-        echo ""
+        if [ "$MAC_FILES_FOUND" = true ]; then
+            echo -e "${BLUE}macOS:${NC}"
+            for file in dist/*.dmg dist/*.zip; do
+                if [ -f "$file" ]; then
+                    SIZE=$(du -h "$file" | cut -f1)
+                    echo -e "  $(basename "$file") ($SIZE)"
+                fi
+            done
+            echo ""
+        fi
     fi
     
     # Linux
-    if [ "$BUILD_LINUX" = true ] && (ls dist/*.AppImage 2>/dev/null 1>&2 || ls dist/*.deb 2>/dev/null 1>&2 || ls dist/*.rpm 2>/dev/null 1>&2); then
-        echo -e "${BLUE}Linux:${NC}"
-        for file in dist/*.AppImage dist/*.deb dist/*.rpm 2>/dev/null; do
+    if [ "$BUILD_LINUX" = true ]; then
+        LINUX_FILES_FOUND=false
+        for file in dist/*.AppImage dist/*.deb dist/*.rpm; do
             if [ -f "$file" ]; then
-                SIZE=$(du -h "$file" | cut -f1)
-                echo -e "  $(basename "$file") ($SIZE)"
+                LINUX_FILES_FOUND=true
+                break
             fi
         done
-        echo ""
+        if [ "$LINUX_FILES_FOUND" = true ]; then
+            echo -e "${BLUE}Linux:${NC}"
+            for file in dist/*.AppImage dist/*.deb dist/*.rpm; do
+                if [ -f "$file" ]; then
+                    SIZE=$(du -h "$file" | cut -f1)
+                    echo -e "  $(basename "$file") ($SIZE)"
+                fi
+            done
+            echo ""
+        fi
     fi
     
     echo "=========================================="
