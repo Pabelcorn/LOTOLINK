@@ -107,7 +107,9 @@ jobs:
         with:
           name: coverage
           path: backend/coverage/
+          retention-days: 7
         if: always()
+        continue-on-error: true
 
   build-backend:
     name: Build Backend
@@ -141,6 +143,9 @@ jobs:
         with:
           name: backend-dist
           path: backend/dist/
+          retention-days: 7
+        if: github.ref == 'refs/heads/main'
+        continue-on-error: true
 
   container-scan:
     name: Container Security Scan
@@ -284,7 +289,9 @@ jobs:
         with:
           name: e2e-report
           path: e2e/playwright-report/
+          retention-days: 7
         if: always()
+        continue-on-error: true
 
   deploy-production:
     name: Deploy to Production
