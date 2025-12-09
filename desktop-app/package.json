@@ -33,6 +33,7 @@
     "appId": "com.lotolink.desktop",
     "productName": "LotoLink",
     "copyright": "Copyright © 2024 LotoLink",
+    "publish": null,
     "directories": {
       "output": "dist"
     },
