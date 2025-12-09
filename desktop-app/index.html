@@ -7406,7 +7406,8 @@
     /* --- ELECTRON WINDOW CONTROLS INTEGRATION --- */
     if (window.electronAPI) {
       // Setup window control button listeners
-      document.addEventListener('DOMContentLoaded', function() {
+      // Use setTimeout to ensure DOM is ready, or execute immediately if already loaded
+      const setupWindowControls = function() {
         const closeBtn = document.querySelector('.window-btn-close');
         const minimizeBtn = document.querySelector('.window-btn-minimize');
         const maximizeBtn = document.querySelector('.window-btn-maximize');
@@ -7434,11 +7435,20 @@
             }
           });
         }
-      });
+      };
+      
+      // Execute immediately or wait for DOM to be ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupWindowControls);
+      } else {
+        setupWindowControls();
+      }
       
       // Log that we're running in Electron
       console.log('LotoLink: Running in Electron desktop app mode');
-      console.log('Platform:', window.electronAPI.platform);
+      if (window.electronAPI && window.electronAPI.platform) {
+        console.log('Platform:', window.electronAPI.platform);
+      }
     } else {
       // Running in browser - hide desktop-only elements
       console.log('LotoLink: Running in web browser mode');

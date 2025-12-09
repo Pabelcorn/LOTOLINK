@@ -155,15 +155,18 @@ echo ""
 if [ -d "dist" ]; then
     echo -e "${GREEN}✅ dist directory exists${NC}"
     
-    # Count installer files
-    INSTALLER_COUNT=$(find dist -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" \) 2>/dev/null | wc -l)
+    # Find installer files and store in variable to avoid duplicate searches
+    INSTALLER_FILES=$(find dist -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" \) 2>/dev/null)
+    INSTALLER_COUNT=$(echo "$INSTALLER_FILES" | grep -c .)
     
     if [ $INSTALLER_COUNT -gt 0 ]; then
         echo -e "${GREEN}✅ Found $INSTALLER_COUNT installer file(s)${NC}"
         echo ""
         echo "Installers found:"
-        find dist -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" \) -exec basename {} \; 2>/dev/null | while read file; do
-            echo "  - $file"
+        echo "$INSTALLER_FILES" | while read file; do
+            if [ -n "$file" ]; then
+                echo "  - $(basename "$file")"
+            fi
         done
     else
         echo -e "${YELLOW}⚠️  No installer files found. Run 'npm run build' to create installers${NC}"
