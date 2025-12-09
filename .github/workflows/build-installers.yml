@@ -183,17 +183,38 @@ jobs:
           echo "" >> release_summary.md
           echo "### Windows" >> release_summary.md
           if [ -d "artifacts/windows-installer" ]; then
-            ls -lh artifacts/windows-installer/ | grep -E '\.exe$' | awk '{printf "- %s (%s)\n", $9, $5}' >> release_summary.md || echo "- No Windows installer found" >> release_summary.md
+            cd artifacts/windows-installer
+            for file in *.exe; do
+              if [ -f "$file" ]; then
+                SIZE=$(du -h "$file" | cut -f1)
+                echo "- $file ($SIZE)" >> ../../release_summary.md
+              fi
+            done
+            cd ../..
           fi
           echo "" >> release_summary.md
           echo "### macOS" >> release_summary.md
           if [ -d "artifacts/macos-installer" ]; then
-            ls -lh artifacts/macos-installer/ | grep -E '\.(dmg|zip)$' | awk '{printf "- %s (%s)\n", $9, $5}' >> release_summary.md || echo "- No macOS installer found" >> release_summary.md
+            cd artifacts/macos-installer
+            for file in *.dmg *.zip; do
+              if [ -f "$file" ]; then
+                SIZE=$(du -h "$file" | cut -f1)
+                echo "- $file ($SIZE)" >> ../../release_summary.md
+              fi
+            done
+            cd ../..
           fi
           echo "" >> release_summary.md
           echo "### Linux" >> release_summary.md
           if [ -d "artifacts/linux-installers" ]; then
-            ls -lh artifacts/linux-installers/ | grep -E '\.(AppImage|deb|rpm)$' | awk '{printf "- %s (%s)\n", $9, $5}' >> release_summary.md || echo "- No Linux installers found" >> release_summary.md
+            cd artifacts/linux-installers
+            for file in *.AppImage *.deb *.rpm; do
+              if [ -f "$file" ]; then
+                SIZE=$(du -h "$file" | cut -f1)
+                echo "- $file ($SIZE)" >> ../../release_summary.md
+              fi
+            done
+            cd ../..
           fi
           echo "" >> release_summary.md
           echo "## Installation Instructions" >> release_summary.md

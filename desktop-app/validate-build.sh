@@ -87,14 +87,18 @@ if [ -f "lotolink-logo.png" ]; then
         echo -e "${GREEN}✓${NC} Valid PNG icon file"
         
         # Check icon dimensions (should be at least 512x512 for best results)
-        DIMENSIONS=$(file lotolink-logo.png | grep -oP '\d+ x \d+' | head -1)
+        # Use portable grep approach for dimensions
+        DIMENSIONS=$(file lotolink-logo.png | sed -n 's/.*PNG image data, \([0-9]* x [0-9]*\).*/\1/p' | head -1)
         echo -e "  Dimensions: $DIMENSIONS"
         
-        WIDTH=$(echo $DIMENSIONS | cut -d' ' -f1)
-        if [ "$WIDTH" -ge 512 ]; then
+        WIDTH=$(echo "$DIMENSIONS" | cut -d' ' -f1)
+        if [ -n "$WIDTH" ] && [ "$WIDTH" -ge 512 ] 2>/dev/null; then
             echo -e "${GREEN}✓${NC} Icon size is adequate (>= 512px)"
-        else
+        elif [ -n "$WIDTH" ]; then
             echo -e "${YELLOW}⚠${NC} Icon size is small (< 512px), consider using larger icon"
+            WARNINGS=$((WARNINGS + 1))
+        else
+            echo -e "${YELLOW}⚠${NC} Could not determine icon dimensions"
             WARNINGS=$((WARNINGS + 1))
         fi
     else

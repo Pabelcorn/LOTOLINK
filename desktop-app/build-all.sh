@@ -157,23 +157,38 @@ if [ -d "dist" ]; then
     echo ""
     
     # Windows
-    if [ "$BUILD_WINDOWS" = true ] && ls dist/*.exe 2>/dev/null; then
+    if [ "$BUILD_WINDOWS" = true ] && ls dist/*.exe 2>/dev/null 1>&2; then
         echo -e "${BLUE}Windows:${NC}"
-        ls -lh dist/*.exe | awk '{printf "  %s (%s)\n", $9, $5}'
+        for file in dist/*.exe; do
+            if [ -f "$file" ]; then
+                SIZE=$(du -h "$file" | cut -f1)
+                echo -e "  $(basename "$file") ($SIZE)"
+            fi
+        done
         echo ""
     fi
     
     # macOS
-    if [ "$BUILD_MACOS" = true ] && (ls dist/*.dmg 2>/dev/null || ls dist/*.zip 2>/dev/null); then
+    if [ "$BUILD_MACOS" = true ] && (ls dist/*.dmg 2>/dev/null 1>&2 || ls dist/*.zip 2>/dev/null 1>&2); then
         echo -e "${BLUE}macOS:${NC}"
-        ls -lh dist/*.dmg dist/*.zip 2>/dev/null | awk '{printf "  %s (%s)\n", $9, $5}'
+        for file in dist/*.dmg dist/*.zip 2>/dev/null; do
+            if [ -f "$file" ]; then
+                SIZE=$(du -h "$file" | cut -f1)
+                echo -e "  $(basename "$file") ($SIZE)"
+            fi
+        done
         echo ""
     fi
     
     # Linux
-    if [ "$BUILD_LINUX" = true ] && (ls dist/*.AppImage 2>/dev/null || ls dist/*.deb 2>/dev/null || ls dist/*.rpm 2>/dev/null); then
+    if [ "$BUILD_LINUX" = true ] && (ls dist/*.AppImage 2>/dev/null 1>&2 || ls dist/*.deb 2>/dev/null 1>&2 || ls dist/*.rpm 2>/dev/null 1>&2); then
         echo -e "${BLUE}Linux:${NC}"
-        ls -lh dist/*.AppImage dist/*.deb dist/*.rpm 2>/dev/null | awk '{printf "  %s (%s)\n", $9, $5}'
+        for file in dist/*.AppImage dist/*.deb dist/*.rpm 2>/dev/null; do
+            if [ -f "$file" ]; then
+                SIZE=$(du -h "$file" | cut -f1)
+                echo -e "  $(basename "$file") ($SIZE)"
+            fi
+        done
         echo ""
     fi
     
