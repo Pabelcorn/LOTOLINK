@@ -250,8 +250,10 @@ LOTLINK/
 │   ├── preload.js              # Preload script (security)
 │   ├── index.html              # Application UI
 │   ├── package.json            # Desktop dependencies
-│   ├── build.sh                # Build script
-│   └── README.md               # Desktop app documentation
+│   ├── build.sh                # Build script (current platform)
+│   ├── build-all.sh            # Build script (all platforms)
+│   ├── README.md               # Desktop app documentation
+│   └── DISTRIBUTION.md         # Distribution and release guide
 ├── mock-banca/                 # Servicio mock para testing
 │   ├── index.js
 │   ├── Dockerfile
@@ -261,7 +263,8 @@ LOTLINK/
 ├── e2e/                        # Tests end-to-end
 ├── .github/
 │   └── workflows/
-│       └── ci-cd.yml           # GitHub Actions pipeline
+│       ├── ci-cd.yml           # GitHub Actions pipeline
+│       └── build-installers.yml # Desktop installer builds
 ├── index.html                  # 🌐 Web App (Single Page Application)
 ├── index (20) (3).html         # 🎨 Enhanced UI Template
 └── README.md                   # Este documento
@@ -295,7 +298,18 @@ npm run build          # Construir para la plataforma actual
 npm run build:all      # Construir para todas las plataformas
 ```
 
-Ver documentación completa en [`desktop-app/README.md`](desktop-app/README.md)
+**Construcción automatizada de instaladores:**
+Los instaladores se construyen automáticamente mediante GitHub Actions:
+- 🔄 Build automático en cada push a `main`
+- 📦 Generación de instaladores para Windows, macOS y Linux
+- 🚀 Publicación automática en GitHub Releases para versiones etiquetadas
+
+Para descargar los instaladores:
+1. Ve a la sección [Releases](https://github.com/Pabelcorn/LOTOLINK/releases)
+2. Descarga el instalador para tu plataforma
+3. Instala y ejecuta LotoLink
+
+Ver documentación completa en [`desktop-app/README.md`](desktop-app/README.md) y [`desktop-app/DISTRIBUTION.md`](desktop-app/DISTRIBUTION.md)
 
 ---
 
@@ -423,6 +437,8 @@ services:
 - [x] Dockerfiles para backend y mock-banca
 - [x] Tests unitarios básicos
 - [x] **App Web** - Single Page Application en `index.html`
+- [x] **Desktop App** - Aplicación de escritorio con Electron
+- [x] **Instaladores Desktop** - Build automatizado para Windows, macOS y Linux
 - [ ] Postgres connection string (secrets) - configurar en deployment
 - [ ] Shared secrets para bancas de prueba (mock) - configurar en .env
 - [ ] Certificados TLS (dev self-signed ok) - configurar en deployment

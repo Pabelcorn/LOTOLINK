@@ -103,6 +103,36 @@ npm run build:all
 
 **Note**: Building for macOS requires a Mac. Building for Windows from Mac/Linux requires Wine.
 
+### Automated Builds with GitHub Actions
+
+The repository includes automated CI/CD pipelines that build installers for all platforms:
+
+- **Trigger**: Automatically runs on push to `main` branch or when creating a version tag
+- **Platforms**: Windows, macOS, and Linux in parallel
+- **Output**: Installers are uploaded as GitHub Artifacts and attached to Releases
+
+#### Downloading Pre-built Installers
+
+1. Go to [GitHub Releases](https://github.com/Pabelcorn/LOTOLINK/releases)
+2. Download the installer for your platform:
+   - Windows: `LotoLink-Setup-{version}.exe`
+   - macOS: `LotoLink-{version}.dmg` or `LotoLink-{version}-mac.zip`
+   - Linux: `LotoLink-{version}.AppImage`, `.deb`, or `.rpm`
+3. Install and run
+
+#### Triggering a Manual Build
+
+You can manually trigger builds from GitHub Actions:
+1. Go to the **Actions** tab
+2. Select **Build Desktop Installers** workflow
+3. Click **Run workflow**
+4. Choose platform(s) to build (all, windows, macos, or linux)
+5. Wait for the build to complete
+6. Download artifacts from the workflow run
+
+For more details, see [DISTRIBUTION.md](DISTRIBUTION.md)
+
+
 ## 📦 Distribution Files
 
 After building, you'll find installers in the `dist/` directory:
