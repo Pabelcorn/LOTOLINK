@@ -53,8 +53,9 @@ jobs:
           path: |
             desktop-app/dist/*.exe
             desktop-app/dist/*.nsis.7z
-          retention-days: 30
+          retention-days: 7
           if-no-files-found: error
+        continue-on-error: true
 
       - name: Upload to Release (if tag)
         if: startsWith(github.ref, 'refs/tags/')
@@ -96,8 +97,9 @@ jobs:
           path: |
             desktop-app/dist/*.dmg
             desktop-app/dist/*.zip
-          retention-days: 30
+          retention-days: 7
           if-no-files-found: error
+        continue-on-error: true
 
       - name: Upload to Release (if tag)
         if: startsWith(github.ref, 'refs/tags/')
@@ -142,8 +144,9 @@ jobs:
             desktop-app/dist/*.AppImage
             desktop-app/dist/*.deb
             desktop-app/dist/*.rpm
-          retention-days: 30
+          retention-days: 7
           if-no-files-found: error
+        continue-on-error: true
 
       - name: Upload to Release (if tag)
         if: startsWith(github.ref, 'refs/tags/')
@@ -252,4 +255,5 @@ jobs:
         with:
           name: release-summary
           path: release_summary.md
-          retention-days: 90
+          retention-days: 7
+        continue-on-error: true
