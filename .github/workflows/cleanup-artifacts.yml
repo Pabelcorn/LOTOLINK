@@ -5,9 +5,18 @@ on:
     # Run every day at midnight UTC
     - cron: '0 0 * * *'
   workflow_dispatch:
+    inputs:
+      days_to_keep:
+        description: 'Number of days to keep artifacts (default: 7)'
+        required: false
+        default: '7'
+        type: string
 
 permissions:
   actions: write
+
+env:
+  DAYS_TO_KEEP: 7
 
 jobs:
   cleanup:
@@ -15,11 +24,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Clean up artifacts older than 7 days
+      - name: Clean up artifacts older than configured days
         uses: actions/github-script@v7
         with:
           script: |
-            const days_to_keep = 7;
+            const days_to_keep = parseInt('${{ github.event.inputs.days_to_keep || env.DAYS_TO_KEEP }}');
             const cutoff_date = new Date();
             cutoff_date.setDate(cutoff_date.getDate() - days_to_keep);
             
