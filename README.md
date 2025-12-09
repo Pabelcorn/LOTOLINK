@@ -245,6 +245,13 @@ LOTLINK/
 │   ├── test/                   # Tests unitarios e integración
 │   ├── Dockerfile
 │   └── package.json
+├── desktop-app/                # 💻 Desktop Application (Electron)
+│   ├── main.js                 # Electron main process
+│   ├── preload.js              # Preload script (security)
+│   ├── index.html              # Application UI
+│   ├── package.json            # Desktop dependencies
+│   ├── build.sh                # Build script
+│   └── README.md               # Desktop app documentation
 ├── mock-banca/                 # Servicio mock para testing
 │   ├── index.js
 │   ├── Dockerfile
@@ -256,6 +263,7 @@ LOTLINK/
 │   └── workflows/
 │       └── ci-cd.yml           # GitHub Actions pipeline
 ├── index.html                  # 🌐 Web App (Single Page Application)
+├── index (20) (3).html         # 🎨 Enhanced UI Template
 └── README.md                   # Este documento
 ```
 
@@ -264,6 +272,30 @@ LOTLINK/
 | Plataforma | Tecnología | Ubicación | Comando |
 |------------|------------|-----------|---------|
 | **Web** | HTML/CSS/JavaScript | `index.html` | Abrir directamente en navegador |
+| **Desktop** | Electron | `desktop-app/` | `cd desktop-app && npm start` |
+
+### Desktop Application
+
+La aplicación de escritorio está disponible para **Windows, macOS y Linux** con diseño profesional glass morphism y bordes redondeados.
+
+**Características principales:**
+- ✨ Diseño glass morphism profesional y elegante
+- 🎨 Bordes redondeados que se difuminan con la pantalla
+- 🖥️ Controles de ventana nativos por plataforma (macOS/Windows/Linux)
+- 🌓 Soporte completo de modo oscuro
+- 📱 Transición perfecta entre modo ventana y pantalla completa
+- ⚡ Alto rendimiento y experiencia nativa
+
+**Inicio rápido:**
+```bash
+cd desktop-app
+npm install
+npm start              # Ejecutar en modo desarrollo
+npm run build          # Construir para la plataforma actual
+npm run build:all      # Construir para todas las plataformas
+```
+
+Ver documentación completa en [`desktop-app/README.md`](desktop-app/README.md)
 
 ---
 
