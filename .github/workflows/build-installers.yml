@@ -34,14 +34,14 @@ jobs:
   build-android:
     name: Build Android APK
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.build_android != 'false' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_android != 'false' }}
     permissions:
       contents: write
-    
+
     defaults:
       run:
         working-directory: ./mobile
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -132,14 +132,14 @@ jobs:
   build-desktop-windows:
     name: Build Windows Installer
     runs-on: windows-latest
-    if: ${{ github.event.inputs.build_desktop != 'false' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_desktop != 'false' }}
     permissions:
       contents: write
-    
+
     defaults:
       run:
         working-directory: ./desktop
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -179,14 +179,14 @@ jobs:
   build-desktop-macos:
     name: Build macOS Installer
     runs-on: macos-latest
-    if: ${{ github.event.inputs.build_desktop != 'false' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_desktop != 'false' }}
     permissions:
       contents: write
-    
+
     defaults:
       run:
         working-directory: ./desktop
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -226,14 +226,14 @@ jobs:
   build-desktop-linux:
     name: Build Linux Installers
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.build_desktop != 'false' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_desktop != 'false' }}
     permissions:
       contents: write
-    
+
     defaults:
       run:
         working-directory: ./desktop
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -282,7 +282,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -305,49 +305,49 @@ jobs:
         with:
           body: |
             ## 📱 LotoLink ${{ github.ref_name }}
-            
+
             ### Instaladores Disponibles
-            
+
             #### Android
             - `app-release.apk` - APK para instalación directa en Android
-            
+
             #### Windows
             - `LotoLink-Setup-*.exe` - Instalador NSIS para Windows
-            
+
             #### macOS
             - `LotoLink-*.dmg` - Imagen de disco para macOS
-            
+
             #### Linux
             - `LotoLink-*.AppImage` - AppImage universal
             - `LotoLink-*.deb` - Paquete para Debian/Ubuntu
             - `LotoLink-*.rpm` - Paquete para Fedora/RHEL
-            
+
             ### Instalación
-            
+
             #### Android
             1. Descargar `app-release.apk`
             2. Habilitar "Instalar desde fuentes desconocidas" en Configuración
             3. Abrir el archivo APK e instalar
-            
+
             #### Windows
             1. Descargar `LotoLink-Setup-*.exe`
             2. Ejecutar el instalador
             3. Seguir las instrucciones de instalación
-            
+
             #### macOS
             1. Descargar `LotoLink-*.dmg`
             2. Abrir el archivo DMG
             3. Arrastrar LotoLink a la carpeta Aplicaciones
-            
+
             #### Linux
             ```bash
             # AppImage
             chmod +x LotoLink-*.AppImage
             ./LotoLink-*.AppImage
-            
+
             # Debian/Ubuntu
             sudo dpkg -i LotoLink-*.deb
-            
+
             # Fedora/RHEL
             sudo rpm -i LotoLink-*.rpm
             ```
