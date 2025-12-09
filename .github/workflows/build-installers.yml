@@ -34,7 +34,7 @@ jobs:
   build-android:
     name: Build Android APK
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.build_android != 'false' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_android != 'false' }}
     permissions:
       contents: write
     
@@ -132,7 +132,7 @@ jobs:
   build-desktop-windows:
     name: Build Windows Installer
     runs-on: windows-latest
-    if: ${{ github.event.inputs.build_desktop != 'false' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_desktop != 'false' }}
     permissions:
       contents: write
     
@@ -179,7 +179,7 @@ jobs:
   build-desktop-macos:
     name: Build macOS Installer
     runs-on: macos-latest
-    if: ${{ github.event.inputs.build_desktop != 'false' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_desktop != 'false' }}
     permissions:
       contents: write
     
@@ -226,7 +226,7 @@ jobs:
   build-desktop-linux:
     name: Build Linux Installers
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.build_desktop != 'false' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_desktop != 'false' }}
     permissions:
       contents: write
     
