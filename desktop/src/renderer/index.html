@@ -217,7 +217,6 @@
       border-bottom: 1px solid rgba(124, 58, 237, 0.08);
       position: relative;
       z-index: 1000;
-      display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 16px;
@@ -7355,10 +7354,12 @@
         // Initial check
         updateFullscreenState();
         
-        // Also listen for window state changes from Electron
-        if (window.electronAPI && window.electronAPI.onWindowStateChange) {
+        // Also listen for window state changes from Electron (if available)
+        // Note: Only true fullscreen should remove rounded corners, not maximized state
+        if (window.electronAPI && typeof window.electronAPI.onWindowStateChange === 'function') {
           window.electronAPI.onWindowStateChange((state) => {
-            if (state.isMaximized || state.isFullscreen) {
+            // Only add is-fullscreen class for true fullscreen, not maximized
+            if (state.isFullscreen) {
               document.documentElement.classList.add('is-fullscreen');
             } else {
               document.documentElement.classList.remove('is-fullscreen');
