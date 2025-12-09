@@ -22,7 +22,7 @@ jobs:
   cleanup:
     name: Clean up old artifacts
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Clean up artifacts older than configured days
         uses: actions/github-script@v7
@@ -31,25 +31,25 @@ jobs:
             const days_to_keep = parseInt('${{ github.event.inputs.days_to_keep || env.DAYS_TO_KEEP }}');
             const cutoff_date = new Date();
             cutoff_date.setDate(cutoff_date.getDate() - days_to_keep);
-            
+
             console.log(`Deleting artifacts older than ${cutoff_date.toISOString()}`);
-            
+
             // Get all artifacts
             const artifacts = await github.paginate(github.rest.actions.listArtifactsForRepo, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               per_page: 100
             });
-            
+
             let deleted_count = 0;
             let kept_count = 0;
-            
+
             for (const artifact of artifacts) {
               const created_at = new Date(artifact.created_at);
-              
+
               if (created_at < cutoff_date) {
                 console.log(`Deleting artifact: ${artifact.name} (ID: ${artifact.id}, Created: ${artifact.created_at})`);
-                
+
                 try {
                   await github.rest.actions.deleteArtifact({
                     owner: context.repo.owner,
@@ -64,7 +64,7 @@ jobs:
                 kept_count++;
               }
             }
-            
+
             console.log(`\nSummary:`);
             console.log(`- Deleted: ${deleted_count} artifacts`);
             console.log(`- Kept: ${kept_count} artifacts`);
