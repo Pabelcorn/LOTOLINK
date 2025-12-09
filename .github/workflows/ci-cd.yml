@@ -40,6 +40,10 @@ jobs:
         working-directory: ./backend
         continue-on-error: true
 
+      - name: Install mock-banca dependencies
+        run: npm ci
+        working-directory: ./mock-banca
+
       - name: Run npm audit (mock-banca)
         run: npm audit --audit-level=high
         working-directory: ./mock-banca
