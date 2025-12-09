@@ -6,6 +6,7 @@ package-lock.json
 dist/
 out/
 build/
+*.nsis.7z
 
 # Electron specific
 *.log
