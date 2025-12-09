@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen } = require('electron');
+const { app, BrowserWindow, screen, ipcMain } = require('electron');
 const path = require('path');
 
 let mainWindow;
@@ -44,19 +44,18 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     
-    // Apply OS-specific class for styling
+    // Apply OS-specific class for styling using predefined platform mappings
+    const platformClass = {
+      'darwin': 'os-macos',
+      'win32': 'os-windows',
+      'linux': 'os-linux'
+    }[process.platform] || 'os-unknown';
+    
     mainWindow.webContents.executeJavaScript(`
       document.documentElement.classList.add('electron-app');
+      document.documentElement.classList.add('${platformClass}');
       document.documentElement.classList.add('os-${process.platform}');
-      
-      // Add platform-specific class to body
-      if ('${isMac}' === 'true') {
-        document.body.classList.add('os-macos');
-      } else if ('${isWindows}' === 'true') {
-        document.body.classList.add('os-windows');
-      } else if ('${isLinux}' === 'true') {
-        document.body.classList.add('os-linux');
-      }
+      document.body.classList.add('${platformClass}');
     `);
   });
 
@@ -115,8 +114,6 @@ app.on('window-all-closed', () => {
 });
 
 // Handle IPC messages from renderer process
-const { ipcMain } = require('electron');
-
 ipcMain.on('window-minimize', () => {
   if (mainWindow) mainWindow.minimize();
 });
