@@ -33,6 +33,23 @@ export class BancaEntity {
   @Column('boolean', { name: 'is_active', default: true })
   isActive!: boolean;
 
+  @Column('varchar', { nullable: true })
+  rnc?: string;
+
+  @Column('text', { nullable: true })
+  address?: string;
+
+  @Column('varchar', { nullable: true })
+  phone?: string;
+
+  @Column('varchar', { nullable: true })
+  @Index()
+  email?: string;
+
+  @Column('varchar', { default: 'pending' })
+  @Index()
+  status!: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

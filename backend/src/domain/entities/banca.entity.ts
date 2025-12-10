@@ -13,6 +13,14 @@ export enum AuthType {
   NONE = 'none',
 }
 
+export enum BancaStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  ACTIVE = 'active',
+  SUSPENDED = 'suspended',
+}
+
 export interface BancaProps {
   id?: string;
   name: string;
@@ -24,6 +32,11 @@ export interface BancaProps {
   publicKey?: string;
   slaMs?: number;
   isActive?: boolean;
+  rnc?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  status?: BancaStatus;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -39,6 +52,11 @@ export class Banca {
   private _publicKey?: string;
   private _slaMs: number;
   private _isActive: boolean;
+  private _rnc?: string;
+  private _address?: string;
+  private _phone?: string;
+  private _email?: string;
+  private _status: BancaStatus;
   readonly createdAt: Date;
   private _updatedAt: Date;
 
@@ -53,6 +71,11 @@ export class Banca {
     this._publicKey = props.publicKey;
     this._slaMs = props.slaMs || 5000;
     this._isActive = props.isActive !== undefined ? props.isActive : true;
+    this._rnc = props.rnc;
+    this._address = props.address;
+    this._phone = props.phone;
+    this._email = props.email;
+    this._status = props.status || BancaStatus.PENDING;
     this.createdAt = props.createdAt || new Date();
     this._updatedAt = props.updatedAt || new Date();
   }
@@ -85,9 +108,62 @@ export class Banca {
     return this._updatedAt;
   }
 
+  get rnc(): string | undefined {
+    return this._rnc;
+  }
+
+  get address(): string | undefined {
+    return this._address;
+  }
+
+  get phone(): string | undefined {
+    return this._phone;
+  }
+
+  get email(): string | undefined {
+    return this._email;
+  }
+
+  get status(): BancaStatus {
+    return this._status;
+  }
+
   updateEndpoint(endpoint: string): void {
     this._endpoint = endpoint;
     this._updatedAt = new Date();
+  }
+
+  updateContactInfo(rnc?: string, address?: string, phone?: string, email?: string): void {
+    if (rnc) this._rnc = rnc;
+    if (address) this._address = address;
+    if (phone) this._phone = phone;
+    if (email) this._email = email;
+    this._updatedAt = new Date();
+  }
+
+  approve(): void {
+    this._status = BancaStatus.APPROVED;
+    this._updatedAt = new Date();
+  }
+
+  reject(): void {
+    this._status = BancaStatus.REJECTED;
+    this._isActive = false;
+    this._updatedAt = new Date();
+  }
+
+  suspend(): void {
+    this._status = BancaStatus.SUSPENDED;
+    this._isActive = false;
+    this._updatedAt = new Date();
+  }
+
+  activateAfterApproval(): void {
+    if (this._status === BancaStatus.APPROVED) {
+      this._status = BancaStatus.ACTIVE;
+      this._isActive = true;
+      this._updatedAt = new Date();
+    }
   }
 
   updateCredentials(clientId?: string, secret?: string, publicKey?: string): void {
@@ -116,6 +192,11 @@ export class Banca {
       authType: this.authType,
       slaMs: this._slaMs,
       isActive: this._isActive,
+      rnc: this._rnc,
+      address: this._address,
+      phone: this._phone,
+      email: this._email,
+      status: this._status,
       createdAt: this.createdAt,
       updatedAt: this._updatedAt,
     };
