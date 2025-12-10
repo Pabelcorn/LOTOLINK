@@ -46,6 +46,8 @@ logs/
 npm-debug.log*
 backend.log
 adminpanel.log
+backend_*.log
+adminpanel_*.log
 
 # Coverage
 coverage/

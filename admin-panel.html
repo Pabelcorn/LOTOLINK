@@ -646,13 +646,16 @@
         // Cambia esta URL si tu backend está en otro puerto o servidor
         const API_BASE_URL = 'http://localhost:3000/admin/bancas';
         
+        // Extraer la URL base para el health check
+        const API_BASE = API_BASE_URL.replace('/admin/bancas', '');
+        
         // ============================================
         // CHECK CONNECTION STATUS
         // ============================================
         async function checkConnection() {
             const statusEl = document.getElementById('connection-status');
             try {
-                const response = await fetch('http://localhost:3000/health', {
+                const response = await fetch(`${API_BASE}/health`, {
                     method: 'GET',
                     cache: 'no-cache'
                 });
@@ -674,7 +677,7 @@
                 if (container) {
                     container.innerHTML = `
                         <div class="alert alert-error">
-                            ❌ <strong>Error de conexión:</strong> No se puede conectar al backend en ${API_BASE_URL}<br><br>
+                            ❌ <strong>Error de conexión:</strong> No se puede conectar al backend en ${API_BASE}<br><br>
                             <strong>Solución:</strong><br>
                             1. Verifica que el backend esté ejecutándose: <code>cd backend && npm run start:dev</code><br>
                             2. O ejecuta el script de inicio: <code>npm start</code><br>

@@ -3,6 +3,10 @@
 ## Opción 1: Inicio Automático (Recomendado)
 
 ```bash
+# Si es la primera vez, dale permisos de ejecución a los scripts
+chmod +x scripts/*.sh
+
+# Inicia el sistema
 npm start
 ```
 

@@ -57,15 +57,21 @@ else
     rm .lotolink.pids
 fi
 
-# Clean up log files (optional)
+# Archive log files instead of deleting (keeps last 5 logs)
 if [ -f "backend.log" ]; then
-    rm backend.log
-    echo -e "${GREEN}✅ Log del backend eliminado${NC}"
+    timestamp=$(date +%Y%m%d_%H%M%S)
+    mv backend.log "backend_${timestamp}.log" 2>/dev/null || true
+    # Keep only last 5 logs
+    ls -t backend_*.log 2>/dev/null | tail -n +6 | xargs rm -f 2>/dev/null || true
+    echo -e "${GREEN}✅ Log del backend archivado${NC}"
 fi
 
 if [ -f "adminpanel.log" ]; then
-    rm adminpanel.log
-    echo -e "${GREEN}✅ Log del panel eliminado${NC}"
+    timestamp=$(date +%Y%m%d_%H%M%S)
+    mv adminpanel.log "adminpanel_${timestamp}.log" 2>/dev/null || true
+    # Keep only last 5 logs
+    ls -t adminpanel_*.log 2>/dev/null | tail -n +6 | xargs rm -f 2>/dev/null || true
+    echo -e "${GREEN}✅ Log del panel archivado${NC}"
 fi
 
 echo ""
