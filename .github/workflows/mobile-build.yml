@@ -61,7 +61,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: mobile-app
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Build web assets
         working-directory: mobile-app
@@ -134,7 +134,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: mobile-app
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Build web assets
         working-directory: mobile-app
