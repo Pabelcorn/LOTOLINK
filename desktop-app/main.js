@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, ipcMain } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, dialog } = require('electron');
 const path = require('path');
 
 let mainWindow;
@@ -48,7 +48,6 @@ function createWindow() {
   mainWindow.loadFile(htmlPath).catch(err => {
     console.error('Failed to load index.html:', err);
     // Show error dialog if loading fails
-    const { dialog } = require('electron');
     dialog.showErrorBox(
       'Error Loading Application',
       'Failed to load the application interface. Please reinstall the application.\n\nError: ' + err.message
@@ -80,7 +79,6 @@ function createWindow() {
   // Handle page load failures
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
     console.error('Page failed to load:', errorCode, errorDescription);
-    const { dialog } = require('electron');
     dialog.showErrorBox(
       'Page Load Error',
       'Failed to load the application page.\n\nError: ' + errorDescription
@@ -138,7 +136,6 @@ app.whenReady().then(() => {
   });
 }).catch(err => {
   console.error('Error during app initialization:', err);
-  const { dialog } = require('electron');
   dialog.showErrorBox(
     'Startup Error',
     'The application failed to start. Please try reinstalling.\n\nError: ' + err.message
