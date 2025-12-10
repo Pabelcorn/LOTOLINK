@@ -10,10 +10,11 @@ import {
   WebhooksController,
   HealthController,
   AuthController,
+  AdminBancasController,
 } from './infrastructure/http/controllers';
 
 // Services
-import { PlayService, UserService, WebhookService } from './application/services';
+import { PlayService, UserService, WebhookService, BancaService } from './application/services';
 
 // Database entities
 import {
@@ -28,10 +29,11 @@ import {
 import {
   TypeOrmPlayRepository,
   TypeOrmUserRepository,
+  TypeOrmBancaRepository,
 } from './infrastructure/database/repositories';
 
 // Domain repository tokens
-import { PLAY_REPOSITORY, USER_REPOSITORY } from './domain/repositories';
+import { PLAY_REPOSITORY, USER_REPOSITORY, BANCA_REPOSITORY } from './domain/repositories';
 
 // Port tokens
 import { EVENT_PUBLISHER, CACHE_PORT, BANCA_ADAPTER } from './ports/outgoing';
@@ -112,12 +114,13 @@ class MockCachePort {
       inject: [ConfigService],
     }),
   ],
-  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController],
+  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController],
   providers: [
     // Services
     PlayService,
     UserService,
     WebhookService,
+    BancaService,
     
     // Workers
     PlayWorker,
@@ -134,6 +137,10 @@ class MockCachePort {
     {
       provide: USER_REPOSITORY,
       useClass: TypeOrmUserRepository,
+    },
+    {
+      provide: BANCA_REPOSITORY,
+      useClass: TypeOrmBancaRepository,
     },
     
     // Banca Adapter - uses mock by default, switch to ApiBancaAdapter for production
