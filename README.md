@@ -6,6 +6,8 @@ Documento listo para enviar a una IA de programación o a tu equipo de desarroll
 
 > 🏦 **Guía de Integración para Bancas:** Para integrar bancas con Lotolink (API directa o App White-Label), consulte [docs/BANCA_INTEGRATION_GUIDE.md](docs/BANCA_INTEGRATION_GUIDE.md)
 
+> 👨‍💼 **Panel de Administración de Bancas:** Para gestionar el registro y aprobación de bancas, consulte [docs/ADMIN_PANEL_GUIDE.md](docs/ADMIN_PANEL_GUIDE.md)
+
 > 💻 **Ejemplos de Código:** Ejemplos de integración en Node.js, PHP y Java disponibles en [docs/integration-examples/](docs/integration-examples/)
 
 > 🧪 **Guía de Pruebas:** Para probar que el sistema funciona correctamente, consulte [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md)
@@ -26,6 +28,33 @@ El paquete incluye:
 - Ejemplos de código en Node.js, PHP y Java
 
 Ver documentación completa en [`docs/BANCA_INTEGRATION_GUIDE_FULL.md`](docs/BANCA_INTEGRATION_GUIDE_FULL.md)
+
+---
+
+## 🏦 Panel de Administración de Bancas
+
+LotoLink incluye un panel de administración web para gestionar el registro y aprobación de bancas, reemplazando el proceso manual anterior.
+
+### Características
+
+- ✅ **Registro centralizado**: Formulario web para capturar información de nuevas bancas
+- 🔐 **Generación automática de credenciales**: Client ID, Client Secret y HMAC Secret
+- 📊 **Dashboard completo**: Visualización de todas las bancas y sus estados
+- ⚡ **Flujo de aprobación**: Aprobar o rechazar solicitudes con un clic
+- 🛡️ **Gestión de estados**: Suspender, activar o desactivar bancas
+- 📈 **Estadísticas en tiempo real**: Total, pendientes, activas, suspendidas
+
+### Acceso Rápido
+
+```bash
+# Abrir el panel de administración
+# Asegúrate de que el backend esté ejecutándose primero
+open admin-panel.html  # macOS
+start admin-panel.html # Windows
+xdg-open admin-panel.html # Linux
+```
+
+**Ver guía completa**: [docs/ADMIN_PANEL_GUIDE.md](docs/ADMIN_PANEL_GUIDE.md)
 
 ---
 
