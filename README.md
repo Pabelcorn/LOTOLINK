@@ -35,7 +35,25 @@ Ver documentación completa en [`docs/BANCA_INTEGRATION_GUIDE_FULL.md`](docs/BAN
 
 LotoLink incluye un panel de administración web para gestionar el registro y aprobación de bancas, reemplazando el proceso manual anterior.
 
-### Características
+### 🚀 Acceso Rápido - 3 Pasos
+
+**1. Iniciar el sistema completo:**
+
+```bash
+npm start
+```
+
+Este comando automáticamente:
+- ✅ Instala dependencias si es necesario
+- ✅ Inicia el backend en http://localhost:3000
+- ✅ Inicia el panel en http://localhost:8080/admin-panel.html
+- ✅ Abre el navegador automáticamente
+
+**2. ¡Ya puedes usar el panel!** 🎉
+
+Si prefieres inicio manual, consulta: [QUICK_START.md](QUICK_START.md)
+
+### Características del Panel
 
 - ✅ **Registro centralizado**: Formulario web para capturar información de nuevas bancas
 - 🔐 **Generación automática de credenciales**: Client ID, Client Secret y HMAC Secret
@@ -43,16 +61,13 @@ LotoLink incluye un panel de administración web para gestionar el registro y ap
 - ⚡ **Flujo de aprobación**: Aprobar o rechazar solicitudes con un clic
 - 🛡️ **Gestión de estados**: Suspender, activar o desactivar bancas
 - 📈 **Estadísticas en tiempo real**: Total, pendientes, activas, suspendidas
+- 🔄 **Indicador de conexión**: Verifica el estado del backend en tiempo real
 
-### Acceso Rápido
+### Documentación Completa
 
-```bash
-# Abrir el panel de administración
-# Asegúrate de que el backend esté ejecutándose primero
-open admin-panel.html  # macOS
-start admin-panel.html # Windows
-xdg-open admin-panel.html # Linux
-```
+- 📖 [Guía de Inicio Rápido](QUICK_START.md) - Configuración en 5 minutos
+- 📚 [Guía Completa de Acceso](docs/ADMIN_PANEL_ACCESS.md) - Documentación detallada
+- 🔧 [Solución de Problemas](docs/ADMIN_PANEL_ACCESS.md#-solución-de-problemas) - Errores comunes
 
 **Ver guía completa**: [docs/ADMIN_PANEL_GUIDE.md](docs/ADMIN_PANEL_GUIDE.md)
 
