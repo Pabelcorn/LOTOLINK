@@ -47,10 +47,19 @@ function createWindow() {
   
   mainWindow.loadFile(htmlPath).catch(err => {
     console.error('Failed to load index.html:', err);
-    // Show error dialog if loading fails
+    // Show user-friendly error dialog with basic troubleshooting info
+    // Detailed errors are logged to console for debugging
     dialog.showErrorBox(
       'Error Loading Application',
-      'Failed to load the application interface. Please reinstall the application.\n\nError: ' + err.message
+      'The application failed to start. This may be due to:\n\n' +
+      '• Incomplete installation\n' +
+      '• Corrupted download\n' +
+      '• Antivirus blocking the app\n\n' +
+      'Please try:\n' +
+      '1. Reinstalling the application\n' +
+      '2. Running as administrator (Windows)\n' +
+      '3. Checking antivirus settings\n\n' +
+      'If the problem persists, please contact support with the error details from the console.'
     );
   });
 
@@ -79,9 +88,15 @@ function createWindow() {
   // Handle page load failures
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
     console.error('Page failed to load:', errorCode, errorDescription);
+    // Show user-friendly error without exposing internal details
     dialog.showErrorBox(
       'Page Load Error',
-      'Failed to load the application page.\n\nError: ' + errorDescription
+      'The application interface failed to load.\n\n' +
+      'This could be caused by:\n' +
+      '• Network connectivity issues\n' +
+      '• File system permissions\n' +
+      '• Antivirus software\n\n' +
+      'Please try restarting the application or reinstalling.'
     );
   });
 
@@ -136,9 +151,16 @@ app.whenReady().then(() => {
   });
 }).catch(err => {
   console.error('Error during app initialization:', err);
+  // Show user-friendly startup error without exposing internal state
   dialog.showErrorBox(
     'Startup Error',
-    'The application failed to start. Please try reinstalling.\n\nError: ' + err.message
+    'The application failed to initialize.\n\n' +
+    'Possible solutions:\n' +
+    '• Restart your computer\n' +
+    '• Reinstall the application\n' +
+    '• Check system requirements\n' +
+    '• Disable conflicting software\n\n' +
+    'Technical details have been logged to the console.'
   );
   app.quit();
 });
