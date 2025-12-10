@@ -149,6 +149,10 @@ jobs:
             npx cap add ios
           fi
 
+      - name: Sync Capacitor iOS
+        working-directory: mobile-app
+        run: npx cap sync ios
+
       - name: Configure iOS deployment target
         working-directory: mobile-app
         run: |
@@ -156,18 +160,20 @@ jobs:
           if [ -f "ios/App/Podfile" ]; then
             # Check if platform is already set
             if ! grep -q "platform :ios" ios/App/Podfile; then
-              # Add platform line at the beginning of the file
-              echo "platform :ios, '13.0'" | cat - ios/App/Podfile > ios/App/Podfile.tmp
+              # Add platform line at the beginning of the file after any initial comments
+              awk 'BEGIN {added=0} 
+                   /^[^#]/ && added==0 {print "platform :ios, '\''13.0'\''"; added=1} 
+                   {print}' ios/App/Podfile > ios/App/Podfile.tmp
               mv ios/App/Podfile.tmp ios/App/Podfile
             else
               # Update existing platform line to ensure minimum 13.0
-              sed -i '' "s/platform :ios, '[0-9.]*'/platform :ios, '13.0'/" ios/App/Podfile
+              if [[ "$OSTYPE" == "darwin"* ]]; then
+                sed -i '' "s/platform :ios, '[0-9.]*'/platform :ios, '13.0'/" ios/App/Podfile
+              else
+                sed -i "s/platform :ios, '[0-9.]*'/platform :ios, '13.0'/" ios/App/Podfile
+              fi
             fi
           fi
-
-      - name: Sync Capacitor iOS
-        working-directory: mobile-app
-        run: npx cap sync ios
 
       - name: Install CocoaPods dependencies
         working-directory: mobile-app/ios/App
