@@ -156,6 +156,7 @@ export const truncate = (str: string, maxLength: number, suffix: string = '...')
 
 /**
  * Get relative time (e.g., "hace 5 minutos")
+ * Falls back to formatted date for times older than 7 days
  */
 export const getRelativeTime = (date: string | Date): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
