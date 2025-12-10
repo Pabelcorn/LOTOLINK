@@ -1,0 +1,329 @@
+name: Build Mobile Installers
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'mobile-v*'
+    paths:
+      - 'mobile-app/**'
+      - '.github/workflows/mobile-build.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'mobile-app/**'
+      - '.github/workflows/mobile-build.yml'
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: 'Platforms to build (all, android, ios)'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - android
+          - ios
+
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: '18'
+  JAVA_VERSION: '17'
+
+jobs:
+  build-android:
+    name: Build Android App
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && (github.event.inputs.platforms == 'all' || github.event.inputs.platforms == 'android') ||
+      github.event_name != 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: mobile-app/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Install dependencies
+        working-directory: mobile-app
+        run: npm ci
+
+      - name: Build web assets
+        working-directory: mobile-app
+        run: npm run build
+
+      - name: Sync Capacitor Android
+        working-directory: mobile-app
+        run: npx cap sync android
+
+      - name: Grant execute permission for gradlew
+        working-directory: mobile-app/android
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        working-directory: mobile-app/android
+        run: ./gradlew assembleDebug
+
+      - name: Build Release AAB (unsigned)
+        working-directory: mobile-app/android
+        run: ./gradlew bundleRelease
+        continue-on-error: true
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apk
+          path: mobile-app/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Upload Release AAB (if built)
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-aab
+          path: mobile-app/android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 7
+          if-no-files-found: ignore
+        continue-on-error: true
+
+      - name: Upload to Release (if tag)
+        if: startsWith(github.ref, 'refs/tags/mobile-v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            mobile-app/android/app/build/outputs/apk/debug/app-debug.apk
+            mobile-app/android/app/build/outputs/bundle/release/app-release.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  build-ios:
+    name: Build iOS App
+    runs-on: macos-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && (github.event.inputs.platforms == 'all' || github.event.inputs.platforms == 'ios') ||
+      github.event_name != 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: mobile-app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: mobile-app
+        run: npm ci
+
+      - name: Build web assets
+        working-directory: mobile-app
+        run: npm run build
+
+      - name: Add iOS platform if not exists
+        working-directory: mobile-app
+        run: |
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          fi
+
+      - name: Sync Capacitor iOS
+        working-directory: mobile-app
+        run: npx cap sync ios
+
+      - name: Install CocoaPods dependencies
+        working-directory: mobile-app/ios/App
+        run: pod install
+
+      - name: Build iOS app (Debug)
+        working-directory: mobile-app/ios/App
+        run: |
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+        continue-on-error: true
+
+      - name: Create IPA archive info
+        working-directory: mobile-app
+        run: |
+          echo "# iOS Build Information" > ios-build-info.txt
+          echo "" >> ios-build-info.txt
+          echo "Build completed at: $(date)" >> ios-build-info.txt
+          echo "Commit: ${{ github.sha }}" >> ios-build-info.txt
+          echo "" >> ios-build-info.txt
+          echo "## Note" >> ios-build-info.txt
+          echo "iOS builds require code signing with Apple Developer certificates." >> ios-build-info.txt
+          echo "For production builds:" >> ios-build-info.txt
+          echo "1. Open the project in Xcode on a Mac" >> ios-build-info.txt
+          echo "2. Configure signing with your Apple Developer account" >> ios-build-info.txt
+          echo "3. Archive the app (Product > Archive)" >> ios-build-info.txt
+          echo "4. Upload to App Store Connect or export IPA" >> ios-build-info.txt
+          echo "" >> ios-build-info.txt
+          echo "Refer to mobile-app/BUILD_GUIDE.md for detailed instructions." >> ios-build-info.txt
+
+      - name: Upload iOS build info
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-info
+          path: mobile-app/ios-build-info.txt
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Upload iOS app bundle (if available)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app-bundle
+          path: mobile-app/ios/App/build/Build/Products/Debug-iphonesimulator/*.app
+          retention-days: 7
+          if-no-files-found: ignore
+        continue-on-error: true
+
+  create-mobile-release-summary:
+    name: Create Mobile Release Summary
+    runs-on: ubuntu-latest
+    needs: [build-android, build-ios]
+    if: startsWith(github.ref, 'refs/tags/mobile-v')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate release summary
+        run: |
+          echo "# LotoLink Mobile Application Release" > mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "## Release Information" >> mobile_release_summary.md
+          echo "- **Version:** ${GITHUB_REF#refs/tags/mobile-v}" >> mobile_release_summary.md
+          echo "- **Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')" >> mobile_release_summary.md
+          echo "- **Commit:** ${{ github.sha }}" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "## Available Builds" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          
+          echo "### Android" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          if [ -d "artifacts/android-debug-apk" ]; then
+            echo "**Debug APK (for testing):**" >> mobile_release_summary.md
+            cd artifacts/android-debug-apk
+            for file in *.apk; do
+              if [ -f "$file" ]; then
+                SIZE=$(du -h "$file" | cut -f1)
+                echo "- \`$file\` ($SIZE)" >> ../../mobile_release_summary.md
+              fi
+            done
+            cd ../..
+          fi
+          
+          if [ -d "artifacts/android-release-aab" ]; then
+            echo "" >> mobile_release_summary.md
+            echo "**Release AAB (for Google Play):**" >> mobile_release_summary.md
+            cd artifacts/android-release-aab
+            for file in *.aab; do
+              if [ -f "$file" ]; then
+                SIZE=$(du -h "$file" | cut -f1)
+                echo "- \`$file\` ($SIZE)" >> ../../mobile_release_summary.md
+              fi
+            done
+            cd ../..
+          fi
+          
+          echo "" >> mobile_release_summary.md
+          echo "### iOS" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "iOS builds require Apple Developer certificates for code signing." >> mobile_release_summary.md
+          echo "The workflow has prepared the iOS project. To create a distributable IPA:" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "1. Clone the repository and checkout this tag" >> mobile_release_summary.md
+          echo "2. Follow the iOS build instructions in \`mobile-app/BUILD_GUIDE.md\`" >> mobile_release_summary.md
+          echo "3. Use Xcode to archive and export the IPA" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          
+          echo "## Installation Instructions" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "### Android" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "**Debug APK (Testing):**" >> mobile_release_summary.md
+          echo "1. Download the \`app-debug.apk\` file" >> mobile_release_summary.md
+          echo "2. Enable \"Install from Unknown Sources\" on your Android device" >> mobile_release_summary.md
+          echo "3. Transfer the APK to your device and install" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "**Release AAB (Production):**" >> mobile_release_summary.md
+          echo "1. Sign the AAB with your release keystore" >> mobile_release_summary.md
+          echo "2. Upload to Google Play Console" >> mobile_release_summary.md
+          echo "3. Follow Google Play's submission process" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          
+          echo "### iOS" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "1. Build and archive the app in Xcode (macOS required)" >> mobile_release_summary.md
+          echo "2. Upload to App Store Connect" >> mobile_release_summary.md
+          echo "3. Submit for App Store review" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          
+          echo "## Requirements" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "### Android" >> mobile_release_summary.md
+          echo "- Minimum SDK: API 22 (Android 5.1)" >> mobile_release_summary.md
+          echo "- Target SDK: API 33 (Android 13)" >> mobile_release_summary.md
+          echo "- Architecture: ARM, ARM64, x86, x86_64" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "### iOS" >> mobile_release_summary.md
+          echo "- Minimum version: iOS 13.0+" >> mobile_release_summary.md
+          echo "- Devices: iPhone, iPad" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          
+          echo "## Documentation" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "- [Build Guide](mobile-app/BUILD_GUIDE.md)" >> mobile_release_summary.md
+          echo "- [Deployment Guide](mobile-app/DEPLOYMENT_GUIDE.md)" >> mobile_release_summary.md
+          echo "- [Quick Start](mobile-app/QUICKSTART.md)" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          
+          echo "---" >> mobile_release_summary.md
+          echo "" >> mobile_release_summary.md
+          echo "For support and issues, please visit the repository." >> mobile_release_summary.md
+          
+          cat mobile_release_summary.md
+
+      - name: Upload release summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-release-summary
+          path: mobile_release_summary.md
+          retention-days: 30
+
+      - name: Add summary to release
+        if: startsWith(github.ref, 'refs/tags/mobile-v')
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: mobile_release_summary.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
