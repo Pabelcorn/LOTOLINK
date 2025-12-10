@@ -166,12 +166,9 @@ jobs:
                    {print}' ios/App/Podfile > ios/App/Podfile.tmp
               mv ios/App/Podfile.tmp ios/App/Podfile
             else
-              # Update existing platform line to ensure minimum 13.0
-              if [[ "$OSTYPE" == "darwin"* ]]; then
-                sed -i '' "s/platform :ios, '[0-9.]*'/platform :ios, '13.0'/" ios/App/Podfile
-              else
-                sed -i "s/platform :ios, '[0-9.]*'/platform :ios, '13.0'/" ios/App/Podfile
-              fi
+              # Update existing platform line to ensure minimum 13.0 (portable across macOS and Linux)
+              sed -i.bak "s/platform :ios, '[0-9.]*'/platform :ios, '13.0'/" ios/App/Podfile
+              rm -f ios/App/Podfile.bak
             fi
           fi
 
