@@ -61,7 +61,8 @@ jobs:
 
       - name: Install dependencies
         working-directory: mobile-app
-        run: npm ci
+        # Using --legacy-peer-deps due to @capacitor-firebase/messaging peer dependency conflict with @capacitor/core
+        run: npm ci --legacy-peer-deps
 
       - name: Build web assets
         working-directory: mobile-app
@@ -134,7 +135,8 @@ jobs:
 
       - name: Install dependencies
         working-directory: mobile-app
-        run: npm ci
+        # Using --legacy-peer-deps due to @capacitor-firebase/messaging peer dependency conflict with @capacitor/core
+        run: npm ci --legacy-peer-deps
 
       - name: Build web assets
         working-directory: mobile-app
