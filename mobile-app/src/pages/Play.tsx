@@ -13,7 +13,7 @@ import {
   IonButtons,
   IonToast
 } from '@ionic/react';
-import { shuffle, cart, informationCircle } from 'ionicons/icons';
+import { shuffle, cart } from 'ionicons/icons';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -36,7 +36,7 @@ const Play: React.FC = () => {
   const { lotteryId = 'leidsa' } = useParams<{ lotteryId: string }>();
   const [selectedGameType, setSelectedGameType] = useState<GameType | null>(null);
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
-  const [amount, setAmount] = useState(10);
+  const [amount] = useState(10);
   const [showToast, setShowToast] = useState(false);
 
   const toggleNumber = (num: number) => {
