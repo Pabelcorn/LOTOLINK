@@ -287,6 +287,7 @@ describe('BancaService', () => {
       const result = await service.activateBanca(bancaId);
 
       expect(result.isActive).toBe(true);
+      expect(result.status).toBe(BancaStatus.ACTIVE);
     });
   });
 });

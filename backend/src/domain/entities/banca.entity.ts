@@ -175,6 +175,7 @@ export class Banca {
 
   activate(): void {
     this._isActive = true;
+    this._status = BancaStatus.ACTIVE;
     this._updatedAt = new Date();
   }
 
