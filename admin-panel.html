@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LotoLink - Panel de Administración</title>
+    <!-- 
+        CONFIGURACIÓN:
+        Para cambiar la URL del backend, edita la variable API_BASE_URL en la sección <script> al final de este archivo.
+        Por defecto usa: http://localhost:3000/admin/bancas
+        
+        IMPORTANTE: Asegúrate de que el backend esté ejecutándose antes de usar este panel.
+        Para iniciar el backend: cd backend && npm run start:dev
+    -->
     <style>
         * {
             margin: 0;
@@ -305,6 +313,31 @@
             font-size: 12px;
             background: white;
         }
+        
+        /* Connection Status Indicator */
+        .connection-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .connection-status.checking {
+            background: #fff3cd;
+            color: #856404;
+        }
 
         .modal {
             display: none;
@@ -425,7 +458,9 @@
     <div class="container">
         <div class="header">
             <h1>🏦 Panel de Administración de Bancas</h1>
-            <p>Gestiona y aprueba el registro de bancas en LotoLink</p>
+            <p>Gestiona y aprueba el registro de bancas en LotoLink
+                <span id="connection-status" class="connection-status checking">⏳ Verificando conexión...</span>
+            </p>
         </div>
 
         <div class="tabs">
@@ -605,7 +640,52 @@
     </div>
 
     <script>
+        // ============================================
+        // CONFIGURACIÓN DEL BACKEND
+        // ============================================
+        // Cambia esta URL si tu backend está en otro puerto o servidor
         const API_BASE_URL = 'http://localhost:3000/admin/bancas';
+        
+        // ============================================
+        // CHECK CONNECTION STATUS
+        // ============================================
+        async function checkConnection() {
+            const statusEl = document.getElementById('connection-status');
+            try {
+                const response = await fetch('http://localhost:3000/health', {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+                
+                if (response.ok) {
+                    statusEl.textContent = '✅ Conectado';
+                    statusEl.className = 'connection-status connected';
+                    return true;
+                } else {
+                    throw new Error('Backend no responde');
+                }
+            } catch (error) {
+                statusEl.textContent = '❌ Sin conexión al backend';
+                statusEl.className = 'connection-status disconnected';
+                console.error('Error de conexión:', error);
+                
+                // Show alert with instructions
+                const container = document.getElementById('register-alert');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="alert alert-error">
+                            ❌ <strong>Error de conexión:</strong> No se puede conectar al backend en ${API_BASE_URL}<br><br>
+                            <strong>Solución:</strong><br>
+                            1. Verifica que el backend esté ejecutándose: <code>cd backend && npm run start:dev</code><br>
+                            2. O ejecuta el script de inicio: <code>npm start</code><br>
+                            3. Verifica que el backend esté en el puerto correcto (3000 por defecto)<br>
+                            4. Revisa la configuración CORS en el backend
+                        </div>
+                    `;
+                }
+                return false;
+            }
+        }
 
         // Tab switching
         function switchTab(tabName) {
@@ -871,9 +951,16 @@
             });
         }
 
-        // Auto-load pending bancas on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            // Initial load can be triggered here if needed
+        // Auto-load on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 LOTOLINK Admin Panel iniciado');
+            console.log('🔗 API Backend:', API_BASE_URL);
+            
+            // Check connection
+            await checkConnection();
+            
+            // Check periodically (every 30 seconds)
+            setInterval(checkConnection, 30000);
         });
     </script>
 </body>
