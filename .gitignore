@@ -44,6 +44,8 @@ Thumbs.db
 logs/
 *.log
 npm-debug.log*
+backend.log
+adminpanel.log
 
 # Coverage
 coverage/
@@ -63,6 +65,9 @@ e2e/node_modules/
 # Temporary files
 tmp/
 temp/
+
+# LOTOLINK Process IDs
+.lotolink.pids
 
 # Docker
 .docker/
