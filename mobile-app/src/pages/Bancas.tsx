@@ -78,7 +78,7 @@ const Bancas: React.FC = () => {
         <IonToolbar>
           <IonSearchbar
             value={searchText}
-            onIonInput={(e) => setSearchText(e.detail.value!)}
+            onIonInput={(e) => setSearchText(e.detail.value || '')}
             placeholder="Buscar banca..."
             animated
           />

@@ -78,7 +78,7 @@ const App: React.FC = () => (
             <IonIcon aria-hidden="true" icon={trophy} />
             <IonLabel>Loterías</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="play" href="/play/leidsa" className="tab-play-button">
+          <IonTabButton tab="play" href="/lotteries" className="tab-play-button">
             <IonIcon aria-hidden="true" icon={ticket} size="large" />
             <IonLabel>Jugar</IonLabel>
           </IonTabButton>

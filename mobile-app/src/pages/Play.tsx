@@ -33,7 +33,7 @@ const gameTypes: GameType[] = [
 ];
 
 const Play: React.FC = () => {
-  const { lotteryId } = useParams<{ lotteryId: string }>();
+  const { lotteryId = 'leidsa' } = useParams<{ lotteryId: string }>();
   const [selectedGameType, setSelectedGameType] = useState<GameType | null>(null);
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const [amount, setAmount] = useState(10);

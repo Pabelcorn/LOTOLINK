@@ -47,7 +47,7 @@ const Lotteries: React.FC = () => {
         <IonToolbar>
           <IonSearchbar
             value={searchText}
-            onIonInput={(e) => setSearchText(e.detail.value!)}
+            onIonInput={(e) => setSearchText(e.detail.value || '')}
             placeholder="Buscar lotería..."
             animated
           />

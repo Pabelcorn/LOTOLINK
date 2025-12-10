@@ -25,6 +25,7 @@ import {
   logOut,
   chevronForward
 } from 'ionicons/icons';
+import { APP_INFO } from '../constants';
 
 const Profile: React.FC = () => {
   return (
@@ -196,7 +197,7 @@ const Profile: React.FC = () => {
             color: 'var(--ion-color-medium)',
             fontSize: '12px'
           }}>
-            Version 1.0.0 • LotoLink © 2024
+            Version {APP_INFO.VERSION} • {APP_INFO.NAME} © {APP_INFO.COPYRIGHT_YEAR}
           </div>
         </div>
       </IonContent>
