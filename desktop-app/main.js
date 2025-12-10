@@ -9,9 +9,13 @@ const isWindows = process.platform === 'win32';
 const isLinux = process.platform === 'linux';
 
 function createWindow() {
+  console.log('Creating main window...');
+  console.log('Platform:', process.platform);
+  
   // Get primary display dimensions
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
+  console.log('Display size:', width, 'x', height);
 
   // Create the browser window with glass morphism effects
   mainWindow = new BrowserWindow({
@@ -37,11 +41,23 @@ function createWindow() {
     show: false // Don't show until ready
   });
 
-  // Load the index.html file
-  mainWindow.loadFile('index.html');
+  // Load the index.html file with absolute path for packaged app
+  const htmlPath = path.join(__dirname, 'index.html');
+  console.log('Loading HTML from:', htmlPath);
+  
+  mainWindow.loadFile(htmlPath).catch(err => {
+    console.error('Failed to load index.html:', err);
+    // Show error dialog if loading fails
+    const { dialog } = require('electron');
+    dialog.showErrorBox(
+      'Error Loading Application',
+      'Failed to load the application interface. Please reinstall the application.\n\nError: ' + err.message
+    );
+  });
 
   // Show window when ready to prevent visual flash
   mainWindow.once('ready-to-show', () => {
+    console.log('Window is ready to show');
     mainWindow.show();
     
     // Apply OS-specific class for styling using predefined platform mappings
@@ -56,7 +72,19 @@ function createWindow() {
       document.documentElement.classList.add('${platformClass}');
       document.documentElement.classList.add('os-${process.platform}');
       document.body.classList.add('${platformClass}');
-    `);
+    `).catch(err => {
+      console.error('Failed to inject platform classes:', err);
+    });
+  });
+
+  // Handle page load failures
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('Page failed to load:', errorCode, errorDescription);
+    const { dialog } = require('electron');
+    dialog.showErrorBox(
+      'Page Load Error',
+      'Failed to load the application page.\n\nError: ' + errorDescription
+    );
   });
 
   // Handle window state changes
@@ -96,6 +124,10 @@ function createWindow() {
 
 // This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
+  console.log('Electron app is ready');
+  console.log('App path:', app.getAppPath());
+  console.log('User data path:', app.getPath('userData'));
+  
   createWindow();
 
   app.on('activate', () => {
@@ -104,6 +136,14 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
+}).catch(err => {
+  console.error('Error during app initialization:', err);
+  const { dialog } = require('electron');
+  dialog.showErrorBox(
+    'Startup Error',
+    'The application failed to start. Please try reinstalling.\n\nError: ' + err.message
+  );
+  app.quit();
 });
 
 // Quit when all windows are closed, except on macOS
