@@ -172,7 +172,7 @@ export const clearWatch = async (watchId: string): Promise<void> => {
  * Get coordinates from address (requires geocoding service)
  * This is a placeholder - you would need to integrate with a geocoding API
  */
-export const geocodeAddress = async (_address: string): Promise<Coordinates | null> => {
+export const geocodeAddress = async (): Promise<Coordinates | null> => {
   // TODO: Integrate with geocoding service (Google Maps, Mapbox, etc.)
   console.warn('Geocoding not implemented yet');
   return null;
