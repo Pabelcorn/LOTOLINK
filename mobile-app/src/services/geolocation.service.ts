@@ -124,8 +124,8 @@ export const formatDistance = (distanceKm: number): string => {
 export const watchPosition = (
   callback: (location: LocationResult) => void,
   errorCallback?: (error: any) => void
-): string => {
-  const watchId = Geolocation.watchPosition(
+): Promise<string> => {
+  return Geolocation.watchPosition(
     {
       enableHighAccuracy: true,
       timeout: 10000,
@@ -155,8 +155,6 @@ export const watchPosition = (
       }
     }
   );
-
-  return watchId;
 };
 
 /**
@@ -174,7 +172,7 @@ export const clearWatch = async (watchId: string): Promise<void> => {
  * Get coordinates from address (requires geocoding service)
  * This is a placeholder - you would need to integrate with a geocoding API
  */
-export const geocodeAddress = async (address: string): Promise<Coordinates | null> => {
+export const geocodeAddress = async (_address: string): Promise<Coordinates | null> => {
   // TODO: Integrate with geocoding service (Google Maps, Mapbox, etc.)
   console.warn('Geocoding not implemented yet');
   return null;
