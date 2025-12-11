@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEmail } from 'class-validator';
+import { IsString, IsOptional, IsEmail, MinLength } from 'class-validator';
 
 export class RegisterDto {
   @IsString()
@@ -11,15 +11,18 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   name?: string;
+
+  @IsString()
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  password!: string;
 }
 
 export class LoginDto {
   @IsString()
   phone!: string;
 
-  @IsOptional()
   @IsString()
-  password?: string;
+  password!: string;
 }
 
 export class AuthResponseDto {
@@ -28,6 +31,8 @@ export class AuthResponseDto {
     phone: string;
     email?: string;
     name?: string;
+    role: string;
+    isAdmin: boolean;
   };
   accessToken!: string;
   refreshToken!: string;

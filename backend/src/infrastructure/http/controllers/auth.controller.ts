@@ -9,7 +9,9 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '../../../application/services/user.service';
+import { PasswordService } from '../../security/password.service';
 import { RegisterDto, LoginDto, AuthResponseDto } from '../../../application/dtos/auth.dto';
+import { UserRole } from '../../../domain/entities/user.entity';
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -17,21 +19,38 @@ export class AuthController {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly passwordService: PasswordService,
   ) {}
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
+    // Hash the password
+    const hashedPassword = await this.passwordService.hashPassword(registerDto.password);
+
+    // Determine role based on email pattern (for backward compatibility during migration)
+    // In production, admin users should be created through a separate admin endpoint
+    let role = UserRole.USER;
+    if (registerDto.email) {
+      const emailLower = registerDto.email.toLowerCase();
+      if (emailLower.includes('admin@') || emailLower.includes('administrador@')) {
+        role = UserRole.ADMIN;
+      }
+    }
+
     const user = await this.userService.createUser({
       phone: registerDto.phone,
       email: registerDto.email,
       name: registerDto.name,
+      password: hashedPassword,
+      role,
     });
 
     const payload = {
       sub: user.id,
       phone: user.phone,
       email: user.email,
+      role: user.role,
     };
 
     const accessToken = this.jwtService.sign(payload);
@@ -45,6 +64,8 @@ export class AuthController {
         phone: user.phone,
         email: user.email,
         name: user.name,
+        role: user.role,
+        isAdmin: user.isAdmin,
       },
       accessToken,
       refreshToken,
@@ -55,15 +76,24 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
-    // In a real implementation, we would verify password
-    // For this demo, we just verify the user exists by phone
-    let user;
-    try {
-      // This is a simplified login - in production, use proper password verification
-      user = await this.userService.createUser({
-        phone: loginDto.phone,
-      });
-    } catch {
+    // Find user by phone
+    const user = await this.userService.getUserByPhone(loginDto.phone);
+    
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Verify password
+    if (!user.password) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const isPasswordValid = await this.passwordService.verifyPassword(
+      loginDto.password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -71,6 +101,7 @@ export class AuthController {
       sub: user.id,
       phone: user.phone,
       email: user.email,
+      role: user.role,
     };
 
     const accessToken = this.jwtService.sign(payload);
@@ -84,6 +115,8 @@ export class AuthController {
         phone: user.phone,
         email: user.email,
         name: user.name,
+        role: user.role,
+        isAdmin: user.isAdmin,
       },
       accessToken,
       refreshToken,
@@ -100,6 +133,7 @@ export class AuthController {
         sub: payload.sub,
         phone: payload.phone,
         email: payload.email,
+        role: payload.role,
       });
 
       return { accessToken: newAccessToken };

@@ -24,7 +24,11 @@ export class TypeOrmUserRepository implements UserRepository {
   }
 
   async findByPhone(phone: string): Promise<User | null> {
-    const entity = await this.repository.findOne({ where: { phone } });
+    // Include password field for authentication
+    const entity = await this.repository.findOne({ 
+      where: { phone },
+      select: ['id', 'phone', 'email', 'name', 'password', 'role', 'walletBalance', 'createdAt', 'updatedAt']
+    });
     return entity ? this.toDomain(entity) : null;
   }
 
@@ -45,6 +49,8 @@ export class TypeOrmUserRepository implements UserRepository {
     entity.phone = user.phone;
     entity.email = user.email;
     entity.name = user.name;
+    entity.password = user.password;
+    entity.role = user.role;
     entity.walletBalance = user.walletBalance;
     entity.createdAt = user.createdAt;
     entity.updatedAt = user.updatedAt;
@@ -57,6 +63,8 @@ export class TypeOrmUserRepository implements UserRepository {
       phone: entity.phone,
       email: entity.email,
       name: entity.name,
+      password: entity.password,
+      role: entity.role as any,
       walletBalance: Number(entity.walletBalance),
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,

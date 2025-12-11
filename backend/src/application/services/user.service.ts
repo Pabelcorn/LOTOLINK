@@ -1,6 +1,6 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from '../../domain/entities/user.entity';
+import { User, UserRole } from '../../domain/entities/user.entity';
 import { UserRepository, USER_REPOSITORY } from '../../domain/repositories/user.repository';
 import { CreateUserDto, ChargeWalletDto, WalletResponseDto } from '../dtos/user.dto';
 
@@ -21,6 +21,8 @@ export class UserService {
       phone: dto.phone,
       email: dto.email,
       name: dto.name,
+      password: dto.password,
+      role: dto.role as UserRole || UserRole.USER,
     });
 
     return this.userRepository.save(user);
@@ -32,6 +34,10 @@ export class UserService {
       throw new NotFoundException(`User with id ${userId} not found`);
     }
     return user;
+  }
+
+  async getUserByPhone(phone: string): Promise<User | null> {
+    return this.userRepository.findByPhone(phone);
   }
 
   async chargeWallet(userId: string, dto: ChargeWalletDto): Promise<WalletResponseDto> {
