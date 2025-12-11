@@ -2,13 +2,52 @@
 
 ## 🎯 Respuesta a tu Pregunta: "¿CÓMO SE ACCEDE AL PANEL DE ADMINISTRADOR?"
 
-**Respuesta Simple**: Ahora es muy fácil. Ejecuta un solo comando:
+### ✨ NUEVO: Acceso desde la Aplicación Principal
+
+**Método 1 - Desde la Aplicación (Más Fácil)**:
+
+1. **Inicia la aplicación** (abre `index.html` en tu navegador)
+2. **Inicia sesión como administrador**:
+   - Haz clic en "Iniciar Sesión" o en el icono de perfil (👤)
+   - Usa un email que contenga `admin@` o `administrador@`
+   - Ejemplo: `admin@lotolink.com` o `administrador@empresa.com`
+   - Completa tu nombre y teléfono
+3. **Ve a tu Perfil** (haz clic en el icono 👤 en la barra de navegación)
+4. **Verás un botón especial**: **"⚙️ Panel Admin"** (color morado)
+5. **Haz clic** y se abrirá el Panel de Administración en una nueva pestaña
+
+¡Listo! 🎉
+
+**Método 2 - Acceso Directo (Tradicional)**:
+
+Ejecuta un solo comando:
 
 ```bash
 npm start
 ```
 
 Y el sistema se abrirá automáticamente en tu navegador en: http://localhost:8080/admin-panel.html
+
+---
+
+## 🔑 Emails de Administrador
+
+Para acceder al Panel Admin desde la aplicación, tu email debe contener:
+- `admin@` en cualquier parte del email
+- O `administrador@` en cualquier parte del email
+
+### ✅ Ejemplos Válidos:
+- `admin@lotolink.com`
+- `administrador@empresa.com`
+- `juan.admin@miempresa.com`
+- `maria.administrador@lotolink.do`
+
+### ❌ Ejemplos NO Válidos (no mostrarán el botón):
+- `usuario@lotolink.com`
+- `juan@empresa.com`
+- `operador@lotolink.com`
+
+⚠️ **IMPORTANTE**: Esta validación es solo para desarrollo/demo. En producción debes usar autenticación JWT/OAuth con roles y permisos desde el backend.
 
 ---
 

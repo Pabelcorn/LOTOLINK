@@ -2953,6 +2953,17 @@
             >
               🏦 Retirar
             </button>
+            {/* Admin Panel Access - Only for admin users */}
+            {user?.isAdmin && (
+              <button 
+                onClick={() => window.open('admin-panel.html', '_blank')}
+                className="px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 shadow-md flex items-center gap-2"
+                title="Acceder al Panel de Administración"
+              >
+                <span>⚙️</span>
+                <span>Panel Admin</span>
+              </button>
+            )}
           </div>
 
           {/* OVERVIEW VIEW */}
@@ -5504,7 +5515,9 @@
                     const e = document.getElementById('loginEmail').value || 'usuario@lotolink.com';
                     const p = document.getElementById('loginPhone').value || '';
                     if(n) { 
-                      const newUser = { name: n, email: e, phone: p, id: uid("U") };
+                      // Check if user is admin based on email
+                      const isAdmin = e.toLowerCase().includes('admin@') || e.toLowerCase().includes('administrador@');
+                      const newUser = { name: n, email: e, phone: p, id: uid("U"), isAdmin };
                       setUser(newUser);
                       localStorage.setItem("ll_user", JSON.stringify(newUser));
                       setShowAuthModal(false); 
