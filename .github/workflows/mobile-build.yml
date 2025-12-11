@@ -30,7 +30,7 @@ permissions:
 
 env:
   NODE_VERSION: '18'
-  JAVA_VERSION: '21'
+  JAVA_VERSION: '17'
 
 jobs:
   build-android:
@@ -147,36 +147,26 @@ jobs:
         run: |
           if [ ! -d "ios" ]; then
             npx cap add ios
+            
+            # Immediately configure deployment target after platform creation
+            if [ -f "ios/App/Podfile" ]; then
+              # Update platform line or add it if missing
+              perl -i -pe "s/platform :ios, '[0-9]+(?:\\.[0-9]+)*'/platform :ios, '13.0'/g" ios/App/Podfile
+              
+              # If no platform line exists, add it at the beginning of the file
+              if ! grep -q "platform :ios" ios/App/Podfile; then
+                # Insert at the beginning of the file, right after any initial comments
+                perl -i -pe 'print "platform :ios, '\''13.0'\''\n\n" if $. == 1 && !/^#/' ios/App/Podfile
+              fi
+              
+              echo "Podfile deployment target configured:"
+              grep "platform :ios" ios/App/Podfile || echo "Warning: Could not find platform line"
+            fi
           fi
 
       - name: Sync Capacitor iOS
         working-directory: mobile-app
         run: npx cap sync ios
-
-      - name: Configure iOS deployment target
-        working-directory: mobile-app
-        run: |
-          # Update Podfile to set minimum iOS deployment target to 13.0 for Firebase compatibility
-          if [ -f "ios/App/Podfile" ]; then
-            # First, try to update existing platform line
-            # Pattern matches valid iOS versions like '8.0', '11', '12.0', '13.4'
-            perl -i -pe "s/platform :ios, '[0-9]+(?:\\.[0-9]+)*'/platform :ios, '13.0'/g" ios/App/Podfile
-            
-            # If no platform line exists after the update attempt, add it
-            if ! grep -q "platform :ios" ios/App/Podfile; then
-              # Insert platform line after comment block, before first code line
-              perl -i -pe "if (!$seen && /^[^#\\s]/) { print \"platform :ios, '13.0'\n\"; $seen=1; }" ios/App/Podfile
-              
-              # If file has no non-comment lines yet (edge case), append to end
-              if ! grep -q "platform :ios" ios/App/Podfile; then
-                echo "" >> ios/App/Podfile
-                echo "platform :ios, '13.0'" >> ios/App/Podfile
-              fi
-            fi
-            
-            echo "Updated Podfile deployment target:"
-            grep "platform :ios" ios/App/Podfile || echo "No platform line found"
-          fi
 
       - name: Install CocoaPods dependencies
         working-directory: mobile-app/ios/App
