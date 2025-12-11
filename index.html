@@ -3869,6 +3869,16 @@
       // Available voices cache
       const [availableVoices, setAvailableVoices] = useState([]);
       
+      // Migrate existing users to add isAdmin flag if they don't have it
+      useEffect(() => {
+        if (user && user.email && user.isAdmin === undefined) {
+          const isAdmin = user.email.toLowerCase().includes('admin@') || user.email.toLowerCase().includes('administrador@');
+          const updatedUser = { ...user, isAdmin };
+          setUser(updatedUser);
+          localStorage.setItem("ll_user", JSON.stringify(updatedUser));
+        }
+      }, []);
+      
       // Load available TTS voices
       useEffect(() => {
         const loadVoices = () => {
