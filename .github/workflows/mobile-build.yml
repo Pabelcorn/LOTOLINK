@@ -158,18 +158,24 @@ jobs:
         run: |
           # Update Podfile to set minimum iOS deployment target to 13.0 for Firebase compatibility
           if [ -f "ios/App/Podfile" ]; then
-            # Check if platform is already set
+            # First, try to update existing platform line
+            # Pattern matches valid iOS versions like '8.0', '11', '12.0', '13.4'
+            perl -i -pe "s/platform :ios, '[0-9]+(?:\\.[0-9]+)*'/platform :ios, '13.0'/g" ios/App/Podfile
+            
+            # If no platform line exists after the update attempt, add it
             if ! grep -q "platform :ios" ios/App/Podfile; then
-              # Add platform line at the beginning of the file after any initial comments
-              awk 'BEGIN {added=0} 
-                   /^[^#]/ && added==0 {print "platform :ios, '\''13.0'\''"; added=1} 
-                   {print}' ios/App/Podfile > ios/App/Podfile.tmp
-              mv ios/App/Podfile.tmp ios/App/Podfile
-            else
-              # Update existing platform line to ensure minimum 13.0 (portable across macOS and Linux)
-              sed -i.bak "s/platform :ios, '[0-9.]*'/platform :ios, '13.0'/" ios/App/Podfile
-              rm -f ios/App/Podfile.bak
+              # Insert platform line after comment block, before first code line
+              perl -i -pe "if (!$seen && /^[^#\\s]/) { print \"platform :ios, '13.0'\n\"; $seen=1; }" ios/App/Podfile
+              
+              # If file has no non-comment lines yet (edge case), append to end
+              if ! grep -q "platform :ios" ios/App/Podfile; then
+                echo "" >> ios/App/Podfile
+                echo "platform :ios, '13.0'" >> ios/App/Podfile
+              fi
             fi
+            
+            echo "Updated Podfile deployment target:"
+            grep "platform :ios" ios/App/Podfile || echo "No platform line found"
           fi
 
       - name: Install CocoaPods dependencies
