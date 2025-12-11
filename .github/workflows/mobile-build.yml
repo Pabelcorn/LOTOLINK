@@ -146,10 +146,11 @@ jobs:
         working-directory: mobile-app
         run: |
           if [ ! -d "ios" ]; then
-            # Try to add iOS platform - it may fail due to deployment target issues
+            # Try to add iOS platform - it may fail during pod install due to deployment target issues
+            # The platform structure will still be created, allowing us to fix the Podfile before retry
             npx cap add ios || {
-              echo "Initial iOS platform add failed (expected if deployment target is incorrect)"
-              echo "Checking if iOS platform structure was created..."
+              echo "Initial iOS platform add failed (expected if deployment target conflicts with pod requirements)"
+              echo "Platform structure should still be created - will configure Podfile and retry..."
             }
           fi
           
@@ -158,7 +159,7 @@ jobs:
             echo "Configuring Podfile deployment target to iOS 14.0..."
             # Check if platform line exists
             if grep -q "platform :ios" ios/App/Podfile; then
-              # Update existing platform line to iOS 14.0
+              # Update existing platform line to iOS 14.0 (macOS sed syntax with -i '')
               sed -i '' "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
             else
               # Add platform line at the beginning of the file
