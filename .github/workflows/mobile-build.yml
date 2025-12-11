@@ -29,8 +29,8 @@ permissions:
   contents: write
 
 env:
-  NODE_VERSION: '18'
-  JAVA_VERSION: '17'
+  NODE_VERSION: '20'
+  JAVA_VERSION: '21'
 
 jobs:
   build-android:
@@ -152,12 +152,12 @@ jobs:
             if [ -f "ios/App/Podfile" ]; then
               # Check if platform line exists
               if grep -q "platform :ios" ios/App/Podfile; then
-                # Update existing platform line to iOS 13.0
-                sed -i.bak "s/platform :ios, '[^']*'/platform :ios, '13.0'/" ios/App/Podfile
+                # Update existing platform line to iOS 14.0
+                sed -i.bak "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
                 rm -f ios/App/Podfile.bak
               else
                 # Add platform line at the beginning of the file
-                echo -e "platform :ios, '13.0'\n\n$(cat ios/App/Podfile)" > ios/App/Podfile
+                echo -e "platform :ios, '14.0'\n\n$(cat ios/App/Podfile)" > ios/App/Podfile
               fi
               
               echo "Podfile deployment target configured:"
@@ -317,7 +317,7 @@ jobs:
           echo "- Architecture: ARM, ARM64, x86, x86_64" >> mobile_release_summary.md
           echo "" >> mobile_release_summary.md
           echo "### iOS" >> mobile_release_summary.md
-          echo "- Minimum version: iOS 13.0+" >> mobile_release_summary.md
+          echo "- Minimum version: iOS 14.0+" >> mobile_release_summary.md
           echo "- Devices: iPhone, iPad" >> mobile_release_summary.md
           echo "" >> mobile_release_summary.md
           
