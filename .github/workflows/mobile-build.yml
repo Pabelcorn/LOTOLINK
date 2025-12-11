@@ -146,18 +146,20 @@ jobs:
         working-directory: mobile-app
         run: |
           if [ ! -d "ios" ]; then
+            # Set environment variable to skip pod install during cap add
+            export CAPACITOR_SKIP_COCOAPODS_INSTALL=1
             npx cap add ios
             
-            # Immediately configure deployment target after platform creation
+            # Configure deployment target after platform creation
             if [ -f "ios/App/Podfile" ]; then
               # Check if platform line exists
               if grep -q "platform :ios" ios/App/Podfile; then
                 # Update existing platform line to iOS 14.0
-                sed -i.bak "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
-                rm -f ios/App/Podfile.bak
+                sed -i '' "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
               else
                 # Add platform line at the beginning of the file
-                echo -e "platform :ios, '14.0'\n\n$(cat ios/App/Podfile)" > ios/App/Podfile
+                printf "platform :ios, '14.0'\n\n%s" "$(cat ios/App/Podfile)" > ios/App/Podfile.tmp
+                mv ios/App/Podfile.tmp ios/App/Podfile
               fi
               
               echo "Podfile deployment target configured:"
