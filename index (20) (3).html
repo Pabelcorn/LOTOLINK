@@ -3489,6 +3489,17 @@
             >
               🏦 Retirar
             </button>
+            {/* Admin Panel Access - Only for admin users */}
+            {user?.isAdmin && (
+              <button 
+                onClick={() => window.open('admin-panel.html', '_blank')}
+                className="px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 shadow-md flex items-center gap-2"
+                title="Acceder al Panel de Administración"
+              >
+                <span>⚙️</span>
+                <span>Panel Admin</span>
+              </button>
+            )}
           </div>
 
           {/* OVERVIEW VIEW */}
@@ -4399,6 +4410,27 @@
       
       // Available voices cache
       const [availableVoices, setAvailableVoices] = useState([]);
+      
+      // Migrate existing users to add role and isAdmin flag based on backend response or email pattern
+      useEffect(() => {
+        if (user && user.email) {
+          // If user has role from backend, set isAdmin based on role
+          if (user.role) {
+            const isAdmin = user.role === 'admin';
+            if (user.isAdmin !== isAdmin) {
+              const updatedUser = { ...user, isAdmin };
+              setUser(updatedUser);
+              localStorage.setItem("ll_user", JSON.stringify(updatedUser));
+            }
+          } else if (user.isAdmin === undefined) {
+            // Fallback for users without role (offline mode)
+            const isAdmin = user.email.toLowerCase().includes('admin@') || user.email.toLowerCase().includes('administrador@');
+            const updatedUser = { ...user, isAdmin, role: isAdmin ? 'admin' : 'user' };
+            setUser(updatedUser);
+            localStorage.setItem("ll_user", JSON.stringify(updatedUser));
+          }
+        }
+      }, [user]);
       
       // Load available TTS voices
       useEffect(() => {
@@ -6212,21 +6244,88 @@
                 />
                 <input 
                   id="loginPhone"
-                  className="w-full border border-gray-200 dark:border-white/10 p-4 rounded-xl mb-6 bg-gray-50 dark:bg-white/5 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all" 
+                  className="w-full border border-gray-200 dark:border-white/10 p-4 rounded-xl mb-4 bg-gray-50 dark:bg-white/5 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all" 
                   placeholder="Tu teléfono (809-XXX-XXXX)" 
                   type="tel"
                 />
+                <input 
+                  id="loginPassword"
+                  className="w-full border border-gray-200 dark:border-white/10 p-4 rounded-xl mb-6 bg-gray-50 dark:bg-white/5 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all" 
+                  placeholder="Contraseña (min. 8 caracteres)" 
+                  type="password"
+                />
                 <button 
-                  onClick={() => { 
+                  onClick={async () => { 
                     const n = document.getElementById('loginName').value;
-                    const e = document.getElementById('loginEmail').value || 'usuario@lotolink.com';
+                    const e = document.getElementById('loginEmail').value || '';
                     const p = document.getElementById('loginPhone').value || '';
-                    if(n) { 
-                      const newUser = { name: n, email: e, phone: p, id: uid("U") };
+                    const pwd = document.getElementById('loginPassword').value || '';
+                    
+                    if(!n || !p || !pwd) {
+                      alert('Por favor completa todos los campos');
+                      return;
+                    }
+                    
+                    if(pwd.length < 8) {
+                      alert('La contraseña debe tener al menos 8 caracteres');
+                      return;
+                    }
+                    
+                    try {
+                      // Try to register (will login if user exists)
+                      // Production: Change this to your production API URL
+                      // Example: const API_BASE = 'https://api.lotolink.com';
+                      const API_BASE = window.location.hostname === 'localhost' 
+                        ? 'http://localhost:3000' 
+                        : 'https://api.lotolink.com';  // TODO: Update with your production API URL
+                      
+                      const response = await fetch(`${API_BASE}/api/v1/auth/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phone: p, email: e, name: n, password: pwd })
+                      });
+                      
+                      if (!response.ok) {
+                        // If registration fails, try login
+                        const loginResponse = await fetch(`${API_BASE}/api/v1/auth/login`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ phone: p, password: pwd })
+                        });
+                        
+                        if (!loginResponse.ok) {
+                          throw new Error('Credenciales inválidas');
+                        }
+                        
+                        const loginData = await loginResponse.json();
+                        // Store tokens and user data
+                        localStorage.setItem('ll_access_token', loginData.accessToken);
+                        localStorage.setItem('ll_refresh_token', loginData.refreshToken);
+                        const userData = { ...loginData.user, id: uid("U") };
+                        setUser(userData);
+                        localStorage.setItem("ll_user", JSON.stringify(userData));
+                        setShowAuthModal(false);
+                        return;
+                      }
+                      
+                      const data = await response.json();
+                      // Store tokens and user data
+                      localStorage.setItem('ll_access_token', data.accessToken);
+                      localStorage.setItem('ll_refresh_token', data.refreshToken);
+                      const userData = { ...data.user, id: uid("U") };
+                      setUser(userData);
+                      localStorage.setItem("ll_user", JSON.stringify(userData));
+                      setShowAuthModal(false);
+                    } catch (error) {
+                      console.error('Auth error:', error); // Log for debugging
+                      alert('No se pudo conectar con el servidor. Usando modo offline.');
+                      // Fallback to offline mode
+                      const isAdmin = e.toLowerCase().includes('admin@') || e.toLowerCase().includes('administrador@');
+                      const newUser = { name: n, email: e, phone: p, id: uid("U"), isAdmin, role: isAdmin ? 'admin' : 'user' };
                       setUser(newUser);
                       localStorage.setItem("ll_user", JSON.stringify(newUser));
-                      setShowAuthModal(false); 
-                    } 
+                      setShowAuthModal(false);
+                    }
                   }} 
                   className="btn-apple-primary w-full py-4"
                 >

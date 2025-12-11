@@ -16,6 +16,13 @@ export class UserEntity {
   @Column('varchar', { nullable: true })
   name?: string;
 
+  @Column('varchar', { nullable: true, select: false })
+  password?: string;
+
+  @Column('varchar', { default: 'user' })
+  @Index()
+  role!: string;
+
   @Column('decimal', { name: 'wallet_balance', precision: 12, scale: 2, default: 0 })
   walletBalance!: number;
 
