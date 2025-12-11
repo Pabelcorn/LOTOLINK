@@ -142,38 +142,41 @@ jobs:
         working-directory: mobile-app
         run: npm run build
 
-      - name: Add iOS platform if not exists
+      - name: Add iOS platform and configure deployment target
         working-directory: mobile-app
         run: |
           if [ ! -d "ios" ]; then
-            # Set environment variable to skip pod install during cap add
-            export CAPACITOR_SKIP_COCOAPODS_INSTALL=1
-            npx cap add ios
-            
-            # Configure deployment target after platform creation
-            if [ -f "ios/App/Podfile" ]; then
-              # Check if platform line exists
-              if grep -q "platform :ios" ios/App/Podfile; then
-                # Update existing platform line to iOS 14.0
-                sed -i '' "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
-              else
-                # Add platform line at the beginning of the file
-                printf "platform :ios, '14.0'\n\n%s" "$(cat ios/App/Podfile)" > ios/App/Podfile.tmp
-                mv ios/App/Podfile.tmp ios/App/Podfile
-              fi
-              
-              echo "Podfile deployment target configured:"
-              grep "platform :ios" ios/App/Podfile || echo "Warning: Could not find platform line"
+            # Try to add iOS platform - it may fail during pod install due to deployment target issues
+            # The platform structure will still be created, allowing us to fix the Podfile before retry
+            npx cap add ios || {
+              echo "Initial iOS platform add failed (expected if deployment target conflicts with pod requirements)"
+              echo "Platform structure should still be created - will configure Podfile and retry..."
+            }
+          fi
+          
+          # Ensure deployment target is set correctly in Podfile
+          if [ -f "ios/App/Podfile" ]; then
+            echo "Configuring Podfile deployment target to iOS 14.0..."
+            # Check if platform line exists
+            if grep -q "platform :ios" ios/App/Podfile; then
+              # Update existing platform line to iOS 14.0 (macOS sed syntax with -i '')
+              sed -i '' "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
+            else
+              # Add platform line at the beginning of the file
+              printf "platform :ios, '14.0'\n\n%s" "$(cat ios/App/Podfile)" > ios/App/Podfile.tmp
+              mv ios/App/Podfile.tmp ios/App/Podfile
             fi
+            
+            echo "Podfile deployment target configured:"
+            grep "platform :ios" ios/App/Podfile
+          else
+            echo "ERROR: Podfile not found after iOS platform add!"
+            exit 1
           fi
 
-      - name: Sync Capacitor iOS
+      - name: Sync Capacitor iOS and install pods
         working-directory: mobile-app
         run: npx cap sync ios
-
-      - name: Install CocoaPods dependencies
-        working-directory: mobile-app/ios/App
-        run: pod install
 
       - name: Build iOS app (Debug)
         working-directory: mobile-app/ios/App
