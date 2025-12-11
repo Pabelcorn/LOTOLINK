@@ -146,11 +146,10 @@ jobs:
         working-directory: mobile-app
         run: |
           if [ ! -d "ios" ]; then
-            # Set environment variable to skip pod install during cap add
-            export CAPACITOR_SKIP_COCOAPODS_INSTALL=1
-            npx cap add ios
+            # Add iOS platform without running pod install
+            npx cap add ios --no-sync
             
-            # Configure deployment target after platform creation
+            # Configure deployment target in Podfile BEFORE running pod install
             if [ -f "ios/App/Podfile" ]; then
               # Check if platform line exists
               if grep -q "platform :ios" ios/App/Podfile; then
