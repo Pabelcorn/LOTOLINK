@@ -159,7 +159,7 @@ jobs:
           # Update Podfile to set minimum iOS deployment target to 13.0 for Firebase compatibility
           if [ -f "ios/App/Podfile" ]; then
             # Use perl for portable in-place editing (works on both macOS and Linux)
-            perl -i -pe 's/platform :ios, .[0-9.]+./platform :ios, '\''13.0'\''/g' ios/App/Podfile
+            perl -i -pe 's/platform :ios, '\''[0-9.]+'\'''/platform :ios, '\''13.0'\''/g' ios/App/Podfile
             
             # If no platform line exists, add it at the beginning
             if ! grep -q "platform :ios" ios/App/Podfile; then
