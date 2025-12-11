@@ -159,13 +159,14 @@ jobs:
           # Update Podfile to set minimum iOS deployment target to 13.0 for Firebase compatibility
           if [ -f "ios/App/Podfile" ]; then
             # First, try to update existing platform line
-            # Pattern matches versions like '11', '12.0', '13.4', etc.
-            perl -i -pe 's/platform :ios, '\''[0-9][0-9.]*'\'''/platform :ios, '\''13.0'\''/g' ios/App/Podfile
+            # Pattern matches versions like '8.0', '11', '12.0', '13.4', etc.
+            perl -i -pe "s/platform :ios, '[0-9]+(?:\\.[0-9]+)*'/platform :ios, '13.0'/g" ios/App/Podfile
             
             # If no platform line exists after the update attempt, add it
             if ! grep -q "platform :ios" ios/App/Podfile; then
               # Insert platform line after the initial comment block and before any code
-              perl -i -pe 'if (!$seen && /^[^#]/ && !/^\s*$/) { print "platform :ios, '\''13.0'\''\n"; $seen=1; }' ios/App/Podfile
+              # This perl script looks for the first non-comment, non-blank line and inserts before it
+              perl -i -pe "if (!$seen && /^[^#]/ && !/^\s*$/) { print \"platform :ios, '13.0'\n\"; $seen=1; }" ios/App/Podfile
               
               # If file has no non-comment lines yet (shouldn't happen, but be safe)
               if ! grep -q "platform :ios" ios/App/Podfile; then
