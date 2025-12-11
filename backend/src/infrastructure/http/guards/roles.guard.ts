@@ -24,6 +24,11 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('User not authenticated');
     }
 
+    // Validate that role exists and is a valid enum value
+    if (!user.role || (user.role !== 'user' && user.role !== 'admin')) {
+      throw new ForbiddenException('Invalid user role');
+    }
+
     const hasRole = requiredRoles.some((role) => user.role === role);
     
     if (!hasRole) {

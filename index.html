@@ -5555,7 +5555,12 @@
                     
                     try {
                       // Try to register (will login if user exists)
-                      const API_BASE = 'http://localhost:3000'; // Update for production
+                      // Production: Change this to your production API URL
+                      // Example: const API_BASE = 'https://api.lotolink.com';
+                      const API_BASE = window.location.hostname === 'localhost' 
+                        ? 'http://localhost:3000' 
+                        : 'https://api.lotolink.com';  // TODO: Update with your production API URL
+                      
                       const response = await fetch(`${API_BASE}/api/v1/auth/register`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -5594,7 +5599,8 @@
                       localStorage.setItem("ll_user", JSON.stringify(userData));
                       setShowAuthModal(false);
                     } catch (error) {
-                      alert('Error: ' + error.message + '. Usando modo offline.');
+                      console.error('Auth error:', error); // Log for debugging
+                      alert('No se pudo conectar con el servidor. Usando modo offline.');
                       // Fallback to offline mode
                       const isAdmin = e.toLowerCase().includes('admin@') || e.toLowerCase().includes('administrador@');
                       const newUser = { name: n, email: e, phone: p, id: uid("U"), isAdmin, role: isAdmin ? 'admin' : 'user' };

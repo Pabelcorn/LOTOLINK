@@ -29,9 +29,11 @@ export class AuthController {
     const hashedPassword = await this.passwordService.hashPassword(registerDto.password);
 
     // Determine role based on email pattern (for backward compatibility during migration)
-    // In production, admin users should be created through a separate admin endpoint
+    // ⚠️ SECURITY WARNING: This is for development/migration only!
+    // In production, remove this logic and use a separate admin creation endpoint
+    // or manual role assignment by existing admins.
     let role = UserRole.USER;
-    if (registerDto.email) {
+    if (registerDto.email && process.env.NODE_ENV !== 'production') {
       const emailLower = registerDto.email.toLowerCase();
       if (emailLower.includes('admin@') || emailLower.includes('administrador@')) {
         role = UserRole.ADMIN;
