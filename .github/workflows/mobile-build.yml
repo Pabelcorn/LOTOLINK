@@ -156,9 +156,8 @@ jobs:
                 sed -i.bak "s/platform :ios, '[^']*'/platform :ios, '13.0'/" ios/App/Podfile
                 rm -f ios/App/Podfile.bak
               else
-                # Add platform line at the beginning (after any leading comments)
-                sed -i.bak '1{/^#/!s/^/platform :ios, '\''13.0'\''\n\n/}' ios/App/Podfile
-                rm -f ios/App/Podfile.bak
+                # Add platform line at the beginning of the file
+                echo -e "platform :ios, '13.0'\n\n$(cat ios/App/Podfile)" > ios/App/Podfile
               fi
               
               echo "Podfile deployment target configured:"
