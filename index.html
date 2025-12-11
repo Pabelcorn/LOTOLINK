@@ -3877,7 +3877,7 @@
           setUser(updatedUser);
           localStorage.setItem("ll_user", JSON.stringify(updatedUser));
         }
-      }, []);
+      }, [user]);
       
       // Load available TTS voices
       useEffect(() => {
