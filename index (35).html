@@ -708,23 +708,20 @@
       display: none !important;
     }
     
-    /* Force mobile-optimized grids - override all responsive grid classes */
-    /* Most grids should be single column for mobile */
+    /* Force grids to mobile-friendly columns */
+    /* 2-column grids for better mobile space usage */
+    .grid-cols-1.sm\\:grid-cols-2,
+    .sm\\:grid-cols-2.lg\\:grid-cols-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    
+    /* Single column for larger desktop grids */
     .grid-cols-1.md\\:grid-cols-2,
     .grid-cols-1.lg\\:grid-cols-2,
     .grid-cols-1.md\\:grid-cols-3,
-    .grid-cols-1.lg\\:grid-cols-3 {
+    .grid-cols-1.lg\\:grid-cols-3,
+    .grid-cols-1.lg\\:grid-cols-4 {
       grid-template-columns: 1fr !important;
-    }
-    
-    /* Lotteries section - allow 2 columns on mobile for better space usage */
-    .grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4 {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-    
-    /* Other 2-column mobile grids - keep 2 columns */
-    .grid-cols-1.sm\\:grid-cols-2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
     
     /* Force column spans to full width */
