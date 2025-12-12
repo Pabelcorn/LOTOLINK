@@ -457,10 +457,28 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏦 Panel de Administración de Bancas</h1>
-            <p>Gestiona y aprueba el registro de bancas en LotoLink
-                <span id="connection-status" class="connection-status checking">⏳ Verificando conexión...</span>
-            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 300px;">
+                    <h1>🏦 Panel de Administración de Bancas</h1>
+                    <p>Gestiona y aprueba el registro de bancas en LotoLink
+                        <span id="connection-status" class="connection-status checking">⏳ Verificando conexión...</span>
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div id="admin-info" style="text-align: right; margin-right: 10px;">
+                        <div style="font-size: 13px; color: #667eea; font-weight: 600;">👑 Administrador</div>
+                        <div id="admin-name" style="font-size: 12px; color: #666;">Cargando...</div>
+                    </div>
+                    <button 
+                        onclick="logoutAdmin()" 
+                        style="padding: 10px 20px; background: #f56565; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s;"
+                        onmouseover="this.style.background='#e53e3e'" 
+                        onmouseout="this.style.background='#f56565'"
+                    >
+                        🚪 Cerrar Sesión
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="tabs">
@@ -954,10 +972,48 @@
             });
         }
 
+        // Logout admin
+        function logoutAdmin() {
+            if (confirm('¿Está seguro que desea cerrar sesión del Panel de Administración?')) {
+                localStorage.removeItem('ll_admin_auth');
+                localStorage.removeItem('ll_admin_timestamp');
+                alert('✅ Sesión cerrada correctamente');
+                window.location.href = 'index.html';
+            }
+        }
+
         // Auto-load on page load
         window.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 LOTOLINK Admin Panel iniciado');
             console.log('🔗 API Backend:', API_BASE_URL);
+            
+            // ===== AUTHENTICATION CHECK =====
+            // Verify admin authentication before allowing access
+            const user = JSON.parse(localStorage.getItem('ll_user') || 'null');
+            const isAdminAuth = localStorage.getItem('ll_admin_auth') === 'true';
+            const adminTimestamp = localStorage.getItem('ll_admin_timestamp');
+            
+            // Check if user is admin and session is valid (24 hours)
+            const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+            const isSessionValid = adminTimestamp && (Date.now() - parseInt(adminTimestamp)) < SESSION_DURATION;
+            
+            if (!user || !user.isAdmin || !isAdminAuth || !isSessionValid) {
+                // Not authenticated or session expired
+                alert('⛔ Acceso Denegado\n\nDebe iniciar sesión como administrador en la aplicación principal.\n\nCredenciales:\nUsuario: admin\nContraseña: Admin@LotoLink2024');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Display admin info
+            const adminNameEl = document.getElementById('admin-name');
+            if (adminNameEl && user) {
+                adminNameEl.textContent = user.name || user.email || 'Administrador';
+            }
+            
+            // Update last access time
+            localStorage.setItem('ll_admin_timestamp', Date.now().toString());
+            
+            console.log('✅ Admin autenticado:', user.name || user.email);
             
             // Check connection
             await checkConnection();
