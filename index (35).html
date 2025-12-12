@@ -197,320 +197,134 @@
     }
     
     /* ========================================
-       MOBILE RESPONSIVE ENHANCEMENTS
-       Full responsive support for all phone sizes
+       MOBILE-ONLY OPTIMIZED LAYOUT
+       Permanently optimized for mobile devices only
        ======================================== */
     
-    /* Base mobile styles - applies to all mobile devices */
-    @media (max-width: 768px) {
-      /* Improve text readability on mobile */
-      html {
-        font-size: 16px;
-        -webkit-text-size-adjust: 100%;
-      }
-      
-      body {
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-      }
-      
-      /* Better container spacing */
-      .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
-        padding-left: 16px;
-        padding-right: 16px;
-        width: 100%;
-      }
-      
-      /* Cards optimization */
-      .premium-card {
-        padding: 16px;
-        border-radius: var(--radius-lg);
-        margin-left: 0;
-        margin-right: 0;
-      }
-      
-      /* Buttons - larger touch targets */
-      .btn-apple-primary, .btn-apple-secondary {
-        padding: 12px 20px;
-        font-size: 15px;
-        min-height: 48px;
-        width: 100%;
-        justify-content: center;
-      }
-      
-      /* Grid improvements for tablets */
-      .grid-cols-4 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-      
-      .grid-cols-3 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-      
-      /* Form elements */
-      input, select, textarea {
-        font-size: 16px !important; /* Prevents iOS zoom on focus */
-        min-height: 48px;
-        padding: 12px;
-      }
-      
-      /* Modal improvements */
-      .modal-scroll {
-        max-height: calc(100vh - 120px);
-        max-height: calc(100dvh - 120px);
-      }
-      
-      /* Map adjustments */
-      #demo-leaflet-map, #banca-selection-map {
-        height: 50vh;
-        border-radius: var(--radius-lg);
-      }
+    /* Base mobile styles - always applied */
+    /* Improve text readability on mobile */
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
     }
     
-    /* Small tablets and large phones (max-width: 640px) */
-    @media (max-width: 640px) {
-      .premium-card {
-        padding: 14px;
-        border-radius: var(--radius-md);
-      }
-      
-      .btn-apple-primary {
-        padding: 11px 18px;
-        font-size: 14px;
-      }
-      
-      /* Container padding */
-      .max-w-7xl, .max-w-6xl, .max-w-5xl {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
-      
-      /* Force single column on mobile */
-      .grid-cols-2:not(.keep-cols), .grid-cols-3:not(.keep-cols), .grid-cols-4:not(.keep-cols) {
-        grid-template-columns: 1fr;
-      }
-      
-      /* Typography scaling */
-      h1, .text-4xl, .text-5xl {
-        font-size: 1.75rem !important;
-        line-height: 1.2;
-      }
-      
-      h2, .text-3xl {
-        font-size: 1.5rem !important;
-      }
-      
-      h3, .text-2xl {
-        font-size: 1.25rem !important;
-      }
-      
-      /* Ticket print adjustments */
-      .ticket-print {
-        width: 100%;
-        max-width: 320px;
-        padding: 16px;
-      }
-      
-      /* Number buttons in lottery grid */
-      .num-btn {
-        min-width: 40px;
-        min-height: 40px;
-        font-size: 14px;
-      }
+    body {
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     }
     
-    /* Standard phones (max-width: 480px) - iPhone SE, older Android */
-    @media (max-width: 480px) {
-      html {
-        font-size: 15px;
-      }
-      
-      .premium-card {
-        padding: 12px;
-        border-radius: 12px;
-      }
-      
-      .btn-apple-primary, .btn-apple-secondary {
-        padding: 10px 16px;
-        font-size: 14px;
-        border-radius: 10px;
-      }
-      
-      /* Container adjustments */
-      .max-w-7xl, .max-w-6xl {
-        padding-left: 10px;
-        padding-right: 10px;
-      }
-      
-      /* Typography */
-      h1, .text-4xl, .text-5xl {
-        font-size: 1.5rem !important;
-      }
-      
-      h2, .text-3xl {
-        font-size: 1.35rem !important;
-      }
-      
-      /* Result number balls */
-      .w-10.h-10 {
-        width: 36px !important;
-        height: 36px !important;
-        font-size: 13px !important;
-      }
-      
-      /* Modal card sizing */
-      #modal-card {
-        margin: 8px;
-        max-height: calc(100vh - 16px);
-        max-height: calc(100dvh - 16px);
-        border-radius: 16px;
-      }
-      
-      /* Map height */
-      #demo-leaflet-map, #banca-selection-map {
-        height: 40vh;
-      }
-      
-      /* Toggle switch scaling */
-      .toggle {
-        transform: scale(0.9);
-      }
+    /* Better container spacing */
+    .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
+      padding-left: 16px;
+      padding-right: 16px;
+      width: 100%;
     }
     
-    /* Small phones (max-width: 375px) - iPhone SE, iPhone mini, small Android */
-    @media (max-width: 375px) {
-      html {
-        font-size: 14px;
-      }
-      
-      .premium-card {
-        padding: 10px;
-        border-radius: 10px;
-      }
-      
-      .btn-apple-primary, .btn-apple-secondary {
-        padding: 10px 14px;
-        font-size: 13px;
-      }
-      
-      /* Container */
-      .max-w-7xl, .max-w-6xl, .max-w-5xl {
-        padding-left: 8px;
-        padding-right: 8px;
-      }
-      
-      /* Typography */
-      h1, .text-4xl, .text-5xl {
-        font-size: 1.35rem !important;
-      }
-      
-      h2, .text-3xl {
-        font-size: 1.2rem !important;
-      }
-      
-      h3, .text-2xl {
-        font-size: 1.1rem !important;
-      }
-      
-      .text-xl {
-        font-size: 1rem !important;
-      }
-      
-      .text-lg {
-        font-size: 0.95rem !important;
-      }
-      
-      /* Result number balls */
-      .w-10.h-10 {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 12px !important;
-      }
-      
-      /* Smaller gaps */
-      .gap-4 {
-        gap: 12px;
-      }
-      
-      .gap-6 {
-        gap: 14px;
-      }
-      
-      /* Number buttons */
-      .num-btn {
-        min-width: 36px;
-        min-height: 36px;
-        font-size: 13px;
-      }
-      
-      /* Modal adjustments */
-      #modal-card {
-        margin: 4px;
-        border-radius: 14px;
-      }
+    /* Cards optimization */
+    .premium-card {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      margin-left: 0;
+      margin-right: 0;
     }
     
-    /* Extra small phones (max-width: 320px) - iPhone SE 1st gen, very small Android */
-    @media (max-width: 320px) {
-      html {
-        font-size: 13px;
-      }
-      
-      .premium-card {
-        padding: 8px;
-        border-radius: 8px;
-      }
-      
-      .btn-apple-primary, .btn-apple-secondary {
-        padding: 8px 12px;
-        font-size: 12px;
-      }
-      
-      /* Container */
-      .max-w-7xl, .max-w-6xl, .max-w-5xl {
-        padding-left: 6px;
-        padding-right: 6px;
-      }
-      
-      /* Typography */
-      h1, .text-4xl, .text-5xl {
-        font-size: 1.2rem !important;
-      }
-      
-      h2, .text-3xl {
-        font-size: 1.1rem !important;
-      }
-      
-      h3, .text-2xl {
-        font-size: 1rem !important;
-      }
-      
-      /* Result number balls */
-      .w-10.h-10 {
-        width: 28px !important;
-        height: 28px !important;
-        font-size: 11px !important;
-      }
-      
-      /* Gaps */
-      .gap-4 {
-        gap: 8px;
-      }
-      
-      .gap-6 {
-        gap: 10px;
-      }
-      
-      /* Number buttons */
-      .num-btn {
-        min-width: 32px;
-        min-height: 32px;
-        font-size: 12px;
-      }
+    /* Buttons - larger touch targets */
+    .btn-apple-primary, .btn-apple-secondary {
+      padding: 12px 20px;
+      font-size: 15px;
+      min-height: 48px;
+      width: 100%;
+      justify-content: center;
     }
     
-    /* Landscape phone orientation */
-    @media (max-width: 768px) and (orientation: landscape) {
+    /* Grid improvements - always single or double column */
+    .grid-cols-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    
+    .grid-cols-3 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    
+    /* Form elements */
+    input, select, textarea {
+      font-size: 16px !important; /* Prevents iOS zoom on focus */
+      min-height: 48px;
+      padding: 12px;
+    }
+    
+    /* Modal improvements */
+    .modal-scroll {
+      max-height: calc(100vh - 120px);
+      max-height: calc(100dvh - 120px);
+    }
+    
+    /* Map adjustments */
+    #demo-leaflet-map, #banca-selection-map {
+      height: 50vh;
+      border-radius: var(--radius-lg);
+    }
+    
+    /* Force single column on mobile */
+    .grid-cols-2:not(.keep-cols), .grid-cols-3:not(.keep-cols), .grid-cols-4:not(.keep-cols) {
+      grid-template-columns: 1fr;
+    }
+    
+    /* Typography scaling for mobile */
+    h1, .text-4xl, .text-5xl {
+      font-size: 1.75rem !important;
+      line-height: 1.2;
+    }
+    
+    h2, .text-3xl {
+      font-size: 1.5rem !important;
+    }
+    
+    h3, .text-2xl {
+      font-size: 1.25rem !important;
+    }
+    
+    /* Ticket print adjustments */
+    .ticket-print {
+      width: 100%;
+      max-width: 320px;
+      padding: 16px;
+    }
+    
+    /* Number buttons in lottery grid */
+    .num-btn {
+      min-width: 40px;
+      min-height: 40px;
+      font-size: 14px;
+    }
+    
+    /* Result number balls - mobile optimized */
+    .w-10.h-10 {
+      width: 36px !important;
+      height: 36px !important;
+      font-size: 13px !important;
+    }
+    
+    /* Modal card sizing - mobile optimized */
+    #modal-card {
+      margin: 8px;
+      max-height: calc(100vh - 16px);
+      max-height: calc(100dvh - 16px);
+      border-radius: 16px;
+    }
+    
+    /* Map height - mobile optimized */
+    #demo-leaflet-map, #banca-selection-map {
+      height: 40vh;
+    }
+    
+    /* Toggle switch scaling */
+    .toggle {
+      transform: scale(0.9);
+    }
+    
+    /* Landscape phone orientation - mobile only */
+    @media (orientation: landscape) {
       .modal-scroll {
         max-height: calc(100vh - 80px);
         max-height: calc(100dvh - 80px);
@@ -569,30 +383,28 @@
       }
     }
     
-    /* Touch-friendly tap targets - Apple HIG recommends 44x44pt minimum */
-    @media (hover: none) and (pointer: coarse) {
-      button, a, .clickable, [role="button"] {
-        min-height: 44px;
-        min-width: 44px;
-      }
-      
-      /* Increase tap area for close buttons */
-      button[aria-label*="close"], button[aria-label*="cerrar"], .close-btn {
-        min-height: 48px;
-        min-width: 48px;
-      }
-      
-      /* Better touch feedback */
-      button:active, a:active, .clickable:active {
-        opacity: 0.7;
-        transform: scale(0.98);
-      }
-      
-      /* Disable hover effects on touch devices */
-      .premium-card:hover {
-        transform: none;
-        box-shadow: var(--shadow-md);
-      }
+    /* Touch-friendly tap targets - always applied for mobile */
+    button, a, .clickable, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Increase tap area for close buttons */
+    button[aria-label*="close"], button[aria-label*="cerrar"], .close-btn {
+      min-height: 48px;
+      min-width: 48px;
+    }
+    
+    /* Better touch feedback */
+    button:active, a:active, .clickable:active {
+      opacity: 0.7;
+      transform: scale(0.98);
+    }
+    
+    /* Disable hover effects on touch devices */
+    .premium-card:hover {
+      transform: none;
+      box-shadow: var(--shadow-md);
     }
     
     /* High contrast mode support */
@@ -615,18 +427,16 @@
       }
     }
     
-    /* Dark mode improvements for mobile */
-    @media (max-width: 768px) {
-      .dark .premium-card {
-        background: #1c1c1e;
-        border-color: rgba(255, 255, 255, 0.1);
-      }
-      
-      .dark input, .dark select, .dark textarea {
-        background: #2c2c2e;
-        border-color: rgba(255, 255, 255, 0.1);
-        color: #f5f5f7;
-      }
+    /* Dark mode improvements for mobile - always applied */
+    .dark .premium-card {
+      background: #1c1c1e;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .dark input, .dark select, .dark textarea {
+      background: #2c2c2e;
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #f5f5f7;
     }
     
     /* Fix for iOS rubber-banding */
@@ -715,495 +525,288 @@
 
     .modal-scroll { max-height: calc(100vh - 160px); overflow: auto; }
     
-    /* Mobile Game Panel - COMPLETELY FIXED FOR ALL DEVICES */
+    /* Mobile Game Panel - ALWAYS APPLIED FOR MOBILE-ONLY */
     #modal-root {
       overflow-y: auto !important;
       overflow-x: hidden !important;
       -webkit-overflow-scrolling: touch !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      padding: 0 !important;
+      overflow-y: scroll !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    
+    #modal-backdrop {
+      position: fixed !important;
+      z-index: 1 !important;
     }
     
     #modal-card {
+      position: relative !important;
+      z-index: 2 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: 100vh !important;
+      min-height: 100dvh !important;
+      max-height: none !important;
+      height: auto !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
       overflow-y: auto !important;
       overflow-x: hidden !important;
       -webkit-overflow-scrolling: touch !important;
+      flex: 1 !important;
     }
     
-    /* MOBILE: Full-height scrollable game panel */
-    @media (max-width: 768px) {
-      #modal-root {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        padding: 0 !important;
-        overflow-y: scroll !important;
-        overflow-x: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
-        display: flex !important;
-        flex-direction: column !important;
-      }
-      
-      #modal-backdrop {
-        position: fixed !important;
-        z-index: 1 !important;
-      }
-      
-      #modal-card {
-        position: relative !important;
-        z-index: 2 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-height: 100vh !important;
-        min-height: 100dvh !important;
-        max-height: none !important;
-        height: auto !important;
-        margin: 0 !important;
-        border-radius: 0 !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
-        flex: 1 !important;
-      }
-      
-      /* Header - STICKY at top, always visible */
-      #modal-card > div:first-child {
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 1000 !important;
-        padding: 8px 10px !important;
-        margin: 0 !important;
-        flex-shrink: 0 !important;
-      }
-      
-      /* Header content compact */
-      #modal-card > div:first-child .w-16,
-      #modal-card > div:first-child .w-16.h-16 {
-        width: 36px !important;
-        height: 36px !important;
-        flex-shrink: 0 !important;
-      }
-      
-      #modal-card > div:first-child h2 {
-        font-size: 1.1rem !important;
-        line-height: 1.2 !important;
-      }
-      
-      #modal-card > div:first-child .text-sm {
-        font-size: 0.65rem !important;
-        display: none !important;
-      }
-      
-      /* Close button always visible and accessible */
-      #modal-card > div:first-child button {
-        min-width: 50px !important;
-        padding: 5px 8px !important;
-        font-size: 11px !important;
-        flex-shrink: 0 !important;
-      }
-      
-      #modal-card > div:first-child .flex.items-center.gap-2 {
-        gap: 4px !important;
-      }
-      
-      /* Content area - scrollable */
-      #modal-card > div:not(:first-child) {
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-      }
-      
-      /* All padding sections more compact */
-      #modal-card .p-6 {
-        padding: 8px !important;
-      }
-      
-      #modal-card .p-8 {
-        padding: 10px !important;
-      }
-      
-      /* Add safe padding at bottom for iOS home indicator */
-      #modal-card > div:last-child {
-        padding-bottom: 100px !important;
-      }
-      
-      /* Number grid - 5 columns with proper spacing */
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 6px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 12px !important;
-        padding: 4px !important;
-        min-height: 38px !important;
-        min-width: 38px !important;
-        aspect-ratio: 1 !important;
-      }
-      
-      /* Game type cards - single column */
-      #modal-card .grid.grid-cols-1.md\\:grid-cols-2 {
-        grid-template-columns: 1fr !important;
-        gap: 8px !important;
-      }
-      
-      #modal-card button.p-6 {
-        padding: 8px !important;
-      }
-      
-      #modal-card .w-16.h-16 {
-        width: 40px !important;
-        height: 40px !important;
-      }
-      
-      #modal-card .text-2xl.font-bold {
-        font-size: 1rem !important;
-      }
-      
-      #modal-card .text-3xl.font-bold {
-        font-size: 1.1rem !important;
-      }
-      
-      /* 3-column layout becomes 1 column (Step 3) */
-      #modal-card .lg\\:grid-cols-3,
-      #modal-card .grid-cols-1.lg\\:grid-cols-3 {
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
-      }
-      
-      #modal-card .lg\\:col-span-2 {
-        grid-column: span 1 !important;
-      }
-      
-      /* Step info bar compact */
-      #modal-card .mb-4.p-4 {
-        padding: 6px !important;
-        margin-bottom: 6px !important;
-      }
-      
-      #modal-card .mb-4.p-4 button {
-        padding: 3px 6px !important;
-        font-size: 10px !important;
-      }
-      
-      /* Sidebar compact */
-      #modal-card .bg-gray-50.dark\\:bg-slate-900 {
-        padding: 10px !important;
-      }
-      
-      #modal-card .bg-gray-50.dark\\:bg-slate-900 .text-2xl {
-        font-size: 1.1rem !important;
-      }
-      
-      /* Step 1 banca cards compact */
-      #modal-card .border-2.dark\\:border-slate-600 {
-        padding: 8px !important;
-      }
-      
-      #modal-card .border-2.dark\\:border-slate-600 .w-12 {
-        width: 36px !important;
-        height: 36px !important;
-      }
+    /* Header - STICKY at top, always visible */
+    #modal-card > div:first-child {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 1000 !important;
+      padding: 8px 10px !important;
+      margin: 0 !important;
+      flex-shrink: 0 !important;
     }
     
-    @media (max-width: 480px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 5px !important;
-      }
-      
-      #modal-card .grid-cols-5 {
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 5px !important;
-      }
-      
-      #modal-card .grid-cols-10 button,
-      #modal-card .grid-cols-5 button {
-        font-size: 11px !important;
-        padding: 3px !important;
-        min-height: 34px !important;
-        min-width: 34px !important;
-      }
-      
-      #modal-card > div:first-child {
-        padding: 6px 8px !important;
-      }
-      
-      #modal-card > div:first-child .w-16,
-      #modal-card > div:first-child .w-16.h-16 {
-        width: 30px !important;
-        height: 30px !important;
-      }
-      
-      #modal-card > div:first-child h2 {
-        font-size: 0.95rem !important;
-      }
-      
-      #modal-card .text-xl {
-        font-size: 0.9rem !important;
-      }
-      
-      #modal-card .text-lg {
-        font-size: 0.8rem !important;
-      }
+    /* Header content compact */
+    #modal-card > div:first-child .w-16,
+    #modal-card > div:first-child .w-16.h-16 {
+      width: 36px !important;
+      height: 36px !important;
+      flex-shrink: 0 !important;
     }
     
-    @media (max-width: 375px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 4px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 10px !important;
-        padding: 2px !important;
-        min-height: 30px !important;
-        min-width: 30px !important;
-      }
-      
-      #modal-card .p-6,
-      #modal-card .p-8 {
-        padding: 6px !important;
-      }
-      
-      #modal-card > div:first-child h2 {
-        font-size: 0.85rem !important;
-      }
+    #modal-card > div:first-child h2 {
+      font-size: 1.1rem !important;
+      line-height: 1.2 !important;
     }
     
-    @media (max-width: 320px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 3px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 9px !important;
-        padding: 1px !important;
-        min-height: 26px !important;
-        min-width: 26px !important;
-      }
-    }
-      
-      #modal-card > div:first-child h2 {
-        font-size: 1rem !important;
-      }
-      
-      /* Smaller text */
-      #modal-card .text-xl {
-        font-size: 0.95rem !important;
-      }
-      
-      #modal-card .text-lg {
-        font-size: 0.85rem !important;
-      }
+    #modal-card > div:first-child .text-sm {
+      font-size: 0.65rem !important;
+      display: none !important;
     }
     
-    @media (max-width: 375px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 5px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 11px !important;
-        padding: 3px !important;
-        min-height: 32px !important;
-        min-width: 32px !important;
-      }
-      
-      #modal-card .p-6,
-      #modal-card .p-8 {
-        padding: 8px !important;
-        padding-bottom: 100px !important;
-      }
+    /* Close button always visible and accessible */
+    #modal-card > div:first-child button {
+      min-width: 50px !important;
+      padding: 5px 8px !important;
+      font-size: 11px !important;
+      flex-shrink: 0 !important;
     }
     
-    @media (max-width: 320px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 4px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 10px !important;
-        padding: 2px !important;
-        min-height: 28px !important;
-        min-width: 28px !important;
-      }
-    }
-        font-size: 0.9rem !important;
-      }
+    #modal-card > div:first-child .flex.items-center.gap-2 {
+      gap: 4px !important;
     }
     
-    @media (max-width: 375px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 4px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 12px !important;
-        padding: 6px !important;
-        min-height: 38px;
-      }
-      
-      #modal-card .p-6,
-      #modal-card .p-8 {
-        padding: 10px !important;
-        padding-bottom: 80px !important;
-      }
+    /* Content area - scrollable */
+    #modal-card > div:not(:first-child) {
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
     }
     
-    @media (max-width: 320px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 3px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 11px !important;
-        padding: 4px !important;
-        min-height: 34px;
-      }
+    /* All padding sections more compact */
+    #modal-card .p-6 {
+      padding: 8px !important;
     }
     
-    /* Elegant Ticket Print Animation */
-    .ticket-print {
-      width: 340px; 
-      border-radius: var(--radius-xl); 
-      background: white;
-      box-shadow: var(--shadow-xl);
-      padding: 24px; 
-      transform-origin: top center; 
-      animation: printIn 700ms cubic-bezier(.25,.1,.25,1);
-      color: #000 !important;
-    }
-    @keyframes printIn {
-      0% { transform: translateY(40px) scale(.95); opacity: 0; }
-      60% { transform: translateY(-8px) scale(1.02); opacity: 1; }
-      100% { transform: translateY(0) scale(1); }
+    #modal-card .p-8 {
+      padding: 10px !important;
     }
     
-    .printer-slot { 
-      width: 100%; 
-      height: 14px; 
-      background: linear-gradient(180deg, #2c2c2e 0%, #1c1c1e 100%);
-      border-bottom: 4px solid rgba(0,0,0,0.4); 
-      position: relative; 
-      box-shadow: inset 0 2px 4px rgba(255,255,255,0.02); 
-      margin-bottom: 8px; 
-      border-radius: 8px 8px 0 0; 
-    }
-    .printer-slot::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); top: 50%; width: 60%; height: 4px; background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius: 2px; }
-
-    .ticket-entrance { transform-origin: top center; animation: slideFromTop 700ms cubic-bezier(.25,.1,.25,1); }
-    @keyframes slideFromTop {
-      0% { transform: translateY(-140%) scale(.98); opacity: 0; }
-      60% { transform: translateY(10px) scale(1.02); opacity: 1; }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
+    /* Add safe padding at bottom for iOS home indicator */
+    #modal-card > div:last-child {
+      padding-bottom: 100px !important;
     }
     
-    /* Dark mode for modal card */
-    .dark #modal-card { background: #1c1c1e; color: #f5f5f7; }
-    .dark #modal-card .bg-white { background: #2c2c2e !important; }
-    .dark #modal-card .text-gray-500 { color: #a1a1a6 !important; }
-    .dark #modal-card .border { border-color: rgba(255,255,255,0.1) !important; }
-    .dark #modal-card .bg-gray-50 { background: rgba(255,255,255,0.05) !important; }
-    
-    /* Lottery modal specific dark mode */
-    #modal-card.lottery-dark-mode { background: #1c1c1e; color: #f5f5f7; }
-    #modal-card.lottery-dark-mode .bg-white { background: #2c2c2e !important; }
-    #modal-card.lottery-dark-mode .text-gray-500 { color: #a1a1a6 !important; }
-    #modal-card.lottery-dark-mode .text-gray-600 { color: #8e8e93 !important; }
-    #modal-card.lottery-dark-mode .text-gray-700 { color: #c7c7cc !important; }
-    #modal-card.lottery-dark-mode .border { border-color: rgba(255,255,255,0.1) !important; }
-    #modal-card.lottery-dark-mode .bg-gray-50 { background: rgba(255,255,255,0.05) !important; }
-    #modal-card.lottery-dark-mode .bg-blue-50 { background: rgba(0, 113, 227, 0.15) !important; }
-    #modal-card.lottery-dark-mode .bg-green-50 { background: rgba(52, 199, 89, 0.15) !important; }
-    
-    /* Premium Number Button */
-    .num-btn { 
-      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-      border-radius: var(--radius-md);
-    }
-    .num-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-    .num-btn.selected { 
-      transform: translateY(-2px); 
-      box-shadow: 0 8px 24px rgba(0, 113, 227, 0.3); 
+    /* Number grid - 5 columns with proper spacing */
+    #modal-card .grid-cols-10 {
+      grid-template-columns: repeat(5, 1fr) !important;
+      gap: 6px !important;
     }
     
-    /* Premium Brand Gradient */
-    .bg-gradient-brand {
-      background: linear-gradient(135deg, #0071e3 0%, #42a5f5 100%);
+    #modal-card .grid-cols-10 button {
+      font-size: 12px !important;
+      padding: 4px !important;
+      min-height: 38px !important;
+      min-width: 38px !important;
+      aspect-ratio: 1 !important;
     }
     
-    /* Premium Animations */
-    .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.25, 0.1, 0.25, 1); }
-    @keyframes fadeIn { 
-      from { opacity: 0; transform: translateY(12px); } 
-      to { opacity: 1; transform: translateY(0); } 
-    }
-    @keyframes loading { from { width: 0%; } to { width: 100%; } }
-    
-    /* Premium Input Fields */
-    input, select, textarea {
-      border-radius: var(--radius-md);
-      transition: all 0.2s ease;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+    /* Game type cards - single column */
+    #modal-card .grid.grid-cols-1.md\\:grid-cols-2 {
+      grid-template-columns: 1fr !important;
+      gap: 8px !important;
     }
     
-    /* Elegant Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+    #modal-card button.p-6 {
+      padding: 8px !important;
     }
-    ::-webkit-scrollbar-track {
-      background: transparent;
+    
+    #modal-card .w-16.h-16 {
+      width: 40px !important;
+      height: 40px !important;
     }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 4px;
+    
+    #modal-card .text-2xl.font-bold {
+      font-size: 1rem !important;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(0, 0, 0, 0.3);
+    
+    #modal-card .text-3xl.font-bold {
+      font-size: 1.1rem !important;
     }
-    .dark ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
+    
+    /* 3-column layout becomes 1 column (Step 3) */
+    #modal-card .lg\\:grid-cols-3,
+    #modal-card .grid-cols-1.lg\\:grid-cols-3 {
+      grid-template-columns: 1fr !important;
+      gap: 12px !important;
     }
-    .dark ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.3);
+    
+    #modal-card .lg\\:col-span-2 {
+      grid-column: span 1 !important;
     }
-
-    /* Premium Trust Badge */
-    .trust-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      background: linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(0, 113, 227, 0.1) 100%);
-      border: 1px solid rgba(52, 199, 89, 0.2);
-      border-radius: var(--radius-full);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--success);
+    
+    /* Step info bar compact */
+    #modal-card .mb-4.p-4 {
+      padding: 6px !important;
+      margin-bottom: 6px !important;
     }
-
-    /* Shimmer Effect for Loading */
-    .shimmer {
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
+    
+    #modal-card .mb-4.p-4 button {
+      padding: 3px 6px !important;
+      font-size: 10px !important;
     }
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+    
+    /* Sidebar compact */
+    #modal-card .bg-gray-50.dark\\:bg-slate-900 {
+      padding: 10px !important;
+    }
+    
+    #modal-card .bg-gray-50.dark\\:bg-slate-900 .text-2xl {
+      font-size: 1.1rem !important;
+    }
+    
+    /* Step 1 banca cards compact */
+    #modal-card .border-2.dark\\:border-slate-600 {
+      padding: 8px !important;
+    }
+    
+    #modal-card .border-2.dark\\:border-slate-600 .w-12 {
+      width: 36px !important;
+      height: 36px !important;
+    }
+    
+    /* Mobile-specific utility classes - always applied */
+    .mobile-full-width {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    
+    .mobile-stack {
+      flex-direction: column !important;
+    }
+    
+    .mobile-center {
+      text-align: center !important;
+      justify-content: center !important;
+    }
+    
+    .mobile-hide {
+      display: none !important;
+    }
+    
+    /* Hide desktop-only elements */
+    .desktop-hide {
+      display: none !important;
+    }
+    
+    /* FORCE MOBILE-ONLY LAYOUT - Override all responsive classes */
+    /* Force hide desktop navigation */
+    .hidden.lg\\:flex,
+    nav.hidden.lg\\:flex {
+      display: none !important;
+    }
+    
+    /* Force show mobile navigation */
+    .lg\\:hidden {
+      display: block !important;
+    }
+    
+    /* Force mobile button display */
+    .hidden.md\\:block,
+    .hidden.md\\:flex {
+      display: none !important;
+    }
+    
+    /* Force single column grids - override all responsive grid classes */
+    .grid-cols-1.sm\\:grid-cols-2,
+    .grid-cols-1.md\\:grid-cols-2,
+    .grid-cols-1.lg\\:grid-cols-2,
+    .grid-cols-1.md\\:grid-cols-3,
+    .grid-cols-1.lg\\:grid-cols-3,
+    .grid-cols-1.lg\\:grid-cols-4,
+    .sm\\:grid-cols-2.lg\\:grid-cols-4 {
+      grid-template-columns: 1fr !important;
+    }
+    
+    /* Force column spans to full width */
+    .lg\\:col-span-2,
+    .md\\:col-span-3,
+    .sm\\:col-span-2 {
+      grid-column: span 1 !important;
+    }
+    
+    /* Force mobile flex direction */
+    .flex-col.md\\:flex-row,
+    .flex-col.lg\\:flex-row {
+      flex-direction: column !important;
+    }
+    
+    /* Force mobile width classes */
+    .md\\:w-2\\/5,
+    .md\\:w-3\\/5 {
+      width: 100% !important;
+    }
+    
+    /* Force mobile text alignment */
+    .text-center.lg\\:text-left {
+      text-align: center !important;
+    }
+    
+    /* Force mobile justify */
+    .justify-center.lg\\:justify-start {
+      justify-content: center !important;
+    }
+    
+    /* Force mobile margins */
+    .mx-auto.lg\\:mx-0 {
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    
+    /* Force mobile gaps */
+    .gap-8.lg\\:gap-12 {
+      gap: 2rem !important;
+    }
+    
+    /* Force mobile padding/spacing */
+    .pb-24.lg\\:pb-32 {
+      padding-bottom: 6rem !important;
+    }
+    
+    /* Override all utility responsive prefixes to use mobile values */
+    [class*="sm:"],
+    [class*="md:"],
+    [class*="lg:"],
+    [class*="xl:"] {
+      /* Mobile-first approach - larger screens ignored */
     }
   </style>
 </head>
