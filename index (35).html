@@ -259,12 +259,6 @@
       max-height: calc(100dvh - 120px);
     }
     
-    /* Map adjustments */
-    #demo-leaflet-map, #banca-selection-map {
-      height: 50vh;
-      border-radius: var(--radius-lg);
-    }
-    
     /* Force single column on mobile */
     .grid-cols-2:not(.keep-cols), .grid-cols-3:not(.keep-cols), .grid-cols-4:not(.keep-cols) {
       grid-template-columns: 1fr;
@@ -316,6 +310,7 @@
     /* Map height - mobile optimized */
     #demo-leaflet-map, #banca-selection-map {
       height: 40vh;
+      border-radius: var(--radius-lg);
     }
     
     /* Toggle switch scaling */
@@ -695,34 +690,10 @@
       height: 36px !important;
     }
     
-    /* Mobile-specific utility classes - always applied */
-    .mobile-full-width {
-      width: 100% !important;
-      max-width: 100% !important;
-    }
-    
-    .mobile-stack {
-      flex-direction: column !important;
-    }
-    
-    .mobile-center {
-      text-align: center !important;
-      justify-content: center !important;
-    }
-    
-    .mobile-hide {
-      display: none !important;
-    }
-    
-    /* Hide desktop-only elements */
-    .desktop-hide {
-      display: none !important;
-    }
-    
     /* FORCE MOBILE-ONLY LAYOUT - Override all responsive classes */
     /* Force hide desktop navigation */
     .hidden.lg\\:flex,
-    nav.hidden.lg\\:flex {
+    nav.lg\\:flex {
       display: none !important;
     }
     
@@ -791,14 +762,6 @@
     /* Force mobile padding/spacing */
     .pb-24.lg\\:pb-32 {
       padding-bottom: 6rem !important;
-    }
-    
-    /* Override all utility responsive prefixes to use mobile values */
-    [class*="sm:"],
-    [class*="md:"],
-    [class*="lg:"],
-    [class*="xl:"] {
-      /* Mobile-first approach - larger screens ignored */
     }
   </style>
 </head>
