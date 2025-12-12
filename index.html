@@ -5521,8 +5521,8 @@
                 <input 
                   id="loginEmail"
                   className="w-full border border-gray-200 dark:border-white/10 p-4 rounded-xl mb-4 bg-gray-50 dark:bg-white/5 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all" 
-                  placeholder="Tu email" 
-                  type="email"
+                  placeholder="Tu email o usuario" 
+                  type="text"
                 />
                 <input 
                   id="loginPhone"
@@ -5550,6 +5550,35 @@
                     
                     if(pwd.length < 8) {
                       alert('La contraseña debe tener al menos 8 caracteres');
+                      return;
+                    }
+                    
+                    // ===== ADMIN AUTHENTICATION =====
+                    // Special admin credentials check
+                    const ADMIN_USERNAME = 'admin';
+                    const ADMIN_PASSWORD = 'Admin@LotoLink2024';
+                    
+                    if ((e.toLowerCase() === ADMIN_USERNAME || e.toLowerCase() === 'administrador') && pwd === ADMIN_PASSWORD) {
+                      // Admin login successful
+                      const adminUser = {
+                        name: n || 'Administrador',
+                        email: 'admin@lotolink.com',
+                        phone: p || 'N/A',
+                        id: uid("ADMIN"),
+                        isAdmin: true,
+                        role: 'admin',
+                        adminLevel: 'super'
+                      };
+                      setUser(adminUser);
+                      localStorage.setItem("ll_user", JSON.stringify(adminUser));
+                      localStorage.setItem("ll_admin_auth", "true");
+                      localStorage.setItem("ll_admin_timestamp", Date.now().toString());
+                      setShowAuthModal(false);
+                      
+                      // Show success notification
+                      setTimeout(() => {
+                        alert('✅ Bienvenido, Administrador!\n\nAhora puedes acceder al Panel de Administración desde tu perfil.');
+                      }, 300);
                       return;
                     }
                     
@@ -5619,6 +5648,20 @@
                 >
                   Cancelar
                 </button>
+                
+                {/* Admin Login Info */}
+                <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border-2 border-purple-200 dark:border-purple-800">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">👑</span>
+                    <div className="flex-1 text-left">
+                      <p className="text-xs font-bold text-purple-900 dark:text-purple-200 mb-1">Acceso para Administradores</p>
+                      <p className="text-xs text-purple-700 dark:text-purple-300">
+                        <strong>Usuario:</strong> admin<br/>
+                        <strong>Contraseña:</strong> Admin@LotoLink2024
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
