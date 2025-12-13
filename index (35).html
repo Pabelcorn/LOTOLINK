@@ -197,72 +197,74 @@
     }
     
     /* ========================================
-       MOBILE-ONLY OPTIMIZED LAYOUT
-       Permanently optimized for mobile devices
+       MOBILE RESPONSIVE ENHANCEMENTS
+       Full responsive support for all phone sizes
        ======================================== */
     
-    /* Base mobile styles - always applied */
-    /* Improve text readability on mobile */
-    html {
-      font-size: 16px;
-      -webkit-text-size-adjust: 100%;
-    }
-    
-    body {
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-    }
-    
-    /* Better container spacing */
-    .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
-      padding-left: 16px;
-      padding-right: 16px;
-      width: 100%;
-    }
-    
-    /* Cards optimization */
-    .premium-card {
-      padding: 16px;
-      border-radius: var(--radius-lg);
-      margin-left: 0;
-      margin-right: 0;
-    }
-    
-    /* Buttons - larger touch targets */
-    .btn-apple-primary, .btn-apple-secondary {
-      padding: 12px 20px;
-      font-size: 15px;
-      min-height: 48px;
-      width: 100%;
-      justify-content: center;
-    }
-    
-    /* Grid improvements - always active */
-    .grid-cols-4 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    
-    .grid-cols-3 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    
-    /* Form elements */
-    input, select, textarea {
-      font-size: 16px !important; /* Prevents iOS zoom on focus */
-      min-height: 48px;
-      padding: 12px;
-    }
-    
-    /* Modal improvements */
-    .modal-scroll {
-      max-height: calc(100vh - 120px);
-      max-height: calc(100dvh - 120px);
-    }
-    
-    /* Map adjustments */
-    #demo-leaflet-map, #banca-selection-map {
-      height: 50vh;
-      border-radius: var(--radius-lg);
+    /* Base mobile styles - applies to all mobile devices */
+    @media (max-width: 768px) {
+      /* Improve text readability on mobile */
+      html {
+        font-size: 16px;
+        -webkit-text-size-adjust: 100%;
+      }
+      
+      body {
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Better container spacing */
+      .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
+        padding-left: 16px;
+        padding-right: 16px;
+        width: 100%;
+      }
+      
+      /* Cards optimization */
+      .premium-card {
+        padding: 16px;
+        border-radius: var(--radius-lg);
+        margin-left: 0;
+        margin-right: 0;
+      }
+      
+      /* Buttons - larger touch targets */
+      .btn-apple-primary, .btn-apple-secondary {
+        padding: 12px 20px;
+        font-size: 15px;
+        min-height: 48px;
+        width: 100%;
+        justify-content: center;
+      }
+      
+      /* Grid improvements for tablets */
+      .grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      
+      .grid-cols-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      
+      /* Form elements */
+      input, select, textarea {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+        min-height: 48px;
+        padding: 12px;
+      }
+      
+      /* Modal improvements */
+      .modal-scroll {
+        max-height: calc(100vh - 120px);
+        max-height: calc(100dvh - 120px);
+      }
+      
+      /* Map adjustments */
+      #demo-leaflet-map, #banca-selection-map {
+        height: 50vh;
+        border-radius: var(--radius-lg);
+      }
     }
     
     /* Small tablets and large phones (max-width: 640px) */
@@ -625,61 +627,6 @@
         border-color: rgba(255, 255, 255, 0.1);
         color: #f5f5f7;
       }
-    }
-    
-    /* ========================================
-       FORCE MOBILE-ONLY NAVIGATION & UI
-       Target specific elements without affecting grids
-       ======================================== */
-    
-    /* Hide desktop navigation permanently */
-    .hidden.lg\\:flex,
-    nav.hidden.lg\\:flex {
-      display: none !important;
-    }
-    
-    /* Show mobile elements permanently */
-    .lg\\:hidden {
-      display: block !important;
-    }
-    
-    nav.lg\\:hidden {
-      display: flex !important;
-    }
-    
-    /* Force mobile hamburger menu to always show */
-    button.lg\\:hidden {
-      display: flex !important;
-    }
-    
-    /* ========================================
-       MOBILE-OPTIMIZED LOTTERIES GRID
-       Simple grid without Tailwind responsive classes
-       ======================================== */
-    
-    /* Lotteries container - mobile-first grid */
-    .lotteries-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-      width: 100%;
-    }
-    
-    /* Lotteries grid - 2 columns on wider mobile devices */
-    @media (min-width: 480px) {
-      .lotteries-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-      }
-    }
-    
-    /* Ensure lottery buttons are properly styled */
-    .lotteries-grid > button {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      min-height: 80px;
-      text-align: left;
     }
     
     /* Fix for iOS rubber-banding */
@@ -5100,7 +5047,7 @@
                  <h2 className="text-2xl font-bold mb-2 dark:text-white">Loterías Disponibles</h2>
                  <p className="text-gray-600 dark:text-gray-300 mb-6">Las jugadas se agregarán automáticamente a tu <strong>Bolso Global</strong>.</p>
                  <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
-                   <div id="lotteries" className="lotteries-grid"></div>
+                   <div id="lotteries" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
                  </div>
                  
                  {/* Modal Container */}
