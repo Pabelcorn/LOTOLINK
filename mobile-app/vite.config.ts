@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 import path from 'path'
 
 // https://vitejs.dev/config/
+// Since index.html is now a self-contained single-file app with inline React,
+// we don't need the React plugin or TypeScript compilation
 export default defineConfig({
-  plugins: [react()],
+  plugins: [],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -16,13 +17,10 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false,
     rollupOptions: {
-      output: {
-        manualChunks: {
-          'ionic': ['@ionic/react', '@ionic/react-router'],
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-        }
+      input: {
+        main: path.resolve(__dirname, 'index.html')
       }
     }
   }
