@@ -652,6 +652,32 @@
       display: flex !important;
     }
     
+    /* ========================================
+       PROTECT LOTTERIES SECTION FROM VIEWPORT ISSUES
+       Ensure lotteries display correctly on all screen sizes
+       ======================================== */
+    
+    /* Ensure lotteries container always has proper spacing */
+    #lotteries {
+      gap: 1.5rem !important; /* 24px - consistent gap on all viewports */
+      display: grid !important;
+    }
+    
+    /* Ensure lotteries parent container has proper padding on all screens */
+    #lotteries.grid {
+      padding: 0 !important;
+      min-height: 100px; /* Prevent collapse */
+    }
+    
+    /* Ensure lottery buttons are always visible and properly sized */
+    #lotteries button {
+      min-height: 80px !important;
+      width: 100% !important;
+      display: flex !important;
+      padding: 1rem !important;
+      box-sizing: border-box !important;
+    }
+    
     /* Fix for iOS rubber-banding */
     .no-bounce {
       overscroll-behavior: none;
