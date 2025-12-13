@@ -9,7 +9,7 @@
   <style>
     /* ========================================
        FORCE MOBILE RESPONSIVE DESIGN ON ALL DEVICES
-       This ensures mobile layout is ALWAYS active
+       Mobile layout adapts to screen size (phone, tablet, desktop)
        ======================================== */
     
     /* Override Tailwind responsive classes to force mobile layout */
@@ -18,25 +18,19 @@
     }
     
     html {
-      max-width: 480px !important;
-      margin: 0 auto !important;
       overflow-x: hidden !important;
       font-size: 16px !important;
       -webkit-text-size-adjust: 100%;
-      background: #1a1a1a !important; /* Dark background to simulate desktop viewing mobile */
     }
     
     body {
-      max-width: 480px !important;
-      margin: 0 auto !important;
       overflow-x: hidden !important;
       -webkit-overflow-scrolling: touch;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5) !important; /* Add shadow to simulate phone frame */
     }
     
     #root {
-      max-width: 480px !important;
       width: 100% !important;
+      max-width: 100% !important;
     }
     
     /* Force mobile layout classes */
@@ -107,24 +101,23 @@
       display: flex !important;
     }
     
-    /* Typography - mobile sizing */
+    /* Typography - mobile sizing that scales with screen */
     h1, .text-4xl, .text-5xl {
-      font-size: 1.75rem !important;
+      font-size: clamp(1.5rem, 4vw, 2.5rem) !important;
       line-height: 1.2 !important;
     }
     
     h2, .text-3xl {
-      font-size: 1.5rem !important;
+      font-size: clamp(1.25rem, 3.5vw, 2rem) !important;
     }
     
     h3, .text-2xl {
-      font-size: 1.25rem !important;
+      font-size: clamp(1.1rem, 3vw, 1.5rem) !important;
     }
     
-    /* Buttons - full width mobile */
+    /* Buttons - mobile touch targets */
     .btn-apple-primary, .btn-apple-secondary {
       min-height: 48px !important;
-      width: 100% !important;
     }
     
     /* Cards - mobile padding */
@@ -167,15 +160,15 @@
       text-align: left !important;
     }
     
-    /* Override responsive text sizes - force mobile sizes */
-    .sm\:text-base { font-size: 0.875rem !important; }
-    .sm\:text-lg { font-size: 1rem !important; }
-    .sm\:text-xl { font-size: 1.125rem !important; }
-    .sm\:text-2xl { font-size: 1.25rem !important; }
-    .sm\:text-3xl { font-size: 1.5rem !important; }
-    .sm\:text-4xl { font-size: 1.75rem !important; }
-    .md\:text-5xl { font-size: 1.875rem !important; }
-    .lg\:text-6xl { font-size: 2rem !important; }
+    /* Override responsive text sizes - scale with viewport */
+    .sm\:text-base { font-size: clamp(0.875rem, 2vw, 1rem) !important; }
+    .sm\:text-lg { font-size: clamp(1rem, 2.5vw, 1.25rem) !important; }
+    .sm\:text-xl { font-size: clamp(1.125rem, 2.75vw, 1.5rem) !important; }
+    .sm\:text-2xl { font-size: clamp(1.25rem, 3vw, 1.75rem) !important; }
+    .sm\:text-3xl { font-size: clamp(1.5rem, 3.5vw, 2rem) !important; }
+    .sm\:text-4xl { font-size: clamp(1.75rem, 4vw, 2.5rem) !important; }
+    .md\:text-5xl { font-size: clamp(1.875rem, 4.5vw, 3rem) !important; }
+    .lg\:text-6xl { font-size: clamp(2rem, 5vw, 3.5rem) !important; }
     
     /* Force buttons to maintain mobile flex behavior */
     .flex-1.sm\:flex-initial,
@@ -184,19 +177,19 @@
       flex: 1 1 0% !important;
     }
     
-    /* Force mobile padding - prevent desktop larger padding */
-    .sm\:p-8 { padding: 1rem !important; }
-    .sm\:p-6 { padding: 1rem !important; }
-    .sm\:p-5 { padding: 1rem !important; }
-    .sm\:p-4 { padding: 0.75rem !important; }
-    .sm\:p-3 { padding: 0.75rem !important; }
-    .md\:p-12 { padding: 1.5rem !important; }
+    /* Adaptive padding - scales with screen size */
+    .sm\:p-8 { padding: clamp(1rem, 2vw, 2rem) !important; }
+    .sm\:p-6 { padding: clamp(1rem, 2vw, 1.5rem) !important; }
+    .sm\:p-5 { padding: clamp(1rem, 1.5vw, 1.25rem) !important; }
+    .sm\:p-4 { padding: clamp(0.75rem, 1.5vw, 1rem) !important; }
+    .sm\:p-3 { padding: clamp(0.75rem, 1vw, 0.875rem) !important; }
+    .md\:p-12 { padding: clamp(1.5rem, 3vw, 3rem) !important; }
     
-    .sm\:px-8 { padding-left: 1rem !important; padding-right: 1rem !important; }
-    .sm\:px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
-    .sm\:px-5 { padding-left: 0.875rem !important; padding-right: 0.875rem !important; }
-    .sm\:px-4 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
-    .sm\:px-3 { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
+    .sm\:px-8 { padding-left: clamp(1rem, 2vw, 2rem) !important; padding-right: clamp(1rem, 2vw, 2rem) !important; }
+    .sm\:px-6 { padding-left: clamp(1rem, 2vw, 1.5rem) !important; padding-right: clamp(1rem, 2vw, 1.5rem) !important; }
+    .sm\:px-5 { padding-left: clamp(0.875rem, 1.5vw, 1.25rem) !important; padding-right: clamp(0.875rem, 1.5vw, 1.25rem) !important; }
+    .sm\:px-4 { padding-left: clamp(0.75rem, 1.5vw, 1rem) !important; padding-right: clamp(0.75rem, 1.5vw, 1rem) !important; }
+    .sm\:px-3 { padding-left: clamp(0.625rem, 1vw, 0.875rem) !important; padding-right: clamp(0.625rem, 1vw, 0.875rem) !important; }
   </style>
   
   <!-- PWA Meta Tags -->
