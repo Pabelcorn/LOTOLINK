@@ -1,10 +1,18 @@
 # LotoLink Mobile App 📱
 
-**Native iOS & Android application built with Ionic + Capacitor + React + TypeScript**
+**Native iOS & Android application - Self-contained single-file app with full responsive design**
 
 ## 🚀 Overview
 
-LotoLink Mobile is a native mobile application that brings the LOTOLINK lottery platform to iOS and Android devices. Built with modern web technologies that compile to truly native applications.
+LotoLink Mobile is a native mobile application that brings the LOTOLINK lottery platform to iOS and Android devices. Built with a self-contained HTML application that includes complete responsive design optimized for all mobile devices.
+
+### Architecture Highlights
+- **Single-file application** - Complete app in one HTML file with inline React
+- **Fully responsive** - Optimized breakpoints for all screen sizes (320px to tablets)
+- **Native mobile features** - Capacitor integration for camera, geolocation, notifications
+- **PWA-ready** - Works offline with service worker support
+- **Safe area support** - Proper handling of notched devices (iPhone X and newer)
+- **Touch-optimized** - 44x44pt minimum tap targets following Apple HIG
 
 ## ✨ Features
 
@@ -12,10 +20,11 @@ LotoLink Mobile is a native mobile application that brings the LOTOLINK lottery 
 - ✅ **Native iOS and Android apps** - Single codebase, native performance
 - ✅ **Apple-inspired premium design** - Glass morphism, smooth animations
 - ✅ **Multiple lottery games** - Quiniela, Palé, Tripleta, and more
-- ✅ **Banca locator** - Find nearest lottery locations
+- ✅ **Banca locator** - Find nearest lottery locations with interactive maps
 - ✅ **User profile management** - Wallet, settings, preferences
 - ✅ **Dark mode support** - Automatic based on system preferences
-- ✅ **Responsive design** - Optimized for all screen sizes
+- ✅ **Fully responsive design** - Perfect on all devices from 320px phones to tablets
+- ✅ **Voice assistant** - AI-powered voice commands for playing lottery
 
 ### Native Integrations (Ready to implement)
 - 🔔 **Push Notifications** - Firebase Cloud Messaging
@@ -30,12 +39,27 @@ LotoLink Mobile is a native mobile application that brings the LOTOLINK lottery 
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Ionic** | 7.5.4 | UI Components & Framework |
 | **Capacitor** | 5.5.1 | Native Bridge |
-| **React** | 18.2.0 | UI Library |
-| **TypeScript** | 5.3.3 | Type Safety |
+| **React** | 17.x (CDN) | UI Library (loaded from unpkg CDN) |
 | **Vite** | 5.0.6 | Build Tool |
-| **Axios** | 1.6.2 | HTTP Client |
+| **Tailwind CSS** | Latest (CDN) | Styling Framework |
+| **Leaflet** | 1.9.4 | Interactive Maps |
+| **Chart.js** | Latest | Data Visualization |
+
+### Architecture Notes
+- The app uses a self-contained single-file architecture with all dependencies loaded from CDN
+- No TypeScript compilation needed - pure HTML/CSS/JavaScript
+- Vite is used only to copy the HTML file to the dist folder
+- Capacitor wraps the web app into native containers for iOS and Android
+
+### Note on Dependencies
+The `package.json` includes some dependencies (like `@ionic/react`, `typescript`, etc.) that are not directly used by the single-file app. These are kept for:
+- Capacitor plugin compatibility
+- Potential future development tools
+- Avoiding breaking changes in CI/CD workflows
+- Developer tooling (linting, testing)
+
+The runtime application doesn't require any of these - all UI dependencies are loaded from CDN.
 
 ## 📦 Installation
 
