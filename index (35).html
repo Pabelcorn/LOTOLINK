@@ -152,6 +152,35 @@
     .grid-cols-4:not(.keep-cols) {
       grid-template-columns: 1fr !important;
     }
+    
+    /* Force flex layouts to column (mobile stack) */
+    .md\:flex-row,
+    .lg\:flex-row,
+    .sm\:flex-row {
+      flex-direction: column !important;
+    }
+    
+    /* Force flex items to stack */
+    .flex-col.md\:flex-row,
+    .flex-col.lg\:flex-row,
+    .flex-col.sm\:flex-row {
+      flex-direction: column !important;
+    }
+    
+    /* Force text alignment to mobile (center/left) */
+    .lg\:text-left {
+      text-align: left !important;
+    }
+    
+    /* Override responsive text sizes - force mobile sizes */
+    .sm\:text-base { font-size: 0.875rem !important; }
+    .sm\:text-lg { font-size: 1rem !important; }
+    .sm\:text-xl { font-size: 1.125rem !important; }
+    .sm\:text-2xl { font-size: 1.25rem !important; }
+    .sm\:text-3xl { font-size: 1.5rem !important; }
+    .sm\:text-4xl { font-size: 1.75rem !important; }
+    .md\:text-5xl { font-size: 1.875rem !important; }
+    .lg\:text-6xl { font-size: 2rem !important; }
   </style>
   
   <!-- PWA Meta Tags -->
