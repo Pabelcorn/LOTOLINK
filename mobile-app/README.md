@@ -52,6 +52,15 @@ LotoLink Mobile is a native mobile application that brings the LOTOLINK lottery 
 - Vite is used only to copy the HTML file to the dist folder
 - Capacitor wraps the web app into native containers for iOS and Android
 
+### Note on Dependencies
+The `package.json` includes some dependencies (like `@ionic/react`, `typescript`, etc.) that are not directly used by the single-file app. These are kept for:
+- Capacitor plugin compatibility
+- Potential future development tools
+- Avoiding breaking changes in CI/CD workflows
+- Developer tooling (linting, testing)
+
+The runtime application doesn't require any of these - all UI dependencies are loaded from CDN.
+
 ## 📦 Installation
 
 ### Prerequisites
