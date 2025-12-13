@@ -197,8 +197,14 @@
        ======================================== */
     
     /* Bottom Navigation Bar - Adaptive sizing and centering */
+    /* Center on ALL screen sizes */
+    nav.fixed.bottom-0[class*="lg:hidden"] > div {
+      justify-content: center !important;
+      gap: clamp(0.5rem, 4vw, 2rem) !important;
+    }
+    
     @media (min-width: 768px) {
-      /* Center the navigation and add max-width for tablet/desktop */
+      /* Add max-width and extra padding for tablet/desktop */
       nav.fixed.bottom-0[class*="lg:hidden"] > div {
         max-width: 600px !important;
         margin: 0 auto !important;
