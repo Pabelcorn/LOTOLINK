@@ -23,6 +23,7 @@
       overflow-x: hidden !important;
       font-size: 16px !important;
       -webkit-text-size-adjust: 100%;
+      background: #1a1a1a !important; /* Dark background to simulate desktop viewing mobile */
     }
     
     body {
@@ -30,6 +31,7 @@
       margin: 0 auto !important;
       overflow-x: hidden !important;
       -webkit-overflow-scrolling: touch;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5) !important; /* Add shadow to simulate phone frame */
     }
     
     #root {
@@ -42,6 +44,28 @@
       display: flex !important;
     }
     
+    /* Hide desktop navigation - handle "hidden lg:flex" pattern */
+    .hidden.lg\:flex {
+      display: none !important;
+    }
+    
+    .hidden.lg\:block {
+      display: none !important;
+    }
+    
+    .hidden.lg\:grid {
+      display: none !important;
+    }
+    
+    .hidden.md\:flex {
+      display: none !important;
+    }
+    
+    .hidden.md\:block {
+      display: none !important;
+    }
+    
+    /* Hide any lg:flex that is not lg:hidden */
     .lg\:flex:not(.lg\:hidden) {
       display: none !important;
     }
