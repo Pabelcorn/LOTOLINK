@@ -2,6 +2,19 @@
 
 Complete guide for building and distributing the LotoLink mobile app for iOS and Android.
 
+## Architecture
+
+The mobile app is built using a self-contained single-file HTML application (`index.html`) that includes:
+- Complete responsive design optimized for all mobile devices (phones and tablets)
+- React application loaded from CDN
+- Full PWA support with offline capabilities
+- Native mobile features through Capacitor
+- Comprehensive responsive CSS with breakpoints for all screen sizes
+- Safe area insets support for notched devices (iPhone X and newer)
+- Touch-optimized UI with proper tap targets (44x44pt minimum)
+
+The build process uses Vite to bundle the HTML and assets into a `dist/` folder, which is then synced to native platforms via Capacitor.
+
 ## Prerequisites
 
 ### General Requirements
