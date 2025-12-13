@@ -65,16 +65,11 @@
       display: none !important;
     }
     
-    /* Hide any lg:flex that is not lg:hidden */
-    .lg\:flex:not(.lg\:hidden) {
-      display: none !important;
-    }
-    
-    .lg\:grid:not(.lg\:hidden) {
-      display: none !important;
-    }
-    
-    .lg\:block:not(.lg\:hidden) {
+    /* Force any desktop-showing classes to hide */
+    nav.hidden.lg\:flex,
+    div.hidden.lg\:flex,
+    button.hidden.lg\:flex,
+    div.hidden.md\:flex {
       display: none !important;
     }
     
@@ -245,21 +240,6 @@
        APPLE-INSPIRED ELEGANT DESIGN SYSTEM
        FORCE MOBILE RESPONSIVE DESIGN ON ALL DEVICES
        ======================================== */
-    
-    /* OVERRIDE: Force mobile viewport on all devices */
-    @media (min-width: 769px) {
-      html, body {
-        max-width: 480px !important;
-        margin: 0 auto !important;
-        background: #e5e5e5;
-      }
-      
-      #root {
-        max-width: 480px !important;
-        margin: 0 auto !important;
-        box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      }
-    }
     
     :root {
       /* Premium Color Palette - Apple inspired */
