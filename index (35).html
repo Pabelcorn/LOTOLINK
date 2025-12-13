@@ -629,6 +629,37 @@
       }
     }
     
+    /* ========================================
+       FORCE MOBILE LAYOUT PERMANENTLY
+       Display mobile design on all screen sizes
+       ======================================== */
+    
+    /* Hide desktop navigation permanently */
+    .hidden.lg\\:flex,
+    nav.hidden.lg\\:flex {
+      display: none !important;
+    }
+    
+    /* Show mobile elements permanently */
+    .lg\\:hidden {
+      display: block !important;
+    }
+    
+    nav.lg\\:hidden {
+      display: flex !important;
+    }
+    
+    /* Force mobile hamburger menu to always show */
+    button.lg\\:hidden {
+      display: flex !important;
+    }
+    
+    /* Force viewport to behave like mobile */
+    body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    
     /* Fix for iOS rubber-banding */
     .no-bounce {
       overscroll-behavior: none;
