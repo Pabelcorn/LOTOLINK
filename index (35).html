@@ -652,6 +652,36 @@
       display: flex !important;
     }
     
+    /* ========================================
+       MOBILE-OPTIMIZED LOTTERIES GRID
+       Simple grid without Tailwind responsive classes
+       ======================================== */
+    
+    /* Lotteries container - mobile-first grid */
+    .lotteries-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      width: 100%;
+    }
+    
+    /* Lotteries grid - 2 columns on wider mobile devices */
+    @media (min-width: 480px) {
+      .lotteries-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+    }
+    
+    /* Ensure lottery buttons are properly styled */
+    .lotteries-grid > button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 80px;
+      text-align: left;
+    }
+    
     /* Fix for iOS rubber-banding */
     .no-bounce {
       overscroll-behavior: none;
@@ -5070,7 +5100,7 @@
                  <h2 className="text-2xl font-bold mb-2 dark:text-white">Loterías Disponibles</h2>
                  <p className="text-gray-600 dark:text-gray-300 mb-6">Las jugadas se agregarán automáticamente a tu <strong>Bolso Global</strong>.</p>
                  <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
-                   <div id="lotteries" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+                   <div id="lotteries" className="lotteries-grid"></div>
                  </div>
                  
                  {/* Modal Container */}
