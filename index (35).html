@@ -190,6 +190,78 @@
     .sm\:px-5 { padding-left: clamp(0.875rem, 1.5vw, 1.25rem) !important; padding-right: clamp(0.875rem, 1.5vw, 1.25rem) !important; }
     .sm\:px-4 { padding-left: clamp(0.75rem, 1.5vw, 1rem) !important; padding-right: clamp(0.75rem, 1.5vw, 1rem) !important; }
     .sm\:px-3 { padding-left: clamp(0.625rem, 1vw, 0.875rem) !important; padding-right: clamp(0.625rem, 1vw, 0.875rem) !important; }
+    
+    /* ========================================
+       ADAPTIVE ENHANCEMENTS FOR LARGER SCREENS
+       Bottom navigation and buttons scale appropriately
+       ======================================== */
+    
+    /* Bottom Navigation Bar - Adaptive sizing and centering */
+    @media (min-width: 768px) {
+      /* Center the navigation and add max-width for tablet/desktop */
+      nav.lg\:hidden.fixed.bottom-0 > div {
+        max-width: 600px !important;
+        margin: 0 auto !important;
+        padding: 1rem 2rem !important;
+      }
+      
+      /* Enlarge bottom nav buttons on larger screens */
+      nav.lg\:hidden.fixed.bottom-0 button {
+        width: clamp(4rem, 8vw, 6rem) !important;
+        padding: 0.75rem !important;
+      }
+      
+      nav.lg\:hidden.fixed.bottom-0 button span:first-child {
+        font-size: clamp(1.5rem, 3vw, 2rem) !important;
+      }
+      
+      nav.lg\:hidden.fixed.bottom-0 button span:last-child {
+        font-size: clamp(0.75rem, 1.5vw, 1rem) !important;
+      }
+      
+      /* Center play button - enlarge it on larger screens */
+      nav.lg\:hidden.fixed.bottom-0 button .w-14.h-14 {
+        width: clamp(3.5rem, 6vw, 5rem) !important;
+        height: clamp(3.5rem, 6vw, 5rem) !important;
+        font-size: clamp(1.75rem, 3.5vw, 2.5rem) !important;
+      }
+    }
+    
+    /* Popular Plays "Agregar rápida" buttons - Adaptive layout */
+    @media (min-width: 640px) {
+      /* Make container flex row to put button on the right */
+      div.mb-2.sm\\:mb-3.pb-2.sm\\:pb-3.border-b {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+      }
+      
+      /* Text content takes available space */
+      div.mb-2.sm\\:mb-3.pb-2.sm\\:pb-3.border-b > div {
+        flex: 1 !important;
+        margin-right: 1rem !important;
+      }
+      
+      /* Agregar rápida button - larger and to the right */
+      div.mb-2.sm\\:mb-3.pb-2.sm\\:pb-3.border-b > button {
+        flex-shrink: 0 !important;
+        padding: 0.75rem 1.5rem !important;
+        font-size: 0.875rem !important;
+        min-width: 150px !important;
+        margin-top: 0 !important;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      /* Even larger on desktop */
+      div.mb-2.sm\\:mb-3.pb-2.sm\\:pb-3.border-b > button {
+        padding: 1rem 2rem !important;
+        font-size: 1rem !important;
+        min-width: 180px !important;
+      }
+    }
   </style>
   
   <!-- PWA Meta Tags -->
