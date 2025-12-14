@@ -137,7 +137,8 @@ jobs:
         with:
           name: mobile-coverage
           path: mobile-app/coverage/
-          retention-days: 7
+          retention-days: 14
+          if-no-files-found: ignore
         if: always()
         continue-on-error: true
 
@@ -338,7 +339,7 @@ jobs:
           path: |
             mobile-app/android/build/reports/
             mobile-app/android/app/build/reports/
-          retention-days: 7
+          retention-days: 14
           if-no-files-found: ignore
 
       - name: Get APK/AAB info
@@ -368,13 +369,36 @@ jobs:
           else
             echo "ℹ️ **Release AAB not built** (requires signing configuration)" >> $GITHUB_STEP_SUMMARY
           fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Download Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Artifacts are available for **30 days** after the workflow run." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To download:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Go to the [Actions tab](https://github.com/${{ github.repository }}/actions)" >> $GITHUB_STEP_SUMMARY
+          echo "2. Select this workflow run" >> $GITHUB_STEP_SUMMARY
+          echo "3. Scroll down to the **Artifacts** section" >> $GITHUB_STEP_SUMMARY
+          echo "4. Click on the artifact name to download" >> $GITHUB_STEP_SUMMARY
+
+      - name: Verify APK exists before upload
+        working-directory: mobile-app/android
+        run: |
+          if [ ! -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "❌ ERROR: app-debug.apk not found!"
+            echo "Build outputs:"
+            find app/build/outputs -name "*.apk" -o -name "*.aab" 2>/dev/null || echo "No APK/AAB files found"
+            exit 1
+          fi
+          echo "✓ APK verified: app-debug.apk exists"
+          ls -lh app/build/outputs/apk/debug/app-debug.apk
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: android-debug-apk
           path: mobile-app/android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 7
+          retention-days: 30
           if-no-files-found: error
 
       - name: Upload Release AAB (if built)
@@ -382,7 +406,7 @@ jobs:
         with:
           name: android-release-aab
           path: mobile-app/android/app/build/outputs/bundle/release/app-release.aab
-          retention-days: 7
+          retention-days: 30
           if-no-files-found: ignore
         continue-on-error: true
 
@@ -562,7 +586,7 @@ jobs:
         with:
           name: ios-build-logs
           path: mobile-app/ios/App/build.log
-          retention-days: 7
+          retention-days: 14
           if-no-files-found: ignore
 
       - name: Get build info
@@ -604,7 +628,7 @@ jobs:
         with:
           name: ios-build-info
           path: mobile-app/ios-build-info.txt
-          retention-days: 7
+          retention-days: 30
           if-no-files-found: warn
 
       - name: Upload iOS app bundle (if available)
@@ -612,7 +636,7 @@ jobs:
         with:
           name: ios-app-bundle
           path: mobile-app/ios/App/build/Build/Products/Debug-iphonesimulator/*.app
-          retention-days: 7
+          retention-days: 30
           if-no-files-found: ignore
         continue-on-error: true
 
@@ -734,7 +758,7 @@ jobs:
         with:
           name: mobile-release-summary
           path: mobile_release_summary.md
-          retention-days: 30
+          retention-days: 90
 
       - name: Add summary to release
         if: startsWith(github.ref, 'refs/tags/mobile-v')
