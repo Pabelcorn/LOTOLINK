@@ -11,11 +11,13 @@ import {
   IonChip,
   IonBackButton,
   IonButtons,
-  IonToast
+  IonToast,
+  IonSpinner
 } from '@ionic/react';
 import { shuffle, cart } from 'ionicons/icons';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 interface GameType {
   id: string;
@@ -38,19 +40,33 @@ const Play: React.FC = () => {
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const [amount] = useState(10);
   const [showToast, setShowToast] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const toggleNumber = (num: number) => {
+  const hapticFeedback = async (style: ImpactStyle = ImpactStyle.Light) => {
+    try {
+      await Haptics.impact({ style });
+    } catch (error) {
+      // Haptics not available in browser
+    }
+  };
+
+  const toggleNumber = async (num: number) => {
     if (!selectedGameType) return;
     
     const index = selectedNumbers.indexOf(num);
     if (index > -1) {
       setSelectedNumbers(selectedNumbers.filter(n => n !== num));
+      await hapticFeedback(ImpactStyle.Light);
     } else if (selectedNumbers.length < selectedGameType.pickCount) {
       setSelectedNumbers([...selectedNumbers, num]);
+      await hapticFeedback(ImpactStyle.Medium);
+    } else {
+      // Feedback for trying to select more than allowed
+      await Haptics.notification({ type: 'WARNING' });
     }
   };
 
-  const quickPick = () => {
+  const quickPick = async () => {
     if (!selectedGameType) return;
     const numbers: number[] = [];
     while (numbers.length < selectedGameType.pickCount) {
@@ -60,13 +76,30 @@ const Play: React.FC = () => {
       }
     }
     setSelectedNumbers(numbers);
+    await hapticFeedback(ImpactStyle.Heavy);
   };
 
-  const addToCart = () => {
+  const addToCart = async () => {
     if (selectedNumbers.length === selectedGameType?.pickCount) {
-      setShowToast(true);
-      setSelectedNumbers([]);
+      setIsLoading(true);
+      await hapticFeedback(ImpactStyle.Heavy);
+      
+      // TODO: Replace with actual API call to cart service
+      // - POST /api/cart/add with lottery, game type, numbers, amount
+      // - Handle errors and show appropriate messages
+      // - Update cart count in app state
+      setTimeout(() => {
+        setShowToast(true);
+        setSelectedNumbers([]);
+        setIsLoading(false);
+      }, 500);
     }
+  };
+
+  const handleGameTypeSelection = async (gameType: GameType) => {
+    setSelectedGameType(gameType);
+    setSelectedNumbers([]);
+    await hapticFeedback(ImpactStyle.Medium);
   };
 
   const lotteryName = lotteryId.charAt(0).toUpperCase() + lotteryId.slice(1);
@@ -76,7 +109,7 @@ const Play: React.FC = () => {
       <IonHeader className="ion-no-border">
         <IonToolbar className="premium-header">
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/lotteries" />
+            <IonBackButton defaultHref="/lotteries" text="Atrás" />
           </IonButtons>
           <IonTitle style={{ fontWeight: '700' }}>{lotteryName}</IonTitle>
         </IonToolbar>
@@ -97,8 +130,9 @@ const Play: React.FC = () => {
                 key={gameType.id}
                 className="premium-card"
                 button
-                onClick={() => setSelectedGameType(gameType)}
+                onClick={() => handleGameTypeSelection(gameType)}
                 style={{ marginBottom: '12px' }}
+                aria-label={`Seleccionar ${gameType.name}, ${gameType.description}, premio hasta ${gameType.prize}`}
               >
                 <IonCardContent>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -111,7 +145,9 @@ const Play: React.FC = () => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '32px'
-                    }}>
+                    }}
+                    role="img"
+                    aria-label={gameType.name}>
                       {gameType.icon}
                     </div>
                     <div style={{ flex: 1 }}>
@@ -127,7 +163,7 @@ const Play: React.FC = () => {
                         </span>
                       </IonChip>
                     </div>
-                    <div style={{ fontSize: '24px', color: 'var(--ion-color-primary)' }}>
+                    <div style={{ fontSize: '24px', color: 'var(--ion-color-primary)' }} aria-hidden="true">
                       →
                     </div>
                   </div>
@@ -173,7 +209,9 @@ const Play: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
-                  }}>
+                  }}
+                  aria-live="polite"
+                  aria-atomic="true">
                     {selectedNumbers.length > 0 
                       ? selectedNumbers.map(n => n.toString().padStart(2, '0')).join(' - ')
                       : '---'
@@ -192,18 +230,21 @@ const Play: React.FC = () => {
               fill="outline" 
               onClick={quickPick}
               style={{ '--border-radius': '12px', marginBottom: '16px' }}
+              aria-label="Seleccionar números al azar"
             >
               <IonIcon slot="start" icon={shuffle} />
               Al Azar
             </IonButton>
 
             {/* Number Grid */}
-            <div className="number-grid">
+            <div className="number-grid" role="group" aria-label="Cuadrícula de números para seleccionar">
               {Array.from({ length: 100 }, (_, i) => i).map((num) => (
                 <button
                   key={num}
                   className={`number-button ${selectedNumbers.includes(num) ? 'selected' : ''}`}
                   onClick={() => toggleNumber(num)}
+                  aria-label={`Número ${num.toString().padStart(2, '0')}${selectedNumbers.includes(num) ? ', seleccionado' : ''}`}
+                  aria-pressed={selectedNumbers.includes(num)}
                 >
                   {num.toString().padStart(2, '0')}
                 </button>
@@ -227,7 +268,9 @@ const Play: React.FC = () => {
             gap: '12px',
             alignItems: 'center',
             zIndex: 1000
-          }}>
+          }}
+          role="toolbar"
+          aria-label="Barra de carrito de compras">
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '12px', color: 'var(--ion-color-medium)' }}>
                 Total a pagar
@@ -239,14 +282,21 @@ const Play: React.FC = () => {
             <IonButton
               expand="block"
               onClick={addToCart}
-              disabled={selectedNumbers.length !== selectedGameType.pickCount}
+              disabled={selectedNumbers.length !== selectedGameType.pickCount || isLoading}
               style={{ 
                 '--border-radius': '12px',
                 flex: 1
               }}
+              aria-label={`Agregar jugada al carrito, ${selectedNumbers.length} de ${selectedGameType.pickCount} números seleccionados`}
             >
-              <IonIcon slot="start" icon={cart} />
-              Agregar al Carrito
+              {isLoading ? (
+                <IonSpinner name="crescent" />
+              ) : (
+                <>
+                  <IonIcon slot="start" icon={cart} />
+                  Agregar al Carrito
+                </>
+              )}
             </IonButton>
           </div>
         )}

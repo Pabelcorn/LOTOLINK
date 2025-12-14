@@ -69,3 +69,11 @@ temp/
 
 # Source maps
 *.map
+
+# Signing and certificates (DO NOT COMMIT!)
+*.jks
+*.keystore
+keystore.properties
+*.p12
+*.mobileprovision
+*.certSigningRequest
