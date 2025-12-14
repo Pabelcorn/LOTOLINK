@@ -160,8 +160,8 @@ jobs:
             exit 1
           fi
           echo "✓ Capacitor configuration found"
-          echo "Capacitor config:"
-          cat capacitor.config.ts
+          echo "Capacitor app info:"
+          grep -E "appId|appName" capacitor.config.ts || echo "Could not extract app info"
 
       - name: Sync Capacitor Android
         working-directory: mobile-app
@@ -344,8 +344,14 @@ jobs:
               perl -i -pe "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
             else
               # Add platform line at the beginning of the file
-              echo "platform :ios, '14.0'" | cat - ios/App/Podfile > ios/App/Podfile.tmp
-              mv ios/App/Podfile.tmp ios/App/Podfile
+              # Ensure Podfile exists before concatenating
+              if [ -f "ios/App/Podfile" ]; then
+                echo "platform :ios, '14.0'" | cat - ios/App/Podfile > ios/App/Podfile.tmp
+                mv ios/App/Podfile.tmp ios/App/Podfile
+              else
+                echo "❌ ERROR: Podfile disappeared during processing!"
+                exit 1
+              fi
             fi
             
             echo "✓ Podfile deployment target configured:"
@@ -364,6 +370,7 @@ jobs:
       - name: Build iOS app (Debug)
         working-directory: mobile-app/ios/App
         run: |
+          set -o pipefail
           echo "Starting iOS build for simulator..."
           xcodebuild \
             -workspace App.xcworkspace \
@@ -373,14 +380,8 @@ jobs:
             -derivedDataPath build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO | tee build.log
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee build.log
           
-          BUILD_EXIT_CODE=${PIPESTATUS[0]}
-          if [ $BUILD_EXIT_CODE -ne 0 ]; then
-            echo "⚠️ iOS build failed with exit code $BUILD_EXIT_CODE"
-            echo "See build.log for details"
-            exit $BUILD_EXIT_CODE
-          fi
           echo "✓ iOS build completed successfully"
         continue-on-error: true
 
