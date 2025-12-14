@@ -218,9 +218,8 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Setup Gradle cache
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-home-cache-cleanup: true
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Verify npm cache integrity
@@ -551,41 +550,66 @@ jobs:
       - name: Add iOS platform and configure deployment target
         working-directory: mobile-app
         run: |
-          if [ ! -d "ios" ]; then
-            echo "iOS platform not found, adding..."
-            # Try to add iOS platform - it may fail during pod install due to deployment target issues
-            # The platform structure will still be created, allowing us to fix the Podfile before retry
-            npx cap add ios || {
-              echo "⚠️ Initial iOS platform add failed (expected if deployment target conflicts with pod requirements)"
-              echo "Platform structure should still be created - will configure Podfile and retry..."
-            }
+          echo "Adding iOS platform (ios/ directory is gitignored, always needs to be generated)..."
+          
+          # Add iOS platform - this will create the ios/ directory and Xcode project
+          # Note: This may fail during the pod install step if there are deployment target conflicts
+          # but the platform structure should still be created
+          if npx cap add ios 2>&1 | tee /tmp/ios-add-output.log; then
+            echo "✓ iOS platform add completed successfully"
           else
-            echo "iOS platform already exists, skipping add step"
+            IOS_ADD_EXIT_CODE=$?
+            echo "⚠️ Warning: iOS platform add failed with exit code $IOS_ADD_EXIT_CODE"
+            echo "Last 20 lines of error output (for debugging):"
+            tail -20 /tmp/ios-add-output.log || echo "Could not read error log"
+            echo "Checking if platform structure was still created..."
           fi
 
-          # Ensure deployment target is set correctly in Podfile
-          if [ -f "ios/App/Podfile" ]; then
-            echo "Configuring Podfile deployment target to iOS 14.0..."
-            # Check if platform line exists
-            if grep -q "platform :ios" ios/App/Podfile; then
-              # Update existing platform line to iOS 14.0
-              # Use sed for better cross-platform compatibility
-              sed -i.bak "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
-              rm -f ios/App/Podfile.bak
-            else
-              # Add platform line at the beginning of the file
-              echo "platform :ios, '14.0'" | cat - ios/App/Podfile > ios/App/Podfile.tmp
-              mv ios/App/Podfile.tmp ios/App/Podfile
-            fi
-
-            echo "✓ Podfile deployment target configured:"
-            grep "platform :ios" ios/App/Podfile || echo "⚠️ Could not find platform line"
-          else
-            echo "❌ ERROR: Podfile not found after iOS platform add!"
-            echo "Directory structure:"
-            ls -la ios/ 2>/dev/null || echo "ios/ directory not found"
+          # Verify that the iOS platform structure was created
+          if [ ! -d "ios" ]; then
+            echo "❌ ERROR: ios/ directory was not created by 'npx cap add ios'"
+            echo "This is unexpected. The command should create the directory even if pod install fails."
             exit 1
           fi
+
+          if [ ! -d "ios/App" ]; then
+            echo "❌ ERROR: ios/App/ directory was not created"
+            echo "Directory structure:"
+            ls -la ios/
+            exit 1
+          fi
+
+          # Check if Podfile was created
+          if [ ! -f "ios/App/Podfile" ]; then
+            echo "❌ ERROR: Podfile was not created at ios/App/Podfile"
+            echo "Directory structure of ios/App/:"
+            ls -la ios/App/
+            exit 1
+          fi
+
+          echo "✓ iOS platform structure created successfully"
+          
+          # Configure deployment target in Podfile
+          echo "Configuring Podfile deployment target to iOS 14.0..."
+          if grep -q "platform :ios" ios/App/Podfile; then
+            # Update existing platform line to iOS 14.0
+            # Handle both single and double quotes separately to ensure matching quotes
+            if grep -q "platform :ios, '[^']*'" ios/App/Podfile; then
+              sed -i.bak "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
+            else
+              sed -i.bak 's/platform :ios, "[^"]*"/platform :ios, "14.0"/' ios/App/Podfile
+            fi
+            rm -f ios/App/Podfile.bak
+            echo "✓ Updated existing platform line in Podfile"
+          else
+            # Add platform line at the beginning of the file using a more efficient approach
+            { printf "platform :ios, '14.0'\n"; cat ios/App/Podfile; } > ios/App/Podfile.tmp
+            mv ios/App/Podfile.tmp ios/App/Podfile
+            echo "✓ Added platform line to Podfile"
+          fi
+
+          echo "Podfile deployment target configuration:"
+          grep "platform :ios" ios/App/Podfile || echo "⚠️ Could not find platform line after configuration"
 
       - name: Sync Capacitor iOS and install pods
         working-directory: mobile-app
