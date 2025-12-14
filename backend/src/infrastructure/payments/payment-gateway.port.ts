@@ -47,7 +47,21 @@ export interface PaymentMethod {
 export interface CreatePaymentMethodRequest {
   userId: string;
   type: 'card' | 'bank_account';
-  token: string; // Stripe token or similar
+  token: string; // Stripe token or payment method ID
+  setAsDefault?: boolean;
+}
+
+export interface CardDetails {
+  number: string;
+  exp_month: number;
+  exp_year: number;
+  cvc: string;
+  name: string;
+}
+
+export interface TokenizeCardRequest {
+  userId: string;
+  cardDetails: CardDetails;
   setAsDefault?: boolean;
 }
 
@@ -66,6 +80,12 @@ export interface PaymentGateway {
    * Create a payment method for a user (tokenized card/bank)
    */
   createPaymentMethod(request: CreatePaymentMethodRequest): Promise<PaymentMethod>;
+
+  /**
+   * Tokenize card details server-side and create payment method
+   * This is the secure way to handle card data in mobile apps
+   */
+  tokenizeAndCreatePaymentMethod?(request: TokenizeCardRequest): Promise<PaymentMethod>;
 
   /**
    * List payment methods for a user

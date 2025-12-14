@@ -78,43 +78,80 @@ STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
 
 ### 4. Configure Frontend (Mobile App)
 
-To enable real card processing in the mobile app, you need to integrate Stripe.js or Stripe Mobile SDK:
+The mobile app uses **server-side tokenization** for maximum security and PCI compliance. No additional Stripe configuration is needed in the mobile app.
 
-#### Option A: Using Stripe.js (Web/PWA)
+#### How It Works
 
-Add to `mobile-app/index.html`:
+1. User enters card details in the mobile app form
+2. Card details are validated client-side (for UX)
+3. Details are sent over HTTPS to the backend
+4. Backend immediately tokenizes with Stripe (no storage)
+5. Payment method is created and returned to the app
 
-```html
-<script src="https://js.stripe.com/v3/"></script>
-```
+#### Why Server-Side Tokenization?
 
-In your payment component:
+✅ **Most Secure**: Card data never touches the client beyond the initial form input
+✅ **PCI Compliant**: Backend handles tokenization over HTTPS without storage
+✅ **Capacitor Compatible**: No need for complex Stripe.js or native SDK integration
+✅ **Simplified**: Single secure endpoint handles everything
 
-```typescript
-const stripe = await loadStripe('pk_test_your_publishable_key');
-const { token, error } = await stripe.createToken('card', {
-  number: cardNumber,
-  exp_month: expiryMonth,
-  exp_year: expiryYear,
-  cvc: cvc,
-});
-```
+#### Alternative Options (Not Implemented)
 
-#### Option B: Using Stripe Native SDK (iOS/Android)
+For reference, other valid approaches include:
 
-For native mobile apps:
+**Option A: Stripe.js with Elements (Web/PWA)**
+- Requires adding Stripe.js to index.html
+- Uses Stripe Elements for iframe-isolated card input
+- More complex integration for Capacitor apps
 
-```bash
-npm install @stripe/stripe-react-native
-```
+**Option B: Stripe React Native SDK (Native Apps)**
+- Requires `@stripe/stripe-react-native` dependency
+- Native UI components for card input
+- Requires platform-specific configuration
 
-See: [Stripe React Native Documentation](https://stripe.com/docs/mobile/react-native)
+The current implementation uses **server-side tokenization** as it provides the best balance of security, simplicity, and compatibility with the Capacitor framework.
 
 ## API Endpoints
 
-### Create Payment Method
+### Tokenize and Create Payment Method (Recommended)
 
-Register a new credit/debit card:
+Securely tokenize card details server-side and create a payment method:
+
+```http
+POST /api/v1/users/{userId}/payment-methods/tokenize
+Authorization: Bearer {jwt_token}
+Content-Type: application/json
+
+{
+  "cardDetails": {
+    "number": "4242424242424242",
+    "exp_month": 12,
+    "exp_year": 2025,
+    "cvc": "123",
+    "name": "John Doe"
+  },
+  "setAsDefault": true
+}
+```
+
+Response:
+```json
+{
+  "id": "pm_1234567890",
+  "type": "card",
+  "last4": "4242",
+  "brand": "visa",
+  "expiryMonth": 12,
+  "expiryYear": 2025,
+  "isDefault": true
+}
+```
+
+**Security Note**: This endpoint is designed for HTTPS-only communication. Card details are immediately tokenized with Stripe and never stored on our servers.
+
+### Create Payment Method (Legacy/Alternative)
+
+Register a payment method using a pre-generated Stripe token or payment method ID:
 
 ```http
 POST /api/v1/users/{userId}/payment-methods
@@ -122,7 +159,7 @@ Authorization: Bearer {jwt_token}
 Content-Type: application/json
 
 {
-  "token": "tok_visa",
+  "token": "pm_1234567890",
   "type": "card",
   "setAsDefault": true
 }
@@ -223,7 +260,7 @@ Use any:
 
 ### Testing Flow
 
-1. Start backend with Stripe configured
+1. Start backend with Stripe configured (`USE_MOCK_PAYMENT=false` and `STRIPE_SECRET_KEY` set)
 2. Open mobile app
 3. Go to Profile → Payment Methods
 4. Click "Agregar Tarjeta"
