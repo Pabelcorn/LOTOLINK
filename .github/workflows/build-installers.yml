@@ -24,7 +24,11 @@ jobs:
   build-windows:
     name: Build Windows Installer
     runs-on: windows-latest
-    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.platforms == 'all' || github.event.inputs.platforms == 'windows') || github.event_name != 'workflow_dispatch'
+    if: |
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.platforms == 'all' || 
+        github.event.inputs.platforms == 'windows')) ||
+      github.event_name != 'workflow_dispatch'
     
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +72,11 @@ jobs:
   build-macos:
     name: Build macOS Installer
     runs-on: macos-latest
-    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.platforms == 'all' || github.event.inputs.platforms == 'macos') || github.event_name != 'workflow_dispatch'
+    if: |
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.platforms == 'all' || 
+        github.event.inputs.platforms == 'macos')) ||
+      github.event_name != 'workflow_dispatch'
     
     steps:
       - uses: actions/checkout@v4
@@ -114,7 +122,11 @@ jobs:
   build-linux:
     name: Build Linux Installers
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.platforms == 'all' || github.event.inputs.platforms == 'linux') || github.event_name != 'workflow_dispatch'
+    if: |
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.platforms == 'all' || 
+        github.event.inputs.platforms == 'linux')) ||
+      github.event_name != 'workflow_dispatch'
     
     steps:
       - uses: actions/checkout@v4
