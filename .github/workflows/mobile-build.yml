@@ -59,6 +59,16 @@ jobs:
           cache: 'npm'
           cache-dependency-path: mobile-app/package-lock.json
 
+      - name: Verify npm cache integrity
+        working-directory: mobile-app
+        run: |
+          echo "Verifying npm cache integrity..."
+          npm cache verify || {
+            echo "⚠️ npm cache verification failed, cleaning cache..."
+            npm cache clean --force
+          }
+        continue-on-error: true
+
       - name: Install dependencies
         working-directory: mobile-app
         run: |
@@ -202,6 +212,16 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Verify npm cache integrity
+        working-directory: mobile-app
+        run: |
+          echo "Verifying npm cache integrity..."
+          npm cache verify || {
+            echo "⚠️ npm cache verification failed, cleaning cache..."
+            npm cache clean --force
+          }
+        continue-on-error: true
 
       - name: Install dependencies
         working-directory: mobile-app
@@ -413,6 +433,16 @@ jobs:
           key: ${{ runner.os }}-pods-${{ hashFiles('mobile-app/ios/App/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pods-
+
+      - name: Verify npm cache integrity
+        working-directory: mobile-app
+        run: |
+          echo "Verifying npm cache integrity..."
+          npm cache verify || {
+            echo "⚠️ npm cache verification failed, cleaning cache..."
+            npm cache clean --force
+          }
+        continue-on-error: true
 
       - name: Install dependencies
         working-directory: mobile-app
