@@ -83,8 +83,8 @@ const Profile: React.FC = () => {
       await Haptics.impact({ style: ImpactStyle.Light });
       
       if (enabled) {
-        // For demo purposes, using dummy credentials
-        // In production, get these from login form
+        // TODO: In production, retrieve credentials from authenticated session
+        // For demo purposes only - replace with actual user credentials
         const success = await enableBiometricLogin('demo_user', 'demo_password');
         if (success) {
           setBiometricEnabled(true);
@@ -148,7 +148,11 @@ const Profile: React.FC = () => {
 
   const confirmLogout = async () => {
     await Haptics.impact({ style: ImpactStyle.Heavy });
-    // In production, clear auth tokens and redirect to login
+    // TODO: Implement logout functionality
+    // - Clear authentication tokens from storage
+    // - Reset user state
+    // - Redirect to login screen
+    // - Invalidate server session
     setToastMessage('Sesión cerrada correctamente');
     setShowToast(true);
   };

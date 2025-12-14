@@ -84,7 +84,10 @@ const Play: React.FC = () => {
       setIsLoading(true);
       await hapticFeedback(ImpactStyle.Heavy);
       
-      // Simulate API call
+      // TODO: Replace with actual API call to cart service
+      // - POST /api/cart/add with lottery, game type, numbers, amount
+      // - Handle errors and show appropriate messages
+      // - Update cart count in app state
       setTimeout(() => {
         setShowToast(true);
         setSelectedNumbers([]);
