@@ -59,17 +59,33 @@ jobs:
           cache: 'npm'
           cache-dependency-path: mobile-app/package-lock.json
 
+      - name: Verify npm cache integrity
+        working-directory: mobile-app
+        run: |
+          echo "Verifying npm cache integrity..."
+          npm cache verify || {
+            echo "⚠️ npm cache verification failed, cleaning cache..."
+            npm cache clean --force
+          }
+        continue-on-error: true
+
       - name: Install dependencies
         working-directory: mobile-app
         run: |
           echo "Installing dependencies with npm ci..."
-          if npm ci --legacy-peer-deps; then
+          if npm ci --legacy-peer-deps 2>&1; then
             echo "✓ npm ci succeeded"
           else
             echo "⚠️ npm ci failed, trying npm install as fallback..."
             rm -rf node_modules package-lock.json
-            npm install --legacy-peer-deps
-            echo "✓ npm install succeeded"
+            if npm install --legacy-peer-deps 2>&1; then
+              echo "✓ npm install succeeded"
+            else
+              echo "⚠️ npm install failed, clearing cache and retrying..."
+              npm cache clean --force
+              npm install --legacy-peer-deps 2>&1
+              echo "✓ npm install with clean cache succeeded"
+            fi
           fi
           
           # Verify installation succeeded
@@ -197,18 +213,34 @@ jobs:
           gradle-home-cache-cleanup: true
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
+      - name: Verify npm cache integrity
+        working-directory: mobile-app
+        run: |
+          echo "Verifying npm cache integrity..."
+          npm cache verify || {
+            echo "⚠️ npm cache verification failed, cleaning cache..."
+            npm cache clean --force
+          }
+        continue-on-error: true
+
       - name: Install dependencies
         working-directory: mobile-app
         # Using --legacy-peer-deps due to @capacitor-firebase/messaging peer dependency conflict with @capacitor/core
         run: |
           echo "Installing dependencies with npm ci..."
-          if npm ci --legacy-peer-deps; then
+          if npm ci --legacy-peer-deps 2>&1; then
             echo "✓ npm ci succeeded"
           else
             echo "⚠️ npm ci failed, trying npm install as fallback..."
             rm -rf node_modules package-lock.json
-            npm install --legacy-peer-deps
-            echo "✓ npm install succeeded"
+            if npm install --legacy-peer-deps 2>&1; then
+              echo "✓ npm install succeeded"
+            else
+              echo "⚠️ npm install failed, clearing cache and retrying..."
+              npm cache clean --force
+              npm install --legacy-peer-deps 2>&1
+              echo "✓ npm install with clean cache succeeded"
+            fi
           fi
           
           # Verify installation succeeded
@@ -402,18 +434,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pods-
 
+      - name: Verify npm cache integrity
+        working-directory: mobile-app
+        run: |
+          echo "Verifying npm cache integrity..."
+          npm cache verify || {
+            echo "⚠️ npm cache verification failed, cleaning cache..."
+            npm cache clean --force
+          }
+        continue-on-error: true
+
       - name: Install dependencies
         working-directory: mobile-app
         # Using --legacy-peer-deps due to @capacitor-firebase/messaging peer dependency conflict with @capacitor/core
         run: |
           echo "Installing dependencies with npm ci..."
-          if npm ci --legacy-peer-deps; then
+          if npm ci --legacy-peer-deps 2>&1; then
             echo "✓ npm ci succeeded"
           else
             echo "⚠️ npm ci failed, trying npm install as fallback..."
             rm -rf node_modules package-lock.json
-            npm install --legacy-peer-deps
-            echo "✓ npm install succeeded"
+            if npm install --legacy-peer-deps 2>&1; then
+              echo "✓ npm install succeeded"
+            else
+              echo "⚠️ npm install failed, clearing cache and retrying..."
+              npm cache clean --force
+              npm install --legacy-peer-deps 2>&1
+              echo "✓ npm install with clean cache succeeded"
+            fi
           fi
           
           # Verify installation succeeded
