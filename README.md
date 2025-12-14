@@ -624,4 +624,41 @@ LotoLink incorpora a **Luna**, una asistente virtual IA integral que mejora la e
 
 ---
 
+## 🚀 CI/CD y Releases
+
+### Creación de Releases con GitHub Actions
+
+El proyecto incluye workflows automatizados para generar instaladores de Desktop y Mobile. Ahora puedes crear releases de dos formas:
+
+#### 1. Método Tradicional: Usando Git Tags
+```bash
+# Desktop
+git tag v1.0.7
+git push origin v1.0.7
+
+# Mobile
+git tag mobile-v1.0.7
+git push origin mobile-v1.0.7
+```
+
+#### 2. Método Manual: Workflow con Release Draft
+
+Ejecuta manualmente los workflows y crea un release en borrador:
+- Ve a [Actions → Build Desktop Installers](https://github.com/Pabelcorn/LOTOLINK/actions/workflows/build-installers.yml)
+- Haz clic en "Run workflow"
+- Marca "Create a GitHub release (draft)"
+- Ingresa el tag (ej: `v1.0.7`)
+
+**Documentación completa:**
+- 📖 [Guía en Español](WORKFLOW_RELEASE_GUIDE.md)
+- 📖 [English Guide](WORKFLOW_RELEASE_GUIDE_EN.md)
+
+### ¿Por qué mis workflows no crearon releases?
+
+Los workflows anteriores solo creaban releases desde **tags**. Si ejecutaste manualmente o desde la rama `main`, los instaladores se generaron como **artifacts** (disponibles 30 días) pero no aparecieron en Releases.
+
+**Solución:** Usa el nuevo método manual con la opción "Create release" activada, o crea un tag git.
+
+---
+
 *Fin del documento.*
