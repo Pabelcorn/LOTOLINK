@@ -299,7 +299,7 @@ jobs:
         shell: bash
         run: |
           # Determine the version/tag to use
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.create_release }}" = "true" ]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] && [[ "${{ github.event.inputs.create_release }}" == "true" ]]; then
             VERSION="${{ github.event.inputs.release_tag }}"
           else
             VERSION="${GITHUB_REF#refs/tags/}"

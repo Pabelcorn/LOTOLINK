@@ -695,7 +695,7 @@ jobs:
       - name: Generate release summary
         run: |
           # Determine the version/tag to use
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.create_release }}" = "true" ]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] && [[ "${{ github.event.inputs.create_release }}" == "true" ]]; then
             VERSION="${{ github.event.inputs.release_tag }}"
             VERSION_NUM="${VERSION#mobile-v}"
           else
@@ -805,19 +805,27 @@ jobs:
           path: mobile_release_summary.md
           retention-days: 90
 
-      - name: Add summary to release
-        if: |
-          startsWith(github.ref, 'refs/tags/mobile-v') ||
-          (github.event_name == 'workflow_dispatch' &&
-           github.event.inputs.create_release == 'true' &&
-           github.event.inputs.release_tag != '')
+      - name: Add summary to release (tag)
+        if: startsWith(github.ref, 'refs/tags/mobile-v')
         uses: softprops/action-gh-release@v1
         with:
           body_path: mobile_release_summary.md
-          tag_name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || '' }}
-          draft: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true' }}
-          prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true' }}
-          name: ${{ github.event_name == 'workflow_dispatch' && format('Mobile Release {0} (Draft)', github.event.inputs.release_tag) || '' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Add summary to release (manual)
+        if: |
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.create_release == 'true' &&
+          github.event.inputs.release_tag != ''
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: mobile_release_summary.md
+          tag_name: ${{ github.event.inputs.release_tag }}
+          draft: true
+          prerelease: true
+          name: 'Mobile Release ${{ github.event.inputs.release_tag }} (Draft)'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
