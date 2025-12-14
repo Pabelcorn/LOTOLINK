@@ -9,6 +9,8 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
+  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { 
@@ -76,12 +78,17 @@ export class PaymentMethodsController {
     const success = await this.paymentGateway.deletePaymentMethod(userId, paymentMethodId);
     
     if (!success) {
-      throw new Error('Payment method not found');
+      throw new NotFoundException('Payment method not found');
     }
   }
 
   /**
    * Set a payment method as default
+   * Note: This is a placeholder implementation. In production, you should:
+   * 1. Add a setDefaultPaymentMethod() method to the PaymentGateway interface
+   * 2. Implement it in StripePaymentGateway to update the customer's default payment method
+   * 3. Call that method here instead of this workaround
+   * 
    * @param userId User ID
    * @param paymentMethodId Payment method ID to set as default
    */
@@ -91,13 +98,8 @@ export class PaymentMethodsController {
     @Param('userId') userId: string,
     @Param('paymentMethodId') paymentMethodId: string,
   ): Promise<{ success: boolean }> {
-    // First, delete the payment method
-    await this.paymentGateway.deletePaymentMethod(userId, paymentMethodId);
-    
-    // Then re-add it as default
-    // Note: This is a workaround. In a real implementation, you'd want to
-    // add a setDefaultPaymentMethod method to the PaymentGateway interface
-    
-    return { success: true };
+    // TODO: Implement proper setDefaultPaymentMethod in PaymentGateway interface
+    // For now, this endpoint is not fully functional
+    throw new BadRequestException('Setting default payment method is not yet implemented. Please add a new card as default instead.');
   }
 }

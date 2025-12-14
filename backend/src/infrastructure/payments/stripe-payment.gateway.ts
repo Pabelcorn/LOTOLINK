@@ -327,21 +327,27 @@ export class StripePaymentGateway implements PaymentGateway {
     // Search for existing customer by metadata
     const existingCustomers = await this.stripe.customers.list({
       limit: 1,
-      email: `user_${userId}@lotolink.com`, // Use a consistent email format
     });
 
-    if (existingCustomers.data.length > 0) {
-      const customerId = existingCustomers.data[0].id;
+    // Find customer with matching userId in metadata
+    const existingCustomer = existingCustomers.data.find(
+      (c) => c.metadata?.userId === userId
+    );
+
+    if (existingCustomer) {
+      const customerId = existingCustomer.id;
       this.customers.set(userId, customerId);
       return customerId;
     }
 
-    // Create new customer
+    // Create new customer with metadata only
+    // Note: In production, you should retrieve the user's actual email from the database
+    // and use it here instead of omitting the email field
     const customer = await this.stripe.customers.create({
-      email: `user_${userId}@lotolink.com`,
       metadata: {
         userId,
       },
+      description: `LotoLink User ${userId}`,
     });
 
     this.customers.set(userId, customer.id);
