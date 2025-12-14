@@ -18,6 +18,8 @@ import {
   PAYMENT_GATEWAY,
   PaymentMethod,
   CreatePaymentMethodRequest,
+  TokenizeCardRequest,
+  CardDetails,
 } from '../../payments/payment-gateway.port';
 
 /**
@@ -51,6 +53,38 @@ export class PaymentMethodsController {
     };
 
     return this.paymentGateway.createPaymentMethod(request);
+  }
+
+  /**
+   * Server-side tokenization endpoint
+   * Securely tokenizes card details and creates a payment method
+   * This is the recommended approach for mobile apps using Capacitor
+   * @param userId User ID
+   * @param body Card details and options
+   */
+  @Post('tokenize')
+  @HttpCode(HttpStatus.CREATED)
+  async tokenizeCard(
+    @Param('userId') userId: string,
+    @Body() body: { cardDetails: CardDetails; setAsDefault?: boolean },
+  ): Promise<PaymentMethod> {
+    // Validate card details
+    if (!body.cardDetails || !body.cardDetails.number || !body.cardDetails.cvc) {
+      throw new BadRequestException('Card details are required');
+    }
+
+    // Check if the payment gateway supports server-side tokenization
+    if (!this.paymentGateway.tokenizeAndCreatePaymentMethod) {
+      throw new BadRequestException('Server-side tokenization is not supported by the payment gateway');
+    }
+
+    const request: TokenizeCardRequest = {
+      userId,
+      cardDetails: body.cardDetails,
+      setAsDefault: body.setAsDefault,
+    };
+
+    return this.paymentGateway.tokenizeAndCreatePaymentMethod(request);
   }
 
   /**

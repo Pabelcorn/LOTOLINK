@@ -145,7 +145,8 @@ const PaymentMethods: React.FC = () => {
       setSubmitting(true);
       await Haptics.impact({ style: ImpactStyle.Medium });
 
-      // Create Stripe token from card details
+      // Tokenize card details using server-side tokenization
+      // This creates the payment method directly on the backend
       const tokenResult = await createCardToken({
         number: cardNumber,
         exp_month: expMonth,
@@ -160,33 +161,10 @@ const PaymentMethods: React.FC = () => {
         return;
       }
 
-      // Send token to backend
-      // TODO: Replace with actual API endpoint and user ID
-      const userId = 'user_123'; // Get from auth context
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      // Payment method was created on the backend during tokenization
+      // Reload the payment methods list to show the new card
+      await loadPaymentMethods();
       
-      const response = await fetch(`${apiUrl}/api/v1/users/${userId}/payment-methods`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // TODO: Add actual JWT token from auth context
-          // Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
-          token: tokenResult.token,
-          type: 'card',
-          setAsDefault,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al registrar la tarjeta');
-      }
-
-      const newMethod = await response.json();
-      
-      setPaymentMethods([...paymentMethods, newMethod]);
       setShowAddModal(false);
       resetForm();
       setToastMessage('Tarjeta agregada exitosamente');

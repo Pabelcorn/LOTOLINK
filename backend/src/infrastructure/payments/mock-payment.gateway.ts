@@ -8,6 +8,7 @@ import {
   RefundResult,
   PaymentMethod,
   CreatePaymentMethodRequest,
+  TokenizeCardRequest,
 } from './payment-gateway.port';
 
 /**
@@ -92,6 +93,43 @@ export class MockPaymentGateway implements PaymentGateway {
       brand: 'visa',
       expiryMonth: 12,
       expiryYear: 2030,
+      isDefault: request.setAsDefault || false,
+    };
+
+    const userMethods = this.paymentMethods.get(request.userId) || [];
+    
+    // If setting as default, unset others
+    if (paymentMethod.isDefault) {
+      userMethods.forEach(m => m.isDefault = false);
+    }
+    
+    userMethods.push(paymentMethod);
+    this.paymentMethods.set(request.userId, userMethods);
+
+    return paymentMethod;
+  }
+
+  async tokenizeAndCreatePaymentMethod(request: TokenizeCardRequest): Promise<PaymentMethod> {
+    this.logger.log(`[MOCK] Tokenizing card for user ${request.userId} (server-side)`);
+
+    await this.delay(200);
+
+    // Extract last 4 digits from card number
+    const cleanNumber = request.cardDetails.number.replace(/\s/g, '');
+    const last4 = cleanNumber.slice(-4);
+
+    // Determine brand from card number
+    let brand = 'visa';
+    if (cleanNumber.startsWith('5')) brand = 'mastercard';
+    else if (cleanNumber.startsWith('3')) brand = 'amex';
+
+    const paymentMethod: PaymentMethod = {
+      id: `mock_pm_${Date.now()}`,
+      type: 'card',
+      last4,
+      brand,
+      expiryMonth: request.cardDetails.exp_month,
+      expiryYear: request.cardDetails.exp_year,
       isDefault: request.setAsDefault || false,
     };
 

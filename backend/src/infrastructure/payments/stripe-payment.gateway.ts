@@ -9,6 +9,7 @@ import {
   RefundResult,
   PaymentMethod,
   CreatePaymentMethodRequest,
+  TokenizeCardRequest,
 } from './payment-gateway.port';
 
 /**
@@ -207,6 +208,60 @@ export class StripePaymentGateway implements PaymentGateway {
       return this.mapStripePaymentMethod(paymentMethod, request.setAsDefault || false);
     } catch (error) {
       this.logger.error(`Create payment method failed:`, error);
+      
+      if (error instanceof Stripe.errors.StripeError) {
+        throw new BadRequestException(error.message);
+      }
+      
+      throw error;
+    }
+  }
+
+  async tokenizeAndCreatePaymentMethod(request: TokenizeCardRequest): Promise<PaymentMethod> {
+    this.logger.log(`Tokenizing card for user ${request.userId} (server-side)`);
+
+    if (!this.stripe) {
+      throw new BadRequestException('Stripe is not configured.');
+    }
+
+    try {
+      // Get or create Stripe customer
+      const customerId = await this.getOrCreateCustomer(request.userId);
+
+      // Create payment method directly with card details
+      // This is the secure server-side approach - card details never stored
+      const paymentMethod = await this.stripe.paymentMethods.create({
+        type: 'card',
+        card: {
+          number: request.cardDetails.number.replace(/\s/g, ''),
+          exp_month: request.cardDetails.exp_month,
+          exp_year: request.cardDetails.exp_year,
+          cvc: request.cardDetails.cvc,
+        },
+        billing_details: {
+          name: request.cardDetails.name,
+        },
+      });
+
+      // Attach payment method to customer
+      await this.stripe.paymentMethods.attach(paymentMethod.id, {
+        customer: customerId,
+      });
+
+      // If setting as default, update customer default payment method
+      if (request.setAsDefault) {
+        await this.stripe.customers.update(customerId, {
+          invoice_settings: {
+            default_payment_method: paymentMethod.id,
+          },
+        });
+      }
+
+      this.logger.log(`Payment method tokenized and created: ${paymentMethod.id}`);
+
+      return this.mapStripePaymentMethod(paymentMethod, request.setAsDefault || false);
+    } catch (error) {
+      this.logger.error(`Tokenize and create payment method failed:`, error);
       
       if (error instanceof Stripe.errors.StripeError) {
         throw new BadRequestException(error.message);
