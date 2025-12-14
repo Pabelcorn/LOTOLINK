@@ -243,3 +243,73 @@ h3, .text-2xl {
     border-width: 3px;
   }
 }
+
+/* Tablet and Desktop Optimization */
+@media (min-width: 768px) {
+  .number-grid {
+    grid-template-columns: repeat(10, 1fr);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .tab-bar-custom {
+    max-width: 768px;
+    margin: 0 auto;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  /* Center content on tablets */
+  ion-content {
+    --padding-start: 16px;
+    --padding-end: 16px;
+  }
+
+  .hero-section,
+  .glass-card,
+  .premium-card,
+  .lottery-card {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Large Tablets and Desktops */
+@media (min-width: 1024px) {
+  .number-grid {
+    grid-template-columns: repeat(10, 1fr);
+    max-width: 1000px;
+    gap: 12px;
+  }
+
+  .number-button {
+    font-size: 18px;
+  }
+
+  /* Two-column layout for cards */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+/* Touch Target Size Enhancement */
+@media (pointer: coarse) {
+  .number-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  ion-button {
+    min-height: 44px;
+  }
+
+  ion-item {
+    --min-height: 56px;
+  }
+}
