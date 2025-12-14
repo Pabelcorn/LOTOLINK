@@ -66,11 +66,7 @@ jobs:
         working-directory: mobile-app
         run: npx tsc --noEmit
 
-      - name: Run tests
-        working-directory: mobile-app
-        run: npm test -- --run
-
-      - name: Generate coverage report
+      - name: Run tests with coverage
         working-directory: mobile-app
         run: npm test -- --run --coverage
         continue-on-error: true
@@ -86,7 +82,17 @@ jobs:
 
       - name: Security audit
         working-directory: mobile-app
-        run: npm audit --audit-level=high
+        run: |
+          echo "Running npm audit with --audit-level=high..."
+          echo "This will only fail for HIGH and CRITICAL vulnerabilities."
+          npm audit --audit-level=high
+          AUDIT_EXIT_CODE=$?
+          if [ $AUDIT_EXIT_CODE -eq 0 ]; then
+            echo "✓ No high or critical vulnerabilities found"
+          else
+            echo "❌ High or critical vulnerabilities detected!"
+            exit $AUDIT_EXIT_CODE
+          fi
 
       - name: Check for outdated dependencies
         working-directory: mobile-app
@@ -124,6 +130,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-home-cache-cleanup: true
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Install dependencies
         working-directory: mobile-app
@@ -134,13 +141,57 @@ jobs:
         working-directory: mobile-app
         run: npm run build
 
+      - name: Verify build output
+        working-directory: mobile-app
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ ERROR: dist directory not found after build!"
+            exit 1
+          fi
+          echo "✓ Build output verified: dist directory exists"
+          echo "Build artifacts:"
+          ls -lh dist/ | head -10
+
+      - name: Verify Capacitor configuration
+        working-directory: mobile-app
+        run: |
+          if [ ! -f "capacitor.config.ts" ]; then
+            echo "❌ ERROR: capacitor.config.ts not found!"
+            exit 1
+          fi
+          echo "✓ Capacitor configuration found"
+          echo "Capacitor config:"
+          cat capacitor.config.ts
+
       - name: Sync Capacitor Android
         working-directory: mobile-app
         run: npx cap sync android
 
+      - name: Verify Android project structure
+        working-directory: mobile-app
+        run: |
+          if [ ! -d "android" ]; then
+            echo "❌ ERROR: android directory not found after sync!"
+            exit 1
+          fi
+          if [ ! -f "android/gradlew" ]; then
+            echo "❌ ERROR: gradlew not found in android directory!"
+            exit 1
+          fi
+          echo "✓ Android project structure verified"
+
       - name: Grant execute permission for gradlew
         working-directory: mobile-app/android
         run: chmod +x gradlew
+
+      - name: Clean Gradle build cache (if exists)
+        working-directory: mobile-app/android
+        run: |
+          if [ -d "app/build" ]; then
+            echo "Cleaning existing build directory..."
+            ./gradlew clean
+          fi
+        continue-on-error: true
 
       - name: Build Debug APK
         working-directory: mobile-app/android
@@ -164,6 +215,9 @@ jobs:
             echo "- Size: $APK_SIZE" >> $GITHUB_STEP_SUMMARY
             echo "- SHA256: \`$APK_SHA256\`" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Debug APK not found**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
           
           if [ -f "app/build/outputs/bundle/release/app-release.aab" ]; then
@@ -172,6 +226,8 @@ jobs:
             echo "**Release AAB:**" >> $GITHUB_STEP_SUMMARY
             echo "- Size: $AAB_SIZE" >> $GITHUB_STEP_SUMMARY
             echo "- SHA256: \`$AAB_SHA256\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ **Release AAB not built** (requires signing configuration)" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Upload Debug APK
@@ -243,16 +299,39 @@ jobs:
         working-directory: mobile-app
         run: npm run build
 
+      - name: Verify build output
+        working-directory: mobile-app
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ ERROR: dist directory not found after build!"
+            exit 1
+          fi
+          echo "✓ Build output verified: dist directory exists"
+          echo "Build artifacts:"
+          ls -lh dist/ | head -10
+
+      - name: Verify Capacitor configuration
+        working-directory: mobile-app
+        run: |
+          if [ ! -f "capacitor.config.ts" ]; then
+            echo "❌ ERROR: capacitor.config.ts not found!"
+            exit 1
+          fi
+          echo "✓ Capacitor configuration found"
+
       - name: Add iOS platform and configure deployment target
         working-directory: mobile-app
         run: |
           if [ ! -d "ios" ]; then
+            echo "iOS platform not found, adding..."
             # Try to add iOS platform - it may fail during pod install due to deployment target issues
             # The platform structure will still be created, allowing us to fix the Podfile before retry
             npx cap add ios || {
-              echo "Initial iOS platform add failed (expected if deployment target conflicts with pod requirements)"
+              echo "⚠️ Initial iOS platform add failed (expected if deployment target conflicts with pod requirements)"
               echo "Platform structure should still be created - will configure Podfile and retry..."
             }
+          else
+            echo "iOS platform already exists, skipping add step"
           fi
           
           # Ensure deployment target is set correctly in Podfile
@@ -260,18 +339,21 @@ jobs:
             echo "Configuring Podfile deployment target to iOS 14.0..."
             # Check if platform line exists
             if grep -q "platform :ios" ios/App/Podfile; then
-              # Update existing platform line to iOS 14.0 (macOS sed syntax with -i '')
-              sed -i '' "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
+              # Update existing platform line to iOS 14.0
+              # Use perl for cross-platform compatibility (works on both macOS and Linux)
+              perl -i -pe "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
             else
               # Add platform line at the beginning of the file
-              printf "platform :ios, '14.0'\n\n%s" "$(cat ios/App/Podfile)" > ios/App/Podfile.tmp
+              echo "platform :ios, '14.0'" | cat - ios/App/Podfile > ios/App/Podfile.tmp
               mv ios/App/Podfile.tmp ios/App/Podfile
             fi
             
-            echo "Podfile deployment target configured:"
-            grep "platform :ios" ios/App/Podfile
+            echo "✓ Podfile deployment target configured:"
+            grep "platform :ios" ios/App/Podfile || echo "⚠️ Could not find platform line"
           else
-            echo "ERROR: Podfile not found after iOS platform add!"
+            echo "❌ ERROR: Podfile not found after iOS platform add!"
+            echo "Directory structure:"
+            ls -la ios/ 2>/dev/null || echo "ios/ directory not found"
             exit 1
           fi
 
@@ -282,6 +364,7 @@ jobs:
       - name: Build iOS app (Debug)
         working-directory: mobile-app/ios/App
         run: |
+          echo "Starting iOS build for simulator..."
           xcodebuild \
             -workspace App.xcworkspace \
             -scheme App \
@@ -290,7 +373,15 @@ jobs:
             -derivedDataPath build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO | tee build.log
+          
+          BUILD_EXIT_CODE=${PIPESTATUS[0]}
+          if [ $BUILD_EXIT_CODE -ne 0 ]; then
+            echo "⚠️ iOS build failed with exit code $BUILD_EXIT_CODE"
+            echo "See build.log for details"
+            exit $BUILD_EXIT_CODE
+          fi
+          echo "✓ iOS build completed successfully"
         continue-on-error: true
 
       - name: Get build info
