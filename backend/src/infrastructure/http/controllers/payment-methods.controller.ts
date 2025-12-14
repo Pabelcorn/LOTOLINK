@@ -68,9 +68,15 @@ export class PaymentMethodsController {
     @Param('userId') userId: string,
     @Body() body: { cardDetails: CardDetails; setAsDefault?: boolean },
   ): Promise<PaymentMethod> {
-    // Validate card details
-    if (!body.cardDetails || !body.cardDetails.number || !body.cardDetails.cvc) {
+    // Validate all required card details
+    if (!body.cardDetails) {
       throw new BadRequestException('Card details are required');
+    }
+
+    const { number, exp_month, exp_year, cvc, name } = body.cardDetails;
+    
+    if (!number || !exp_month || !exp_year || !cvc || !name) {
+      throw new BadRequestException('All card details are required: number, exp_month, exp_year, cvc, name');
     }
 
     // Check if the payment gateway supports server-side tokenization

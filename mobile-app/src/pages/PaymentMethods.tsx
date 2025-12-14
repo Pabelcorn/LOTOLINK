@@ -74,13 +74,16 @@ const PaymentMethods: React.FC = () => {
     try {
       setLoading(true);
       
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/v1/users/me/payment-methods', {
+      // TODO: Replace with actual API call when backend authentication is integrated
+      // const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      // const userId = 'user_123'; // Get from auth context
+      // const response = await fetch(`${apiUrl}/api/v1/users/${userId}/payment-methods`, {
       //   headers: { Authorization: `Bearer ${token}` }
       // });
       // const methods = await response.json();
       
       // Mock data for demonstration
+      // This will be replaced when authentication is fully integrated
       const mockMethods: PaymentMethod[] = [
         {
           id: 'pm_1',

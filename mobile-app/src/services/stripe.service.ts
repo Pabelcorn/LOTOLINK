@@ -35,17 +35,25 @@ export const createCardToken = async (cardDetails: CardDetails): Promise<TokenRe
     
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     
-    // Note: This requires authentication in production
-    // TODO: Get user ID from auth context
-    const userId = 'user_123'; // Placeholder - should come from authentication
+    // TODO: Get user ID and auth token from authentication context
+    // For now, this is a placeholder that needs to be replaced with actual auth integration
+    // Example: const { userId, token } = useAuth();
+    const userId = 'user_123'; // SECURITY: Replace with actual authenticated user ID
+    const authToken = ''; // SECURITY: Replace with actual JWT token from auth context
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Add authorization header if token is available
+    // TODO: In production, this MUST be populated from auth context
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
     
     const response = await fetch(`${apiUrl}/api/v1/users/${userId}/payment-methods/tokenize`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // TODO: Add actual JWT token from auth context in production
-        // Authorization: `Bearer ${authToken}`,
-      },
+      headers,
       body: JSON.stringify({
         cardDetails: {
           number: cardDetails.number.replace(/\s/g, ''),
