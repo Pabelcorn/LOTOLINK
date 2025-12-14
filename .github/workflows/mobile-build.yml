@@ -63,13 +63,19 @@ jobs:
         working-directory: mobile-app
         run: |
           echo "Installing dependencies with npm ci..."
-          if npm ci --legacy-peer-deps; then
+          if npm ci --legacy-peer-deps 2>&1; then
             echo "✓ npm ci succeeded"
           else
             echo "⚠️ npm ci failed, trying npm install as fallback..."
             rm -rf node_modules package-lock.json
-            npm install --legacy-peer-deps
-            echo "✓ npm install succeeded"
+            if npm install --legacy-peer-deps 2>&1; then
+              echo "✓ npm install succeeded"
+            else
+              echo "⚠️ npm install failed, clearing cache and retrying..."
+              npm cache clean --force
+              npm install --legacy-peer-deps 2>&1
+              echo "✓ npm install with clean cache succeeded"
+            fi
           fi
           
           # Verify installation succeeded
@@ -202,13 +208,19 @@ jobs:
         # Using --legacy-peer-deps due to @capacitor-firebase/messaging peer dependency conflict with @capacitor/core
         run: |
           echo "Installing dependencies with npm ci..."
-          if npm ci --legacy-peer-deps; then
+          if npm ci --legacy-peer-deps 2>&1; then
             echo "✓ npm ci succeeded"
           else
             echo "⚠️ npm ci failed, trying npm install as fallback..."
             rm -rf node_modules package-lock.json
-            npm install --legacy-peer-deps
-            echo "✓ npm install succeeded"
+            if npm install --legacy-peer-deps 2>&1; then
+              echo "✓ npm install succeeded"
+            else
+              echo "⚠️ npm install failed, clearing cache and retrying..."
+              npm cache clean --force
+              npm install --legacy-peer-deps 2>&1
+              echo "✓ npm install with clean cache succeeded"
+            fi
           fi
           
           # Verify installation succeeded
@@ -407,13 +419,19 @@ jobs:
         # Using --legacy-peer-deps due to @capacitor-firebase/messaging peer dependency conflict with @capacitor/core
         run: |
           echo "Installing dependencies with npm ci..."
-          if npm ci --legacy-peer-deps; then
+          if npm ci --legacy-peer-deps 2>&1; then
             echo "✓ npm ci succeeded"
           else
             echo "⚠️ npm ci failed, trying npm install as fallback..."
             rm -rf node_modules package-lock.json
-            npm install --legacy-peer-deps
-            echo "✓ npm install succeeded"
+            if npm install --legacy-peer-deps 2>&1; then
+              echo "✓ npm install succeeded"
+            else
+              echo "⚠️ npm install failed, clearing cache and retrying..."
+              npm cache clean --force
+              npm install --legacy-peer-deps 2>&1
+              echo "✓ npm install with clean cache succeeded"
+            fi
           fi
           
           # Verify installation succeeded
