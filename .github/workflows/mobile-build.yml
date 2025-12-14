@@ -68,11 +68,11 @@ jobs:
 
       - name: Run tests
         working-directory: mobile-app
-        run: npm test
+        run: npm test -- --run
 
       - name: Generate coverage report
         working-directory: mobile-app
-        run: npm run test -- --coverage
+        run: npm test -- --run --coverage
         continue-on-error: true
 
       - name: Upload coverage
