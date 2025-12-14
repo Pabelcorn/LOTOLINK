@@ -593,14 +593,18 @@ jobs:
           echo "Configuring Podfile deployment target to iOS 14.0..."
           if grep -q "platform :ios" ios/App/Podfile; then
             # Update existing platform line to iOS 14.0
-            # Support both single and double quotes
-            sed -i.bak "s/platform :ios, ['\"][^'\"]*['\"]*/platform :ios, '14.0'/" ios/App/Podfile
+            # Handle both single and double quotes separately to ensure matching quotes
+            if grep -q "platform :ios, '[^']*'" ios/App/Podfile; then
+              sed -i.bak "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
+            else
+              sed -i.bak 's/platform :ios, "[^"]*"/platform :ios, '"'"'14.0'"'"'/' ios/App/Podfile
+            fi
             rm -f ios/App/Podfile.bak
             echo "✓ Updated existing platform line in Podfile"
           else
-            # Add platform line at the beginning of the file using sed
-            sed -i.bak "1s/^/platform :ios, '14.0'\n/" ios/App/Podfile
-            rm -f ios/App/Podfile.bak
+            # Add platform line at the beginning of the file using a more portable approach
+            printf "platform :ios, '14.0'\n%s" "$(cat ios/App/Podfile)" > ios/App/Podfile.tmp
+            mv ios/App/Podfile.tmp ios/App/Podfile
             echo "✓ Added platform line to Podfile"
           fi
 
