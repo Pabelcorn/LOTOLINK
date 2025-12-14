@@ -24,6 +24,15 @@ on:
           - all
           - android
           - ios
+      create_release:
+        description: 'Create a GitHub release (draft)'
+        required: false
+        type: boolean
+        default: false
+      release_tag:
+        description: 'Release tag name (e.g., mobile-v1.0.7) - required if create_release is true'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -423,6 +432,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
+      - name: Upload to Release (if manual with flag)
+        if: |
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.create_release == 'true' &&
+          github.event.inputs.release_tag != ''
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            mobile-app/android/app/build/outputs/apk/debug/app-debug.apk
+            mobile-app/android/app/build/outputs/bundle/release/app-release.aab
+          tag_name: ${{ github.event.inputs.release_tag }}
+          draft: true
+          prerelease: true
+          name: 'Mobile Release ${{ github.event.inputs.release_tag }} (Draft)'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
   build-ios:
     name: Build iOS App
     runs-on: macos-latest
@@ -648,7 +675,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [build-android, build-ios]
-    if: always() && startsWith(github.ref, 'refs/tags/mobile-v')
+    if: |
+      always() && (
+        startsWith(github.ref, 'refs/tags/mobile-v') ||
+        (github.event_name == 'workflow_dispatch' &&
+         github.event.inputs.create_release == 'true' &&
+         github.event.inputs.release_tag != '')
+      )
 
     steps:
       - name: Checkout repository
@@ -661,10 +694,19 @@ jobs:
 
       - name: Generate release summary
         run: |
+          # Determine the version/tag to use
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.create_release }}" = "true" ]; then
+            VERSION="${{ github.event.inputs.release_tag }}"
+            VERSION_NUM="${VERSION#mobile-v}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+            VERSION_NUM="${GITHUB_REF#refs/tags/mobile-v}"
+          fi
+          
           echo "# LotoLink Mobile Application Release" > mobile_release_summary.md
           echo "" >> mobile_release_summary.md
           echo "## Release Information" >> mobile_release_summary.md
-          echo "- **Version:** ${GITHUB_REF#refs/tags/mobile-v}" >> mobile_release_summary.md
+          echo "- **Version:** $VERSION_NUM" >> mobile_release_summary.md
           echo "- **Date:** $(date +'%Y-%m-%d %H:%M:%S UTC')" >> mobile_release_summary.md
           echo "- **Commit:** ${{ github.sha }}" >> mobile_release_summary.md
           echo "" >> mobile_release_summary.md
@@ -764,10 +806,18 @@ jobs:
           retention-days: 90
 
       - name: Add summary to release
-        if: startsWith(github.ref, 'refs/tags/mobile-v')
+        if: |
+          startsWith(github.ref, 'refs/tags/mobile-v') ||
+          (github.event_name == 'workflow_dispatch' &&
+           github.event.inputs.create_release == 'true' &&
+           github.event.inputs.release_tag != '')
         uses: softprops/action-gh-release@v1
         with:
           body_path: mobile_release_summary.md
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag || '' }}
+          draft: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true' }}
+          prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true' }}
+          name: ${{ github.event_name == 'workflow_dispatch' && format('Mobile Release {0} (Draft)', github.event.inputs.release_tag) || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
