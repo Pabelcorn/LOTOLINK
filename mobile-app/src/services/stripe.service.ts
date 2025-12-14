@@ -3,7 +3,7 @@
  * Handles card tokenization using Stripe.js for secure payment processing
  */
 
-import { loadStripe, Stripe, StripeCardElement } from '@stripe/stripe-js';
+import { loadStripe, Stripe } from '@stripe/stripe-js';
 
 // Stripe publishable key - should be loaded from environment in production
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51QSExample';
@@ -37,7 +37,7 @@ export interface TokenResult {
   error?: string;
 }
 
-export const createCardToken = async (cardDetails: CardDetails): Promise<TokenResult> => {
+export const createCardToken = async (_cardDetails: CardDetails): Promise<TokenResult> => {
   try {
     const stripe = await getStripe();
     
@@ -48,33 +48,36 @@ export const createCardToken = async (cardDetails: CardDetails): Promise<TokenRe
       };
     }
 
-    // Create token from card details
-    const { token, error } = await stripe.createToken('card', {
-      number: cardDetails.number.replace(/\s/g, ''), // Remove spaces
-      exp_month: cardDetails.exp_month,
-      exp_year: cardDetails.exp_year,
-      cvc: cardDetails.cvc,
-      name: cardDetails.name,
-    });
-
-    if (error) {
-      return {
-        success: false,
-        error: error.message || 'Error al procesar la tarjeta',
-      };
+    // FIXME: CRITICAL SECURITY ISSUE - This implementation MUST be updated before production deployment
+    // Issue: Stripe.js does not support creating tokens directly from raw card data for security reasons.
+    // 
+    // Recommended approaches for Capacitor/mobile apps:
+    // 1. Use Stripe's native mobile SDKs (@stripe/stripe-react-native)
+    // 2. Use Stripe Elements in a web context with proper iframe isolation
+    // 3. Handle tokenization server-side via your backend API (most secure)
+    //
+    // Action Required: Update this before enabling payment functionality in production
+    // Current implementation disabled to prevent misuse
+    
+    // Production safety check - explicitly block this functionality
+    const isProduction = import.meta.env.PROD || import.meta.env.MODE === 'production';
+    if (isProduction) {
+      console.error('CRITICAL: Card tokenization attempted in production with incomplete implementation');
     }
-
-    if (!token) {
-      return {
-        success: false,
-        error: 'No se pudo crear el token de pago',
-      };
-    }
-
+    
     return {
-      success: true,
-      token: token.id,
+      success: false,
+      error: 'Card tokenization requires Stripe Elements or native SDK integration. Please contact support.',
     };
+
+    // Original code (commented out due to TypeScript/API incompatibility):
+    // const { token, error } = await stripe.createToken('card', {
+    //   number: cardDetails.number.replace(/\s/g, ''),
+    //   exp_month: cardDetails.exp_month,
+    //   exp_year: cardDetails.exp_year,
+    //   cvc: cardDetails.cvc,
+    //   name: cardDetails.name,
+    // });
   } catch (error) {
     console.error('Error creating card token:', error);
     return {

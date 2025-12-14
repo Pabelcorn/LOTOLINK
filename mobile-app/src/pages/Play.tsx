@@ -17,7 +17,7 @@ import {
 import { shuffle, cart } from 'ionicons/icons';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 interface GameType {
   id: string;
@@ -62,7 +62,7 @@ const Play: React.FC = () => {
       await hapticFeedback(ImpactStyle.Medium);
     } else {
       // Feedback for trying to select more than allowed
-      await Haptics.notification({ type: 'WARNING' });
+      await Haptics.notification({ type: NotificationType.Warning });
     }
   };
 
