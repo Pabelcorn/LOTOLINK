@@ -7,16 +7,16 @@ on:
   workflow_dispatch:
     inputs:
       days_to_keep:
-        description: 'Number of days to keep artifacts (default: 7)'
+        description: 'Number of days to keep artifacts (default: 0 - keep only today)'
         required: false
-        default: '7'
+        default: '0'
         type: string
 
 permissions:
   actions: write
 
 env:
-  DAYS_TO_KEEP: 7
+  DAYS_TO_KEEP: 0
 
 jobs:
   cleanup:
@@ -30,7 +30,9 @@ jobs:
           script: |
             const days_to_keep = parseInt('${{ github.event.inputs.days_to_keep || env.DAYS_TO_KEEP }}');
             const cutoff_date = new Date();
+            // Set to start of day (midnight) to ensure all artifacts from today are kept
             cutoff_date.setDate(cutoff_date.getDate() - days_to_keep);
+            cutoff_date.setHours(0, 0, 0, 0);
 
             console.log(`Deleting artifacts older than ${cutoff_date.toISOString()}`);
 
