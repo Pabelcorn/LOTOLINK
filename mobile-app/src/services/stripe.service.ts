@@ -48,14 +48,16 @@ export const createCardToken = async (_cardDetails: CardDetails): Promise<TokenR
       };
     }
 
-    // TODO: CRITICAL - This implementation needs to be updated for production use
-    // Stripe.js does not support creating tokens directly from raw card data for security reasons.
+    // FIXME: CRITICAL SECURITY ISSUE - This implementation MUST be updated before production deployment
+    // Issue: Stripe.js does not support creating tokens directly from raw card data for security reasons.
+    // 
     // Recommended approaches for Capacitor/mobile apps:
     // 1. Use Stripe's native mobile SDKs (@stripe/stripe-react-native)
-    // 2. Use Stripe Elements in a web context
-    // 3. Handle tokenization server-side via your backend API
+    // 2. Use Stripe Elements in a web context with proper iframe isolation
+    // 3. Handle tokenization server-side via your backend API (most secure)
     //
-    // Current implementation returns mock error for compilation
+    // Action Required: Update this before enabling payment functionality in production
+    // Current implementation returns an error to prevent misuse while allowing compilation
     return {
       success: false,
       error: 'Card tokenization requires Stripe Elements or native SDK integration. Please contact support.',
