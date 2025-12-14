@@ -66,6 +66,13 @@ jobs:
           fi
           echo "✓ Dependencies installed successfully"
 
+      - name: Run pre-flight checks
+        working-directory: mobile-app
+        run: |
+          chmod +x scripts/preflight-check.sh
+          ./scripts/preflight-check.sh || true
+          echo "Pre-flight checks completed (warnings only)"
+
       - name: Run ESLint
         working-directory: mobile-app
         run: npm run lint
