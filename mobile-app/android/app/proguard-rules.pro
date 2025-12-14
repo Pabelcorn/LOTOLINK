@@ -30,7 +30,9 @@
 -keep public class * extends java.lang.Exception
 
 # For React/JavaScript optimization
--keep class ** { *; }
+# Note: Commented out - too broad for production
+# Uncomment and replace with specific package rules if needed
+# -keep class ** { *; }
 
 # Keep native methods
 -keepclasseswithmembernames class * {

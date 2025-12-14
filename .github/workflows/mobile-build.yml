@@ -61,7 +61,6 @@ jobs:
       - name: Run ESLint
         working-directory: mobile-app
         run: npm run lint
-        continue-on-error: true
 
       - name: Run TypeScript check
         working-directory: mobile-app
@@ -70,7 +69,6 @@ jobs:
       - name: Run tests
         working-directory: mobile-app
         run: npm test
-        continue-on-error: true
 
       - name: Generate coverage report
         working-directory: mobile-app
@@ -88,8 +86,7 @@ jobs:
 
       - name: Security audit
         working-directory: mobile-app
-        run: npm audit --audit-level=moderate
-        continue-on-error: true
+        run: npm audit --audit-level=high
 
       - name: Check for outdated dependencies
         working-directory: mobile-app
