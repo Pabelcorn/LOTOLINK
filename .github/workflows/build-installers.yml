@@ -50,6 +50,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Verify Windows installer exists
+        run: |
+          cd desktop-app/dist
+          if ls *.exe 1> /dev/null 2>&1; then
+            echo "✓ Windows installer(s) found:"
+            ls -lh *.exe
+          else
+            echo "❌ ERROR: No .exe installer found!"
+            echo "Contents of dist directory:"
+            ls -la
+            exit 1
+          fi
+
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -57,9 +70,8 @@ jobs:
           path: |
             desktop-app/dist/*.exe
             desktop-app/dist/*.nsis.7z
-          retention-days: 7
+          retention-days: 30
           if-no-files-found: error
-        continue-on-error: true
 
       - name: Upload to Release (if tag)
         if: startsWith(github.ref, 'refs/tags/')
@@ -98,6 +110,20 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Verify macOS installer exists
+        run: |
+          cd desktop-app/dist
+          if ls *.dmg 1> /dev/null 2>&1 || ls *.zip 1> /dev/null 2>&1; then
+            echo "✓ macOS installer(s) found:"
+            # Show existing files; || true prevents failure if one format doesn't exist
+            ls -lh *.dmg *.zip 2>/dev/null || true
+          else
+            echo "❌ ERROR: No .dmg or .zip installer found!"
+            echo "Contents of dist directory:"
+            ls -la
+            exit 1
+          fi
+
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -105,9 +131,8 @@ jobs:
           path: |
             desktop-app/dist/*.dmg
             desktop-app/dist/*.zip
-          retention-days: 7
+          retention-days: 30
           if-no-files-found: error
-        continue-on-error: true
 
       - name: Upload to Release (if tag)
         if: startsWith(github.ref, 'refs/tags/')
@@ -148,6 +173,20 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Verify Linux installers exist
+        run: |
+          cd desktop-app/dist
+          if ls *.AppImage 1> /dev/null 2>&1 || ls *.deb 1> /dev/null 2>&1 || ls *.rpm 1> /dev/null 2>&1; then
+            echo "✓ Linux installer(s) found:"
+            # Show existing files; || true prevents failure if one format doesn't exist
+            ls -lh *.AppImage *.deb *.rpm 2>/dev/null || true
+          else
+            echo "❌ ERROR: No Linux installers found!"
+            echo "Contents of dist directory:"
+            ls -la
+            exit 1
+          fi
+
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -156,9 +195,8 @@ jobs:
             desktop-app/dist/*.AppImage
             desktop-app/dist/*.deb
             desktop-app/dist/*.rpm
-          retention-days: 7
+          retention-days: 30
           if-no-files-found: error
-        continue-on-error: true
 
       - name: Upload to Release (if tag)
         if: startsWith(github.ref, 'refs/tags/')
@@ -267,5 +305,5 @@ jobs:
         with:
           name: release-summary
           path: release_summary.md
-          retention-days: 7
-        continue-on-error: true
+          retention-days: 90
+          if-no-files-found: warn
