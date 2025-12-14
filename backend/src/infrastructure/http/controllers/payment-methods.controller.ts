@@ -81,25 +81,4 @@ export class PaymentMethodsController {
       throw new NotFoundException('Payment method not found');
     }
   }
-
-  /**
-   * Set a payment method as default
-   * Note: This is a placeholder implementation. In production, you should:
-   * 1. Add a setDefaultPaymentMethod() method to the PaymentGateway interface
-   * 2. Implement it in StripePaymentGateway to update the customer's default payment method
-   * 3. Call that method here instead of this workaround
-   * 
-   * @param userId User ID
-   * @param paymentMethodId Payment method ID to set as default
-   */
-  @Post(':paymentMethodId/set-default')
-  @HttpCode(HttpStatus.OK)
-  async setDefaultPaymentMethod(
-    @Param('userId') userId: string,
-    @Param('paymentMethodId') paymentMethodId: string,
-  ): Promise<{ success: boolean }> {
-    // TODO: Implement proper setDefaultPaymentMethod in PaymentGateway interface
-    // For now, this endpoint is not fully functional
-    throw new BadRequestException('Setting default payment method is not yet implemented. Please add a new card as default instead.');
-  }
 }

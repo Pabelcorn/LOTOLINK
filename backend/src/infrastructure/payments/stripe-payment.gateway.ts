@@ -41,7 +41,7 @@ export class StripePaymentGateway implements PaymentGateway {
     } else {
       // Initialize Stripe SDK with latest API version
       this.stripe = new Stripe(this.secretKey, {
-        apiVersion: '2025-11-17.clover',
+        apiVersion: '2024-11-20.acacia',
         typescript: true,
       });
       this.logger.log('Stripe Payment Gateway initialized successfully');
@@ -312,6 +312,9 @@ export class StripePaymentGateway implements PaymentGateway {
 
   /**
    * Get or create a Stripe customer for a user
+   * 
+   * Note: In production, you should store the Stripe customer ID in your database
+   * to avoid searching through all customers. This implementation is for demonstration.
    */
   private async getOrCreateCustomer(userId: string): Promise<string> {
     // Check if we already have a customer ID cached
@@ -324,20 +327,40 @@ export class StripePaymentGateway implements PaymentGateway {
       throw new BadRequestException('Stripe is not configured');
     }
 
-    // Search for existing customer by metadata
-    const existingCustomers = await this.stripe.customers.list({
-      limit: 1,
-    });
+    // TODO: In production, retrieve customer ID from database
+    // const userRecord = await this.userRepository.findById(userId);
+    // if (userRecord.stripeCustomerId) {
+    //   this.customers.set(userId, userRecord.stripeCustomerId);
+    //   return userRecord.stripeCustomerId;
+    // }
 
-    // Find customer with matching userId in metadata
-    const existingCustomer = existingCustomers.data.find(
-      (c) => c.metadata?.userId === userId
-    );
+    // Search for existing customer by metadata (with pagination)
+    // This is not optimal for production - use database storage instead
+    let existingCustomer = null;
+    let hasMore = true;
+    let startingAfter: string | undefined;
+
+    while (hasMore && !existingCustomer) {
+      const customers = await this.stripe.customers.list({
+        limit: 100,
+        starting_after: startingAfter,
+      });
+
+      existingCustomer = customers.data.find(
+        (c) => c.metadata?.userId === userId
+      );
+
+      hasMore = customers.has_more;
+      if (hasMore && customers.data.length > 0) {
+        startingAfter = customers.data[customers.data.length - 1].id;
+      }
+    }
 
     if (existingCustomer) {
-      const customerId = existingCustomer.id;
-      this.customers.set(userId, customerId);
-      return customerId;
+      this.customers.set(userId, existingCustomer.id);
+      // TODO: Save to database
+      // await this.userRepository.updateStripeCustomerId(userId, existingCustomer.id);
+      return existingCustomer.id;
     }
 
     // Create new customer with metadata only
@@ -352,6 +375,9 @@ export class StripePaymentGateway implements PaymentGateway {
 
     this.customers.set(userId, customer.id);
     this.logger.log(`Created Stripe customer ${customer.id} for user ${userId}`);
+    
+    // TODO: Save to database for future lookups
+    // await this.userRepository.updateStripeCustomerId(userId, customer.id);
     
     return customer.id;
   }

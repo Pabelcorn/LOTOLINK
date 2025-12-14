@@ -221,13 +221,23 @@ const PaymentMethods: React.FC = () => {
   const getBrandIcon = (brand?: string) => {
     switch (brand?.toLowerCase()) {
       case 'visa':
-        return '💳';
+        return '🔵'; // Blue circle for Visa
       case 'mastercard':
-        return '💳';
+        return '🔴'; // Red circle for Mastercard
       case 'amex':
-        return '💳';
+      case 'american express':
+        return '🟢'; // Green circle for Amex
+      case 'discover':
+        return '🟠'; // Orange circle for Discover
+      case 'diners':
+      case 'diners club':
+        return '⚪'; // White circle for Diners
+      case 'jcb':
+        return '🟣'; // Purple circle for JCB
+      case 'unionpay':
+        return '🔵'; // Blue for UnionPay
       default:
-        return '💳';
+        return '💳'; // Generic card
     }
   };
 
