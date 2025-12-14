@@ -560,7 +560,7 @@ jobs:
           else
             IOS_ADD_EXIT_CODE=$?
             echo "⚠️ Warning: iOS platform add failed with exit code $IOS_ADD_EXIT_CODE"
-            echo "Error output:"
+            echo "Last 20 lines of error output (for debugging):"
             tail -20 /tmp/ios-add-output.log || echo "Could not read error log"
             echo "Checking if platform structure was still created..."
           fi
@@ -597,13 +597,13 @@ jobs:
             if grep -q "platform :ios, '[^']*'" ios/App/Podfile; then
               sed -i.bak "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
             else
-              sed -i.bak 's/platform :ios, "[^"]*"/platform :ios, '"'"'14.0'"'"'/' ios/App/Podfile
+              sed -i.bak 's/platform :ios, "[^"]*"/platform :ios, "14.0"/' ios/App/Podfile
             fi
             rm -f ios/App/Podfile.bak
             echo "✓ Updated existing platform line in Podfile"
           else
-            # Add platform line at the beginning of the file using a more portable approach
-            printf "platform :ios, '14.0'\n%s" "$(cat ios/App/Podfile)" > ios/App/Podfile.tmp
+            # Add platform line at the beginning of the file using a more efficient approach
+            { printf "platform :ios, '14.0'\n"; cat ios/App/Podfile; } > ios/App/Podfile.tmp
             mv ios/App/Podfile.tmp ios/App/Podfile
             echo "✓ Added platform line to Podfile"
           fi
