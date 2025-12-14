@@ -30,7 +30,9 @@ jobs:
           script: |
             const days_to_keep = parseInt('${{ github.event.inputs.days_to_keep || env.DAYS_TO_KEEP }}');
             const cutoff_date = new Date();
+            // Set to start of day (midnight) to ensure all artifacts from today are kept
             cutoff_date.setDate(cutoff_date.getDate() - days_to_keep);
+            cutoff_date.setHours(0, 0, 0, 0);
 
             console.log(`Deleting artifacts older than ${cutoff_date.toISOString()}`);
 
