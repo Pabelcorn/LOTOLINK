@@ -43,6 +43,7 @@ import Lotteries from './pages/Lotteries';
 import Bancas from './pages/Bancas';
 import Profile from './pages/Profile';
 import Play from './pages/Play';
+import PaymentMethods from './pages/PaymentMethods';
 
 /* Services */
 import { setupNotificationListeners } from './services/notifications.service';
@@ -127,8 +128,11 @@ const App: React.FC = () => {
             <Route exact path="/bancas">
               <Bancas />
             </Route>
-            <Route path="/profile">
+            <Route exact path="/profile">
               <Profile />
+            </Route>
+            <Route exact path="/payment-methods">
+              <PaymentMethods />
             </Route>
             <Route exact path="/">
               <Redirect to="/home" />

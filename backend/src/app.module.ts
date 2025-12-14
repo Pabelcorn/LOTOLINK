@@ -12,6 +12,7 @@ import {
   AuthController,
   AdminBancasController,
 } from './infrastructure/http/controllers';
+import { PaymentMethodsController } from './infrastructure/http/controllers/payment-methods.controller';
 
 // Services
 import { PlayService, UserService, WebhookService, BancaService } from './application/services';
@@ -37,6 +38,11 @@ import { PLAY_REPOSITORY, USER_REPOSITORY, BANCA_REPOSITORY } from './domain/rep
 
 // Port tokens
 import { EVENT_PUBLISHER, CACHE_PORT, BANCA_ADAPTER } from './ports/outgoing';
+import { PAYMENT_GATEWAY } from './infrastructure/payments/payment-gateway.port';
+
+// Payment Gateways
+import { StripePaymentGateway } from './infrastructure/payments/stripe-payment.gateway';
+import { MockPaymentGateway } from './infrastructure/payments/mock-payment.gateway';
 
 // Guards
 import { JwtAuthGuard, IdempotencyGuard } from './infrastructure/http/guards';
@@ -114,7 +120,7 @@ class MockCachePort {
       inject: [ConfigService],
     }),
   ],
-  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController],
+  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController, PaymentMethodsController],
   providers: [
     // Services
     PlayService,
@@ -166,6 +172,19 @@ class MockCachePort {
     {
       provide: CACHE_PORT,
       useClass: MockCachePort,
+    },
+    
+    // Payment Gateway - uses Stripe in production, mock in development
+    {
+      provide: PAYMENT_GATEWAY,
+      useFactory: (configService: ConfigService) => {
+        const useMock = configService.get<string>('USE_MOCK_PAYMENT', 'true') === 'true';
+        if (useMock) {
+          return new MockPaymentGateway(configService);
+        }
+        return new StripePaymentGateway(configService);
+      },
+      inject: [ConfigService],
     },
   ],
 })
