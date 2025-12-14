@@ -438,7 +438,7 @@ jobs:
           echo "" >> mobile_release_summary.md
           echo "### Android" >> mobile_release_summary.md
           echo "- Minimum SDK: API 22 (Android 5.1)" >> mobile_release_summary.md
-          echo "- Target SDK: API 33 (Android 13)" >> mobile_release_summary.md
+          echo "- Target SDK: API 34 (Android 14)" >> mobile_release_summary.md
           echo "- Architecture: ARM, ARM64, x86, x86_64" >> mobile_release_summary.md
           echo "" >> mobile_release_summary.md
           echo "### iOS" >> mobile_release_summary.md
