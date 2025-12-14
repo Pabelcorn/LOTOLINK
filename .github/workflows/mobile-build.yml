@@ -308,7 +308,6 @@ jobs:
             mobile-app/android/app/build/reports/
           retention-days: 7
           if-no-files-found: ignore
-        continue-on-error: true
 
       - name: Get APK/AAB info
         working-directory: mobile-app/android
@@ -517,7 +516,6 @@ jobs:
           path: mobile-app/ios/App/build.log
           retention-days: 7
           if-no-files-found: ignore
-        continue-on-error: true
 
       - name: Get build info
         working-directory: mobile-app
