@@ -144,7 +144,8 @@ fi
 # Check TypeScript version compatibility
 if [ -f "package.json" ]; then
     TS_VERSION=$(grep '"typescript"' package.json | sed 's/.*"typescript": "\([^"]*\)".*/\1/')
-    if [[ $TS_VERSION == ~5.3.* ]] || [[ $TS_VERSION == 5.3.* ]]; then
+    # Check if version starts with ~5.3 or is exactly 5.3.x
+    if [[ "$TS_VERSION" == "~5.3."* ]] || [[ "$TS_VERSION" == "5.3."* ]]; then
         success "TypeScript version pinned correctly: $TS_VERSION"
     else
         warning "TypeScript version should be ~5.3.3 for @typescript-eslint compatibility (found: $TS_VERSION)"
@@ -218,7 +219,8 @@ SENSITIVE_FILES=(
 
 FOUND_SENSITIVE=0
 for pattern in "${SENSITIVE_FILES[@]}"; do
-    if ls $pattern 2>/dev/null; then
+    # Use find for safer file matching
+    if find . -maxdepth 1 -name "$pattern" 2>/dev/null | grep -q .; then
         warning "Found sensitive file matching: $pattern"
         ((FOUND_SENSITIVE++))
     fi
