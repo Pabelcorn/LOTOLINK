@@ -12,7 +12,9 @@ import {
   IonIcon,
   IonButton,
   IonToggle,
-  IonAvatar
+  IonAvatar,
+  IonToast,
+  IonAlert
 } from '@ionic/react';
 import { 
   person, 
@@ -25,9 +27,132 @@ import {
   logOut,
   chevronForward
 } from 'ionicons/icons';
+import { useState, useEffect } from 'react';
 import { APP_INFO } from '../constants';
+import {
+  checkBiometricAvailability,
+  getBiometricTypeName,
+  enableBiometricLogin,
+  disableBiometricLogin,
+  isBiometricEnabled
+} from '../services/biometric.service';
+import {
+  checkNotificationPermissions,
+  requestNotificationPermissions,
+  initializePushNotifications
+} from '../services/notifications.service';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 const Profile: React.FC = () => {
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricType, setBiometricType] = useState('Biométrico');
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [showLogoutAlert, setShowLogoutAlert] = useState(false);
+
+  useEffect(() => {
+    checkBiometricStatus();
+    checkNotificationStatus();
+    checkDarkModeStatus();
+  }, []);
+
+  const checkBiometricStatus = async () => {
+    const info = await checkBiometricAvailability();
+    setBiometricAvailable(info.isAvailable);
+    setBiometricType(getBiometricTypeName(info.biometryType));
+    
+    const enabled = await isBiometricEnabled();
+    setBiometricEnabled(enabled);
+  };
+
+  const checkNotificationStatus = async () => {
+    const enabled = await checkNotificationPermissions();
+    setNotificationsEnabled(enabled);
+  };
+
+  const checkDarkModeStatus = () => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    setDarkModeEnabled(prefersDark.matches);
+  };
+
+  const handleBiometricToggle = async (enabled: boolean) => {
+    try {
+      await Haptics.impact({ style: ImpactStyle.Light });
+      
+      if (enabled) {
+        // For demo purposes, using dummy credentials
+        // In production, get these from login form
+        const success = await enableBiometricLogin('demo_user', 'demo_password');
+        if (success) {
+          setBiometricEnabled(true);
+          setToastMessage(`${biometricType} habilitado correctamente`);
+          setShowToast(true);
+        } else {
+          setToastMessage('No se pudo habilitar la autenticación biométrica');
+          setShowToast(true);
+        }
+      } else {
+        await disableBiometricLogin();
+        setBiometricEnabled(false);
+        setToastMessage('Autenticación biométrica deshabilitada');
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error('Error toggling biometric:', error);
+      setToastMessage('Error al cambiar configuración biométrica');
+      setShowToast(true);
+    }
+  };
+
+  const handleNotificationToggle = async (enabled: boolean) => {
+    try {
+      await Haptics.impact({ style: ImpactStyle.Light });
+      
+      if (enabled) {
+        const granted = await requestNotificationPermissions();
+        if (granted) {
+          await initializePushNotifications();
+          setNotificationsEnabled(true);
+          setToastMessage('Notificaciones habilitadas correctamente');
+          setShowToast(true);
+        } else {
+          setToastMessage('Permiso de notificaciones denegado');
+          setShowToast(true);
+        }
+      } else {
+        setNotificationsEnabled(false);
+        setToastMessage('Notificaciones deshabilitadas');
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error('Error toggling notifications:', error);
+      setToastMessage('Error al cambiar configuración de notificaciones');
+      setShowToast(true);
+    }
+  };
+
+  const handleDarkModeToggle = async (enabled: boolean) => {
+    await Haptics.impact({ style: ImpactStyle.Light });
+    setDarkModeEnabled(enabled);
+    document.body.classList.toggle('dark', enabled);
+    setToastMessage(`Modo ${enabled ? 'oscuro' : 'claro'} activado`);
+    setShowToast(true);
+  };
+
+  const handleLogout = () => {
+    setShowLogoutAlert(true);
+  };
+
+  const confirmLogout = async () => {
+    await Haptics.impact({ style: ImpactStyle.Heavy });
+    // In production, clear auth tokens and redirect to login
+    setToastMessage('Sesión cerrada correctamente');
+    setShowToast(true);
+  };
+
   return (
     <IonPage>
       <IonHeader className="ion-no-border">
@@ -52,7 +177,8 @@ const Profile: React.FC = () => {
                     fontSize: '32px',
                     color: 'white',
                     fontWeight: '700'
-                  }}>
+                  }}
+                  aria-label="Avatar del usuario">
                     JD
                   </div>
                 </IonAvatar>
@@ -88,12 +214,13 @@ const Profile: React.FC = () => {
                     RD$ 1,250.00
                   </div>
                 </div>
-                <IonIcon icon={card} style={{ fontSize: '48px', opacity: 0.3 }} />
+                <IonIcon icon={card} style={{ fontSize: '48px', opacity: 0.3 }} aria-hidden="true" />
               </div>
               <IonButton 
                 expand="block" 
                 color="light" 
                 style={{ marginTop: '16px', '--border-radius': '12px' }}
+                aria-label="Recargar saldo de la billetera"
               >
                 Recargar Wallet
               </IonButton>
@@ -115,31 +242,47 @@ const Profile: React.FC = () => {
                 <IonIcon icon={chevronForward} slot="end" color="medium" />
               </IonItem>
               
-              <IonItem button detail={false}>
+              <IonItem detail={false}>
                 <IonIcon icon={fingerPrint} slot="start" color="primary" />
                 <IonLabel>
                   <h2>Autenticación Biométrica</h2>
-                  <p>Face ID / Touch ID / Huella</p>
+                  <p>{biometricAvailable ? biometricType : 'No disponible en este dispositivo'}</p>
                 </IonLabel>
-                <IonToggle slot="end" checked />
+                <IonToggle 
+                  slot="end" 
+                  checked={biometricEnabled}
+                  onIonChange={(e) => handleBiometricToggle(e.detail.checked)}
+                  disabled={!biometricAvailable}
+                  aria-label={`${biometricEnabled ? 'Deshabilitar' : 'Habilitar'} autenticación biométrica`}
+                />
               </IonItem>
               
-              <IonItem button detail={false}>
+              <IonItem detail={false}>
                 <IonIcon icon={notifications} slot="start" color="primary" />
                 <IonLabel>
                   <h2>Notificaciones Push</h2>
                   <p>Recibe alertas de sorteos y premios</p>
                 </IonLabel>
-                <IonToggle slot="end" checked />
+                <IonToggle 
+                  slot="end" 
+                  checked={notificationsEnabled}
+                  onIonChange={(e) => handleNotificationToggle(e.detail.checked)}
+                  aria-label={`${notificationsEnabled ? 'Deshabilitar' : 'Habilitar'} notificaciones push`}
+                />
               </IonItem>
               
-              <IonItem button detail={false}>
+              <IonItem detail={false}>
                 <IonIcon icon={moon} slot="start" color="primary" />
                 <IonLabel>
                   <h2>Modo Oscuro</h2>
-                  <p>Automático según el sistema</p>
+                  <p>{darkModeEnabled ? 'Activado' : 'Desactivado'}</p>
                 </IonLabel>
-                <IonToggle slot="end" />
+                <IonToggle 
+                  slot="end" 
+                  checked={darkModeEnabled}
+                  onIonChange={(e) => handleDarkModeToggle(e.detail.checked)}
+                  aria-label={`${darkModeEnabled ? 'Desactivar' : 'Activar'} modo oscuro`}
+                />
               </IonItem>
               
               <IonItem button detail={false}>
@@ -186,6 +329,8 @@ const Profile: React.FC = () => {
             color="danger"
             fill="outline"
             style={{ marginTop: '24px', '--border-radius': '12px' }}
+            onClick={handleLogout}
+            aria-label="Cerrar sesión de la aplicación"
           >
             <IonIcon slot="start" icon={logOut} />
             Cerrar Sesión
@@ -200,6 +345,32 @@ const Profile: React.FC = () => {
             Version {APP_INFO.VERSION} • {APP_INFO.NAME} © {APP_INFO.COPYRIGHT_YEAR}
           </div>
         </div>
+
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={toastMessage}
+          duration={2000}
+          position="top"
+        />
+
+        <IonAlert
+          isOpen={showLogoutAlert}
+          onDidDismiss={() => setShowLogoutAlert(false)}
+          header="Cerrar Sesión"
+          message="¿Estás seguro que deseas cerrar sesión?"
+          buttons={[
+            {
+              text: 'Cancelar',
+              role: 'cancel'
+            },
+            {
+              text: 'Cerrar Sesión',
+              role: 'destructive',
+              handler: confirmLogout
+            }
+          ]}
+        />
       </IonContent>
     </IonPage>
   );
