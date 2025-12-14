@@ -25,9 +25,11 @@ import {
   language,
   informationCircle,
   logOut,
-  chevronForward
+  chevronForward,
+  wallet,
 } from 'ionicons/icons';
 import { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { APP_INFO } from '../constants';
 import {
   checkBiometricAvailability,
@@ -44,6 +46,7 @@ import {
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 const Profile: React.FC = () => {
+  const history = useHistory();
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricType, setBiometricType] = useState('Biométrico');
   const [biometricEnabled, setBiometricEnabled] = useState(false);
@@ -243,6 +246,22 @@ const Profile: React.FC = () => {
               <IonItem button detail={false}>
                 <IonIcon icon={person} slot="start" color="primary" />
                 <IonLabel>Información Personal</IonLabel>
+                <IonIcon icon={chevronForward} slot="end" color="medium" />
+              </IonItem>
+              
+              <IonItem 
+                button 
+                detail={false}
+                onClick={() => {
+                  Haptics.impact({ style: ImpactStyle.Light });
+                  history.push('/payment-methods');
+                }}
+              >
+                <IonIcon icon={wallet} slot="start" color="primary" />
+                <IonLabel>
+                  <h2>Métodos de Pago</h2>
+                  <p>Gestionar tarjetas de crédito/débito</p>
+                </IonLabel>
                 <IonIcon icon={chevronForward} slot="end" color="medium" />
               </IonItem>
               
