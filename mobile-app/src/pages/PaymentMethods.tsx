@@ -30,6 +30,14 @@ import {
 } from 'ionicons/icons';
 import { useState, useEffect } from 'react';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { 
+  createCardToken, 
+  validateCardNumber, 
+  validateExpiry, 
+  validateCvc,
+  formatCardNumber as formatCardNumberHelper,
+  formatExpiry as formatExpiryHelper,
+} from '../services/stripe.service';
 
 interface PaymentMethod {
   id: string;
@@ -111,48 +119,72 @@ const PaymentMethods: React.FC = () => {
       return;
     }
 
+    // Validate card number
+    if (!validateCardNumber(cardNumber)) {
+      setToastMessage('Número de tarjeta inválido');
+      setShowToast(true);
+      return;
+    }
+
+    // Parse expiry
+    const [expMonth, expYear] = cardExpiry.split('/').map(s => parseInt(s.trim()));
+    if (!validateExpiry(expMonth, expYear)) {
+      setToastMessage('Fecha de vencimiento inválida');
+      setShowToast(true);
+      return;
+    }
+
+    // Validate CVC
+    if (!validateCvc(cardCvc)) {
+      setToastMessage('Código CVC inválido');
+      setShowToast(true);
+      return;
+    }
+
     try {
       setSubmitting(true);
       await Haptics.impact({ style: ImpactStyle.Medium });
 
-      // TODO: Implement Stripe tokenization
-      // 1. Use Stripe.js to create a token from card details
-      // 2. Send token to backend
-      // Example:
-      // const stripe = await loadStripe('pk_test_...');
-      // const { token, error } = await stripe.createToken('card', {
-      //   number: cardNumber,
-      //   exp_month: parseInt(cardExpiry.split('/')[0]),
-      //   exp_year: parseInt('20' + cardExpiry.split('/')[1]),
-      //   cvc: cardCvc,
-      //   name: cardholderName,
-      // });
+      // Create Stripe token from card details
+      const tokenResult = await createCardToken({
+        number: cardNumber,
+        exp_month: expMonth,
+        exp_year: expYear < 100 ? 2000 + expYear : expYear,
+        cvc: cardCvc,
+        name: cardholderName,
+      });
+
+      if (!tokenResult.success) {
+        setToastMessage(tokenResult.error || 'Error al procesar la tarjeta');
+        setShowToast(true);
+        return;
+      }
+
+      // Send token to backend
+      // TODO: Replace with actual API endpoint and user ID
+      const userId = 'user_123'; // Get from auth context
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       
-      // if (error) throw error;
-      
-      // const response = await fetch('/api/v1/users/me/payment-methods', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      //   body: JSON.stringify({
-      //     token: token.id,
-      //     type: 'card',
-      //     setAsDefault,
-      //   }),
-      // });
-      
-      // Mock success
-      const newMethod: PaymentMethod = {
-        id: `pm_${Date.now()}`,
-        type: 'card',
-        last4: cardNumber.slice(-4),
-        brand: 'visa', // This would come from Stripe
-        expiryMonth: parseInt(cardExpiry.split('/')[0]),
-        expiryYear: parseInt('20' + cardExpiry.split('/')[1]),
-        isDefault: setAsDefault,
-      };
+      const response = await fetch(`${apiUrl}/api/v1/users/${userId}/payment-methods`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // TODO: Add actual JWT token from auth context
+          // Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          token: tokenResult.token,
+          type: 'card',
+          setAsDefault,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al registrar la tarjeta');
+      }
+
+      const newMethod = await response.json();
       
       setPaymentMethods([...paymentMethods, newMethod]);
       setShowAddModal(false);
@@ -162,7 +194,7 @@ const PaymentMethods: React.FC = () => {
       
     } catch (error) {
       console.error('Error adding card:', error);
-      setToastMessage('Error al agregar tarjeta');
+      setToastMessage(error instanceof Error ? error.message : 'Error al agregar tarjeta');
       setShowToast(true);
     } finally {
       setSubmitting(false);
@@ -205,17 +237,11 @@ const PaymentMethods: React.FC = () => {
   };
 
   const formatCardNumber = (value: string) => {
-    const cleaned = value.replace(/\s/g, '');
-    const formatted = cleaned.match(/.{1,4}/g)?.join(' ') || cleaned;
-    return formatted.slice(0, 19); // Max 16 digits + 3 spaces
+    return formatCardNumberHelper(value);
   };
 
   const formatExpiry = (value: string) => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length >= 2) {
-      return `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}`;
-    }
-    return cleaned;
+    return formatExpiryHelper(value);
   };
 
   const getBrandIcon = (brand?: string) => {
