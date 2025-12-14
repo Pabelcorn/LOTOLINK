@@ -5,6 +5,271 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <title>LotoLink — Premium Lottery App</title>
   
+  <!-- Force mobile design on all devices -->
+  <style>
+    /* ========================================
+       FORCE MOBILE RESPONSIVE DESIGN ON ALL DEVICES
+       Mobile layout adapts to screen size (phone, tablet, desktop)
+       ======================================== */
+    
+    /* Override Tailwind responsive classes to force mobile layout */
+    * {
+      box-sizing: border-box;
+    }
+    
+    html {
+      overflow-x: hidden !important;
+      font-size: 16px !important;
+      -webkit-text-size-adjust: 100%;
+    }
+    
+    body {
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    #root {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    
+    /* Force mobile layout classes */
+    .lg\:hidden {
+      display: flex !important;
+    }
+    
+    /* Hide desktop navigation - handle "hidden lg:flex" pattern */
+    .hidden.lg\:flex {
+      display: none !important;
+    }
+    
+    .hidden.lg\:block {
+      display: none !important;
+    }
+    
+    .hidden.lg\:grid {
+      display: none !important;
+    }
+    
+    .hidden.md\:flex {
+      display: none !important;
+    }
+    
+    .hidden.md\:block {
+      display: none !important;
+    }
+    
+    /* Force any desktop-showing classes to hide */
+    nav.hidden.lg\:flex,
+    div.hidden.lg\:flex,
+    button.hidden.lg\:flex,
+    div.hidden.md\:flex {
+      display: none !important;
+    }
+    
+    /* Force single column layouts */
+    .md\:grid-cols-2,
+    .md\:grid-cols-3,
+    .md\:grid-cols-4,
+    .lg\:grid-cols-2,
+    .lg\:grid-cols-3,
+    .lg\:grid-cols-4 {
+      grid-template-columns: 1fr !important;
+    }
+    
+    /* Force mobile column spans */
+    .lg\:col-span-2,
+    .lg\:col-span-3 {
+      grid-column: span 1 !important;
+    }
+    
+    /* Container padding - mobile style */
+    .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    
+    /* Hide desktop-only elements */
+    .desktop-hide {
+      display: none !important;
+    }
+    
+    /* Force mobile navigation to always show */
+    nav.lg\:hidden {
+      display: flex !important;
+    }
+    
+    /* Typography - mobile sizing that scales with screen */
+    h1, .text-4xl, .text-5xl {
+      font-size: clamp(1.5rem, 4vw, 2.5rem) !important;
+      line-height: 1.2 !important;
+    }
+    
+    h2, .text-3xl {
+      font-size: clamp(1.25rem, 3.5vw, 2rem) !important;
+    }
+    
+    h3, .text-2xl {
+      font-size: clamp(1.1rem, 3vw, 1.5rem) !important;
+    }
+    
+    /* Buttons - mobile touch targets */
+    .btn-apple-primary, .btn-apple-secondary {
+      min-height: 48px !important;
+    }
+    
+    /* Cards - mobile padding */
+    .premium-card {
+      padding: 16px !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+    
+    /* Form elements - mobile friendly */
+    input, select, textarea {
+      font-size: 16px !important;
+      min-height: 48px !important;
+      padding: 12px !important;
+    }
+    
+    /* Force grid to single column */
+    .grid-cols-2:not(.keep-cols), 
+    .grid-cols-3:not(.keep-cols), 
+    .grid-cols-4:not(.keep-cols) {
+      grid-template-columns: 1fr !important;
+    }
+    
+    /* Force flex layouts to column (mobile stack) */
+    .md\:flex-row,
+    .lg\:flex-row,
+    .sm\:flex-row {
+      flex-direction: column !important;
+    }
+    
+    /* Force flex items to stack */
+    .flex-col.md\:flex-row,
+    .flex-col.lg\:flex-row,
+    .flex-col.sm\:flex-row {
+      flex-direction: column !important;
+    }
+    
+    /* Force text alignment to mobile (center/left) */
+    .lg\:text-left {
+      text-align: left !important;
+    }
+    
+    /* Override responsive text sizes - scale with viewport (accessible minimums) */
+    .sm\:text-base { font-size: clamp(0.9375rem, 2vw, 1rem) !important; } /* min 15px */
+    .sm\:text-lg { font-size: clamp(1rem, 2.5vw, 1.25rem) !important; }
+    .sm\:text-xl { font-size: clamp(1.125rem, 2.75vw, 1.5rem) !important; }
+    .sm\:text-2xl { font-size: clamp(1.25rem, 3vw, 1.75rem) !important; }
+    .sm\:text-3xl { font-size: clamp(1.5rem, 3.5vw, 2rem) !important; }
+    .sm\:text-4xl { font-size: clamp(1.75rem, 4vw, 2.5rem) !important; }
+    .md\:text-5xl { font-size: clamp(1.875rem, 4.5vw, 3rem) !important; }
+    .lg\:text-6xl { font-size: clamp(2rem, 5vw, 3.5rem) !important; }
+    
+    /* Force buttons to maintain mobile flex behavior */
+    .flex-1.sm\:flex-initial,
+    .flex-1.md\:flex-initial,
+    .flex-1.lg\:flex-initial {
+      flex: 1 1 0% !important;
+    }
+    
+    /* Adaptive padding - scales with screen size */
+    .sm\:p-8 { padding: clamp(1rem, 2vw, 2rem) !important; }
+    .sm\:p-6 { padding: clamp(1rem, 2vw, 1.5rem) !important; }
+    .sm\:p-5 { padding: clamp(1rem, 1.5vw, 1.25rem) !important; }
+    .sm\:p-4 { padding: clamp(0.75rem, 1.5vw, 1rem) !important; }
+    .sm\:p-3 { padding: clamp(0.75rem, 1vw, 0.875rem) !important; }
+    .md\:p-12 { padding: clamp(1.5rem, 3vw, 3rem) !important; }
+    
+    .sm\:px-8 { padding-left: clamp(1rem, 2vw, 2rem) !important; padding-right: clamp(1rem, 2vw, 2rem) !important; }
+    .sm\:px-6 { padding-left: clamp(1rem, 2vw, 1.5rem) !important; padding-right: clamp(1rem, 2vw, 1.5rem) !important; }
+    .sm\:px-5 { padding-left: clamp(0.875rem, 1.5vw, 1.25rem) !important; padding-right: clamp(0.875rem, 1.5vw, 1.25rem) !important; }
+    .sm\:px-4 { padding-left: clamp(0.75rem, 1.5vw, 1rem) !important; padding-right: clamp(0.75rem, 1.5vw, 1rem) !important; }
+    .sm\:px-3 { padding-left: clamp(0.625rem, 1vw, 0.875rem) !important; padding-right: clamp(0.625rem, 1vw, 0.875rem) !important; }
+    
+    /* ========================================
+       ADAPTIVE ENHANCEMENTS FOR LARGER SCREENS
+       Bottom navigation and buttons scale appropriately
+       ======================================== */
+    
+    /* Bottom Navigation Bar - Adaptive sizing and centering */
+    /* Center on ALL screen sizes */
+    nav.fixed.bottom-0[class*="lg:hidden"] > div {
+      justify-content: center !important;
+      gap: clamp(0.5rem, 4vw, 2rem) !important;
+    }
+    
+    @media (min-width: 768px) {
+      /* Add max-width and extra padding for tablet/desktop */
+      nav.fixed.bottom-0[class*="lg:hidden"] > div {
+        max-width: 600px !important;
+        margin: 0 auto !important;
+        padding: 1rem 2rem !important;
+      }
+      
+      /* Enlarge bottom nav buttons on larger screens */
+      nav.fixed.bottom-0[class*="lg:hidden"] button {
+        width: clamp(4rem, 8vw, 6rem) !important;
+        padding: 0.75rem !important;
+      }
+      
+      nav.fixed.bottom-0[class*="lg:hidden"] button span:first-child {
+        font-size: clamp(1.5rem, 3vw, 2rem) !important;
+      }
+      
+      nav.fixed.bottom-0[class*="lg:hidden"] button span:last-child {
+        font-size: clamp(0.75rem, 1.5vw, 1rem) !important;
+      }
+      
+      /* Center play button - enlarge it on larger screens */
+      nav.fixed.bottom-0[class*="lg:hidden"] button [class*="w-14"] {
+        width: clamp(3.5rem, 6vw, 5rem) !important;
+        height: clamp(3.5rem, 6vw, 5rem) !important;
+        font-size: clamp(1.75rem, 3.5vw, 2.5rem) !important;
+      }
+    }
+    
+    /* Popular Plays "Agregar rápida" buttons - Adaptive layout */
+    @media (min-width: 640px) {
+      /* Make container flex row to put button on the right */
+      [class*="border-b"][class*="pb-2"]:has(button) {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+      }
+      
+      /* Text content takes available space */
+      [class*="border-b"][class*="pb-2"]:has(button) > div {
+        flex: 1 !important;
+        margin-right: 1rem !important;
+      }
+      
+      /* Agregar rápida button - larger and to the right */
+      [class*="border-b"][class*="pb-2"] > button[class*="border"] {
+        flex-shrink: 0 !important;
+        padding: 0.75rem 1.5rem !important;
+        font-size: 0.875rem !important;
+        min-width: 150px !important;
+        margin-top: 0 !important;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      /* Even larger on desktop */
+      [class*="border-b"][class*="pb-2"] > button[class*="border"] {
+        padding: 1rem 2rem !important;
+        font-size: 1rem !important;
+        min-width: 180px !important;
+      }
+    }
+  </style>
+  
   <!-- PWA Meta Tags -->
   <meta name="application-name" content="LotoLink">
   <meta name="description" content="La aplicación premium para jugar loterías en República Dominicana. Segura, rápida y fácil de usar.">
@@ -17,12 +282,26 @@
   <meta name="msapplication-tap-highlight" content="no">
   
   <!-- iOS Splash Screens & Favicon -->
-  <link rel="icon" type="image/png" href="/lotolink-logo.png">
-  <link rel="apple-touch-icon" href="/lotolink-logo.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/lotolink-logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./lotolink-logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./lotolink-logo.png">
+  <link rel="shortcut icon" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./lotolink-logo.png">
+  
+  <!-- Microsoft Tiles -->
+  <meta name="msapplication-TileImage" content="./lotolink-logo.png">
+  <meta name="msapplication-config" content="none">
   
   <!-- PWA Manifest (inline for single file) -->
-  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%20%22LotoLink%22%2C%20%22short_name%22%3A%20%22LotoLink%22%2C%20%22description%22%3A%20%22La%20aplicaci%5Cu00f3n%20premium%20para%20jugar%20loter%5Cu00edas%22%2C%20%22start_url%22%3A%20%22.%22%2C%20%22display%22%3A%20%22standalone%22%2C%20%22background_color%22%3A%20%22%23f5f5f7%22%2C%20%22theme_color%22%3A%20%22%230071e3%22%2C%20%22orientation%22%3A%20%22portrait%22%2C%20%22icons%22%3A%20%5B%7B%22src%22%3A%20%22/lotolink-logo.png%22%2C%20%22sizes%22%3A%20%22192x192%22%2C%20%22type%22%3A%20%22image/png%22%7D%2C%20%7B%22src%22%3A%20%22/lotolink-logo.png%22%2C%20%22sizes%22%3A%20%22512x512%22%2C%20%22type%22%3A%20%22image/png%22%7D%5D%7D">
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22LotoLink%22%2C%22short_name%22%3A%22LotoLink%22%2C%22description%22%3A%22La%20aplicaci%C3%B3n%20premium%20para%20jugar%20loter%C3%ADas%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f5f5f7%22%2C%22theme_color%22%3A%22%230071e3%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22lotolink-logo.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22lotolink-logo.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -44,6 +323,7 @@
   <style>
     /* ========================================
        APPLE-INSPIRED ELEGANT DESIGN SYSTEM
+       FORCE MOBILE RESPONSIVE DESIGN ON ALL DEVICES
        ======================================== */
     
     :root {
@@ -640,31 +920,27 @@
       -webkit-overflow-scrolling: touch;
     }
     
-    /* Mobile-specific utility classes */
-    @media (max-width: 640px) {
-      .mobile-full-width {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      
-      .mobile-stack {
-        flex-direction: column !important;
-      }
-      
-      .mobile-center {
-        text-align: center !important;
-        justify-content: center !important;
-      }
-      
-      .mobile-hide {
-        display: none !important;
-      }
+    /* Mobile-specific utility classes - ALWAYS ACTIVE */
+    .mobile-full-width {
+      width: 100% !important;
+      max-width: 100% !important;
     }
     
-    @media (min-width: 641px) {
-      .desktop-hide {
-        display: none !important;
-      }
+    .mobile-stack {
+      flex-direction: column !important;
+    }
+    
+    .mobile-center {
+      text-align: center !important;
+      justify-content: center !important;
+    }
+    
+    .mobile-hide {
+      display: none !important;
+    }
+    
+    .desktop-hide {
+      display: none !important;
     }
     
     /* PWA Splash screen styles */
@@ -1557,7 +1833,7 @@
           {portalView === 'login' ? (
             <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden mt-10 animate-fade-in">
               <div className="bg-gradient-brand p-8 text-center text-white">
-                <img src="/lotolink-logo.png" alt="LotoLink Logo" className="w-16 h-16 rounded-full mx-auto mb-3 object-contain bg-white/20 p-1" />
+                <img src="./lotolink-logo.png" alt="LotoLink Logo" className="w-16 h-16 rounded-full mx-auto mb-3 object-contain bg-white/20 p-1" />
                 <h2 className="text-2xl font-bold">Acceso a Socios</h2>
                 <p className="text-blue-100 text-sm mt-2">Gestiona tu banca desde cualquier lugar</p>
               </div>
@@ -2222,7 +2498,7 @@
                 
                 {/* Premium Logo */}
                 <img 
-                  src="/lotolink-logo.png"
+                  src="./lotolink-logo.png"
                   alt="LotoLink Logo"
                   className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl cursor-pointer shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 hover:scale-105 object-contain" 
                   onClick={()=>handleNavClick('home')}
@@ -2344,7 +2620,7 @@
                 <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <img 
-                      src="/lotolink-logo.png"
+                      src="./lotolink-logo.png"
                       alt="LotoLink Logo"
                       className="w-12 h-12 rounded-xl object-contain"
                     />
@@ -2587,7 +2863,7 @@
                   <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-[2rem] p-6 h-80 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700">
                     {/* App Icon */}
                     <img 
-                      src="/lotolink-logo.png"
+                      src="./lotolink-logo.png"
                       alt="LotoLink Logo"
                       className="w-24 h-24 rounded-2xl shadow-lg shadow-blue-500/30 mb-4 object-contain"
                     />
@@ -7873,7 +8149,7 @@
           // iOS-specific install instructions
           banner.innerHTML = `
             <div class="max-w-md mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 flex items-center gap-4">
-              <img src="/lotolink-logo.png" alt="LotoLink Logo" class="w-14 h-14 rounded-2xl flex-shrink-0 shadow-lg object-contain" />
+              <img src="./lotolink-logo.png" alt="LotoLink Logo" class="w-14 h-14 rounded-2xl flex-shrink-0 shadow-lg object-contain" />
               <div class="flex-1 min-w-0">
                 <div class="font-semibold text-gray-900 dark:text-white text-sm">Instalar LotoLink</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Toca <span class="inline-flex items-center bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-[10px]">
@@ -7889,7 +8165,7 @@
           // Android/Desktop with install prompt
           banner.innerHTML = `
             <div class="max-w-md mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 flex items-center gap-4">
-              <img src="/lotolink-logo.png" alt="LotoLink Logo" class="w-14 h-14 rounded-2xl flex-shrink-0 shadow-lg object-contain" />
+              <img src="./lotolink-logo.png" alt="LotoLink Logo" class="w-14 h-14 rounded-2xl flex-shrink-0 shadow-lg object-contain" />
               <div class="flex-1 min-w-0">
                 <div class="font-semibold text-gray-900 dark:text-white text-sm">Instalar LotoLink</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Instala la app para una mejor experiencia</div>
