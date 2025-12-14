@@ -402,6 +402,8 @@ jobs:
           if-no-files-found: error
 
       - name: Upload Release AAB (if built)
+        # Note: continue-on-error is intentional here because AAB requires signing configuration
+        # which may not be available in all build scenarios. APK is always required, AAB is optional.
         uses: actions/upload-artifact@v4
         with:
           name: android-release-aab

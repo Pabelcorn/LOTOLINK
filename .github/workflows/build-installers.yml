@@ -115,6 +115,7 @@ jobs:
           cd desktop-app/dist
           if ls *.dmg 1> /dev/null 2>&1 || ls *.zip 1> /dev/null 2>&1; then
             echo "✓ macOS installer(s) found:"
+            # Show existing files; || true prevents failure if one format doesn't exist
             ls -lh *.dmg *.zip 2>/dev/null || true
           else
             echo "❌ ERROR: No .dmg or .zip installer found!"
@@ -177,6 +178,7 @@ jobs:
           cd desktop-app/dist
           if ls *.AppImage 1> /dev/null 2>&1 || ls *.deb 1> /dev/null 2>&1 || ls *.rpm 1> /dev/null 2>&1; then
             echo "✓ Linux installer(s) found:"
+            # Show existing files; || true prevents failure if one format doesn't exist
             ls -lh *.AppImage *.deb *.rpm 2>/dev/null || true
           else
             echo "❌ ERROR: No Linux installers found!"
