@@ -7,16 +7,16 @@ on:
   workflow_dispatch:
     inputs:
       days_to_keep:
-        description: 'Number of days to keep artifacts (default: 7)'
+        description: 'Number of days to keep artifacts (default: 0 - keep only today)'
         required: false
-        default: '7'
+        default: '0'
         type: string
 
 permissions:
   actions: write
 
 env:
-  DAYS_TO_KEEP: 7
+  DAYS_TO_KEEP: 0
 
 jobs:
   cleanup:
