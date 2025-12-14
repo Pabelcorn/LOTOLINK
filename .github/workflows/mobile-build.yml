@@ -555,10 +555,15 @@ jobs:
           # Add iOS platform - this will create the ios/ directory and Xcode project
           # Note: This may fail during the pod install step if there are deployment target conflicts
           # but the platform structure should still be created
-          npx cap add ios || {
-            echo "⚠️ Warning: iOS platform add had issues, but platform structure may still be created"
-            echo "Checking if platform structure exists..."
-          }
+          if npx cap add ios 2>&1 | tee /tmp/ios-add-output.log; then
+            echo "✓ iOS platform add completed successfully"
+          else
+            IOS_ADD_EXIT_CODE=$?
+            echo "⚠️ Warning: iOS platform add failed with exit code $IOS_ADD_EXIT_CODE"
+            echo "Error output:"
+            tail -20 /tmp/ios-add-output.log || echo "Could not read error log"
+            echo "Checking if platform structure was still created..."
+          fi
 
           # Verify that the iOS platform structure was created
           if [ ! -d "ios" ]; then
@@ -588,14 +593,14 @@ jobs:
           echo "Configuring Podfile deployment target to iOS 14.0..."
           if grep -q "platform :ios" ios/App/Podfile; then
             # Update existing platform line to iOS 14.0
-            # Use sed for better cross-platform compatibility
-            sed -i.bak "s/platform :ios, '[^']*'/platform :ios, '14.0'/" ios/App/Podfile
+            # Support both single and double quotes
+            sed -i.bak "s/platform :ios, ['\"][^'\"]*['\"]*/platform :ios, '14.0'/" ios/App/Podfile
             rm -f ios/App/Podfile.bak
             echo "✓ Updated existing platform line in Podfile"
           else
-            # Add platform line at the beginning of the file
-            echo "platform :ios, '14.0'" | cat - ios/App/Podfile > ios/App/Podfile.tmp
-            mv ios/App/Podfile.tmp ios/App/Podfile
+            # Add platform line at the beginning of the file using sed
+            sed -i.bak "1s/^/platform :ios, '14.0'\n/" ios/App/Podfile
+            rm -f ios/App/Podfile.bak
             echo "✓ Added platform line to Podfile"
           fi
 
