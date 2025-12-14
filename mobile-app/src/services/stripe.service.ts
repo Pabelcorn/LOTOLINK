@@ -57,7 +57,14 @@ export const createCardToken = async (_cardDetails: CardDetails): Promise<TokenR
     // 3. Handle tokenization server-side via your backend API (most secure)
     //
     // Action Required: Update this before enabling payment functionality in production
-    // Current implementation returns an error to prevent misuse while allowing compilation
+    // Current implementation disabled to prevent misuse
+    
+    // Production safety check - explicitly block this functionality
+    const isProduction = import.meta.env.PROD || import.meta.env.MODE === 'production';
+    if (isProduction) {
+      console.error('CRITICAL: Card tokenization attempted in production with incomplete implementation');
+    }
+    
     return {
       success: false,
       error: 'Card tokenization requires Stripe Elements or native SDK integration. Please contact support.',
