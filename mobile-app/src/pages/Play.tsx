@@ -117,7 +117,7 @@ const Play: React.FC = () => {
       <IonContent fullscreen>
         {/* Game Type Selection */}
         {!selectedGameType ? (
-          <div style={{ padding: '16px' }}>
+          <div className="game-type-grid">
             <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>
               Selecciona el tipo de juego
             </h2>

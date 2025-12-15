@@ -36,6 +36,7 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 import './theme/custom.css';
+import './theme/responsive.css';
 
 /* Pages */
 import Home from './pages/Home';
