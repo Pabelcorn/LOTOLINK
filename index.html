@@ -1214,13 +1214,34 @@
        Works on ALL screen sizes
        ======================================== */
     
-    /* Grid must always be visible */
+    /* Section must always be visible */
+    #lottery-section {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    
+    /* Grid must always be visible - single column on all narrow screens */
     #lotteries {
       display: grid !important;
       visibility: visible !important;
       opacity: 1 !important;
       width: 100% !important;
       box-sizing: border-box !important;
+      grid-template-columns: 1fr !important;
+    }
+    
+    /* Responsive grid - only on wider screens */
+    @media (min-width: 640px) {
+      #lotteries {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      #lotteries {
+        grid-template-columns: repeat(4, 1fr) !important;
+      }
     }
     
     /* Lottery button - simple and clean */
@@ -5157,10 +5178,17 @@
             {view === "how" && <HowItWorks />}
             
             {view === "loterias" && (
-               <section className="mt-6" style={{minHeight: '50vh'}}>
+               <section className="mt-6" id="lottery-section" style={{minHeight: '50vh', display: 'block', visibility: 'visible', opacity: 1}}>
                  <h2 className="text-2xl font-bold mb-2 dark:text-white">Loterías Disponibles</h2>
                  <p className="text-gray-600 dark:text-gray-300 mb-6">Las jugadas se agregarán automáticamente a tu <strong>Bolso Global</strong>.</p>
-                 <div id="lotteries" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" style={{display: 'grid', width: '100%'}}></div>
+                 <div id="lotteries" style={{
+                   display: 'grid',
+                   gridTemplateColumns: '1fr',
+                   gap: '16px',
+                   width: '100%',
+                   visibility: 'visible',
+                   opacity: 1
+                 }}></div>
                  
                  {/* Modal Container */}
                  <div id="modal-root" className="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden" style={{WebkitOverflowScrolling: 'touch'}}>
@@ -7391,8 +7419,13 @@
       let selectedGameType = null; // 'quiniela', 'pale', 'tripleta', 'pega3', 'toca3'
 
       function renderLotteries() {
+        console.log('renderLotteries() called - starting...');
         const container = document.getElementById('lotteries'); 
-        if (!container) return; 
+        if (!container) {
+          console.error('ERROR: #lotteries container not found!');
+          return;
+        }
+        console.log('Container found:', container);
         container.innerHTML = '';
         
         MOCKUP_LOTTERIES.forEach(l => {
@@ -7412,6 +7445,7 @@
           btn.onclick = () => openLottery(l.id); 
           container.appendChild(btn);
         });
+        console.log(`renderLotteries() completed - added ${MOCKUP_LOTTERIES.length} lottery buttons`);
       }
       
       function openLottery(id) { 
