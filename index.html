@@ -718,211 +718,6 @@
 
     .modal-scroll { max-height: calc(100vh - 160px); overflow: auto; }
     
-    /* ========================================
-       LOTTERY CARDS - MOBILE-FIRST RESPONSIVE DESIGN
-       Complete rebuild for narrow phone compatibility
-       ======================================== */
-    
-    /* Base lottery card styles - mobile first */
-    .lottery-card-btn {
-      width: 100%;
-      text-align: left;
-      border-radius: 12px;
-      background: #f9fafb;
-      padding: 14px;
-      transition: all 0.2s;
-      border: 1px solid transparent;
-      cursor: pointer;
-      display: block;
-    }
-    
-    .dark .lottery-card-btn {
-      background: #1c1c1e;
-    }
-    
-    .lottery-card-btn:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      border-color: #60a5fa;
-    }
-    
-    .dark .lottery-card-btn:hover {
-      border-color: #3b82f6;
-    }
-    
-    /* Card inner layout - vertical by default (mobile first) */
-    .lottery-card-inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 10px;
-      width: 100%;
-    }
-    
-    /* Icon container */
-    .lottery-card-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      flex-shrink: 0;
-    }
-    
-    /* Text container */
-    .lottery-card-text {
-      width: 100%;
-      min-width: 0;
-    }
-    
-    .lottery-card-name {
-      font-weight: bold;
-      font-size: 15px;
-      line-height: 1.3;
-      margin-bottom: 4px;
-      color: #1f2937;
-    }
-    
-    .dark .lottery-card-name {
-      color: #f9fafb;
-    }
-    
-    .lottery-card-schedule {
-      font-size: 12px;
-      line-height: 1.4;
-      color: #6b7280;
-    }
-    
-    .dark .lottery-card-schedule {
-      color: #9ca3af;
-    }
-    
-    /* Responsive breakpoints - progressive enhancement */
-    
-    /* Small phones and up (360px+) */
-    @media (min-width: 360px) {
-      .lottery-card-inner {
-        gap: 12px;
-      }
-      
-      .lottery-card-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 22px;
-      }
-      
-      .lottery-card-name {
-        font-size: 16px;
-      }
-      
-      .lottery-card-schedule {
-        font-size: 13px;
-      }
-    }
-    
-    /* Large phones (480px+) - switch to horizontal layout */
-    @media (min-width: 480px) {
-      .lottery-card-btn {
-        padding: 16px;
-      }
-      
-      .lottery-card-inner {
-        flex-direction: row;
-        text-align: left;
-        align-items: flex-start;
-        gap: 14px;
-      }
-      
-      .lottery-card-name {
-        font-size: 17px;
-      }
-    }
-    
-    /* Tablets (640px+) */
-    @media (min-width: 640px) {
-      .lottery-card-btn {
-        padding: 18px;
-        border-radius: 14px;
-      }
-      
-      .lottery-card-inner {
-        gap: 16px;
-      }
-      
-      .lottery-card-icon {
-        width: 64px;
-        height: 64px;
-        font-size: 24px;
-        border-radius: 12px;
-      }
-      
-      .lottery-card-name {
-        font-size: 18px;
-      }
-      
-      .lottery-card-schedule {
-        font-size: 13px;
-      }
-    }
-    
-    /* Desktop (1024px+) */
-    @media (min-width: 1024px) {
-      .lottery-card-btn {
-        padding: 20px;
-      }
-    }
-    
-    /* Lottery grid responsive adjustments */
-    #lotteries.grid {
-      gap: 12px;
-      width: 100%;
-      display: grid !important; /* Force grid display */
-    }
-    
-    /* Ensure lottery section is visible at all widths */
-    #lotteries {
-      display: grid !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
-    
-    /* Section containing lotteries */
-    section .grid#lotteries {
-      width: 100%;
-      max-width: 100%;
-    }
-    
-    @media (max-width: 780px) {
-      #lotteries.grid {
-        grid-template-columns: 1fr !important;
-        gap: 10px;
-      }
-      
-      /* Ensure section visibility */
-      section {
-        padding: 0 12px;
-        margin: 0;
-      }
-    }
-    
-    @media (min-width: 781px) and (max-width: 1023px) {
-      #lotteries.grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px;
-      }
-    }
-    
-    @media (min-width: 1024px) {
-      #lotteries.grid {
-        gap: 24px;
-      }
-    }
-    
     /* Mobile Game Panel - COMPLETELY FIXED FOR ALL DEVICES */
     #modal-root {
       overflow-y: auto !important;
@@ -937,14 +732,7 @@
     }
     
     /* MOBILE: Full-height scrollable game panel */
-    @media (max-width: 780px) {
-      /* Ensure lottery section is visible */
-      section:has(#lotteries) {
-        display: block !important;
-        visibility: visible !important;
-        min-height: auto !important;
-      }
-      
+    @media (max-width: 768px) {
       #modal-root {
         position: fixed !important;
         top: 0 !important;
@@ -979,7 +767,6 @@
         overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch !important;
         flex: 1 !important;
-        box-sizing: border-box !important;
       }
       
       /* Header - STICKY at top, always visible */
@@ -990,7 +777,6 @@
         padding: 8px 10px !important;
         margin: 0 !important;
         flex-shrink: 0 !important;
-        box-sizing: border-box !important;
       }
       
       /* Header content compact */
@@ -1123,22 +909,6 @@
     }
     
     @media (max-width: 480px) {
-      /* Ensure all modal content fits */
-      #modal-card * {
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-      }
-      
-      /* Force all text to wrap */
-      #modal-card p,
-      #modal-card h1,
-      #modal-card h2,
-      #modal-card h3,
-      #modal-card div {
-        word-wrap: break-word !important;
-        overflow-wrap: break-word !important;
-      }
-      
       #modal-card .grid-cols-10 {
         grid-template-columns: repeat(5, 1fr) !important;
         gap: 5px !important;
@@ -1437,6 +1207,117 @@
     @keyframes shimmer {
       0% { background-position: -200% 0; }
       100% { background-position: 200% 0; }
+    }
+    
+    /* ========================================
+       LOTTERY SECTION - SIMPLE & BULLETPROOF
+       Works on ALL screen sizes
+       ======================================== */
+    
+    /* Grid must always be visible */
+    #lotteries {
+      display: grid !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* Lottery button - simple and clean */
+    .lottery-btn {
+      width: 100%;
+      text-align: left;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-sizing: border-box;
+      display: block;
+    }
+    
+    .dark .lottery-btn {
+      background: #1c1c1e;
+      border-color: #374151;
+    }
+    
+    .lottery-btn:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-color: #60a5fa;
+    }
+    
+    /* Inner content - flex layout */
+    .lottery-btn-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+    
+    /* Icon */
+    .lottery-icon {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    
+    /* Text container */
+    .lottery-text {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .lottery-name {
+      font-weight: bold;
+      font-size: 16px;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      color: #1f2937;
+    }
+    
+    .dark .lottery-name {
+      color: #f9fafb;
+    }
+    
+    .lottery-schedule {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #6b7280;
+    }
+    
+    .dark .lottery-schedule {
+      color: #9ca3af;
+    }
+    
+    /* Small phones - make text smaller */
+    @media (max-width: 375px) {
+      .lottery-btn {
+        padding: 12px;
+      }
+      
+      .lottery-icon {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        font-size: 16px;
+      }
+      
+      .lottery-name {
+        font-size: 14px;
+      }
+      
+      .lottery-schedule {
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -5276,10 +5157,10 @@
             {view === "how" && <HowItWorks />}
             
             {view === "loterias" && (
-               <section className="mt-6">
+               <section className="mt-6" style={{minHeight: '50vh'}}>
                  <h2 className="text-2xl font-bold mb-2 dark:text-white">Loterías Disponibles</h2>
                  <p className="text-gray-600 dark:text-gray-300 mb-6">Las jugadas se agregarán automáticamente a tu <strong>Bolso Global</strong>.</p>
-                 <div id="lotteries" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+                 <div id="lotteries" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" style={{display: 'grid', width: '100%'}}></div>
                  
                  {/* Modal Container */}
                  <div id="modal-root" className="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden" style={{WebkitOverflowScrolling: 'touch'}}>
@@ -7516,15 +7397,15 @@
         
         MOCKUP_LOTTERIES.forEach(l => {
           const btn = document.createElement('button'); 
-          btn.className = "lottery-card-btn";
+          btn.className = "lottery-btn";
           btn.innerHTML = `
-            <div class="lottery-card-inner">
-              <div class="lottery-card-icon" style="background: ${l.color}">
+            <div class="lottery-btn-inner">
+              <div class="lottery-icon" style="background: ${l.color}">
                 ${l.logoText}
               </div>
-              <div class="lottery-card-text">
-                <div class="lottery-card-name">${l.name}</div>
-                <div class="lottery-card-schedule">${l.schedule}</div>
+              <div class="lottery-text">
+                <div class="lottery-name">${l.name}</div>
+                <div class="lottery-schedule">${l.schedule}</div>
               </div>
             </div>
           `;
