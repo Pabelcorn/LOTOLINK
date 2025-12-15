@@ -1210,25 +1210,63 @@
     }
     
     /* ========================================
-       LOTTERY SECTION - SIMPLE & BULLETPROOF
-       Works on ALL screen sizes
+       LOTTERY SECTION - FORCED VISIBILITY
+       Works on ALL screen sizes - AGGRESSIVE CSS
        ======================================== */
     
-    /* Section must always be visible */
-    #lottery-section {
+    /* FORCE section to always be visible - highest priority */
+    section#lottery-section,
+    section[id="lottery-section"] {
       display: block !important;
       visibility: visible !important;
       opacity: 1 !important;
+      position: relative !important;
+      z-index: 1 !important;
     }
     
-    /* Grid must always be visible - single column on all narrow screens */
-    #lotteries {
+    /* FORCE grid to always be visible - single column on all narrow screens */
+    #lotteries,
+    div#lotteries,
+    [id="lotteries"] {
       display: grid !important;
       visibility: visible !important;
       opacity: 1 !important;
       width: 100% !important;
       box-sizing: border-box !important;
       grid-template-columns: 1fr !important;
+      position: relative !important;
+      z-index: 1 !important;
+    }
+    
+    /* FORCE all lottery buttons to be visible */
+    .lottery-btn,
+    button.lottery-btn {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: relative !important;
+    }
+    
+    /* FORCE all child elements to be visible */
+    .lottery-btn *,
+    .lottery-btn-inner,
+    .lottery-icon,
+    .lottery-text,
+    .lottery-name,
+    .lottery-schedule {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    
+    /* Fix flex for inner content */
+    .lottery-btn-inner {
+      display: flex !important;
+    }
+    
+    /* Fix flex for icon */
+    .lottery-icon {
+      display: flex !important;
     }
     
     /* Responsive grid - only on wider screens */
@@ -1255,7 +1293,6 @@
       cursor: pointer;
       transition: all 0.2s;
       box-sizing: border-box;
-      display: block;
     }
     
     .dark .lottery-btn {
@@ -1270,7 +1307,6 @@
     
     /* Inner content - flex layout */
     .lottery-btn-inner {
-      display: flex;
       align-items: center;
       gap: 12px;
       width: 100%;
@@ -1282,7 +1318,6 @@
       height: 48px;
       min-width: 48px;
       border-radius: 10px;
-      display: flex;
       align-items: center;
       justify-content: center;
       color: white;
