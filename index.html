@@ -885,10 +885,14 @@
     }
     
     /* Ensure lottery section is visible at all widths */
-    section:has(#lotteries) {
-      display: block !important;
+    #lotteries {
+      display: grid !important;
       visibility: visible !important;
       opacity: 1 !important;
+    }
+    
+    /* Section containing lotteries */
+    section .grid#lotteries {
       width: 100%;
       max-width: 100%;
     }
@@ -899,23 +903,17 @@
         gap: 10px;
       }
       
-      /* Ensure section is fully visible */
-      section:has(#lotteries) {
+      /* Ensure section visibility */
+      section {
         padding: 0 12px;
         margin: 0;
       }
     }
     
-    @media (min-width: 640px) and (max-width: 780px) {
+    @media (min-width: 781px) and (max-width: 1023px) {
       #lotteries.grid {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 12px;
-      }
-    }
-    
-    @media (min-width: 640px) {
-      #lotteries.grid {
-        gap: 16px;
       }
     }
     
