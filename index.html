@@ -1214,6 +1214,31 @@
        Fixes disappearing lottery cards on narrow phones
        ======================================== */
     
+    /* Responsive spacing values - defined once for consistency */
+    @media (max-width: 640px) {
+      :root {
+        --lottery-grid-gap: 12px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      :root {
+        --lottery-grid-gap: 10px;
+      }
+    }
+    
+    @media (max-width: 375px) {
+      :root {
+        --lottery-grid-gap: 8px;
+      }
+    }
+    
+    @media (max-width: 320px) {
+      :root {
+        --lottery-grid-gap: 6px;
+      }
+    }
+    
     /* Base lottery card styles */
     .lottery-card {
       width: 100%;
@@ -1251,33 +1276,33 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       white-space: normal;
-      /* Fallback for non-webkit browsers */
-      max-height: 2.8em; /* Approximately 2 lines */
       line-height: 1.4em;
+      /* Fallback for non-webkit browsers - exactly 2 lines */
+      max-height: 2.8em; /* 2 lines × 1.4em line-height = 2.8em */
     }
     
     /* Responsive gap adjustments for lottery grid */
     @media (max-width: 640px) {
       #lotteries.grid.gap-6 {
-        gap: 12px;
+        gap: var(--lottery-grid-gap, 12px);
       }
     }
     
     @media (max-width: 480px) {
       #lotteries.grid.gap-6 {
-        gap: 10px;
+        gap: var(--lottery-grid-gap, 10px);
       }
     }
     
     @media (max-width: 375px) {
       #lotteries.grid.gap-6 {
-        gap: 8px;
+        gap: var(--lottery-grid-gap, 8px);
       }
     }
     
     @media (max-width: 320px) {
       #lotteries.grid.gap-6 {
-        gap: 6px;
+        gap: var(--lottery-grid-gap, 6px);
       }
     }
     
@@ -1357,8 +1382,9 @@
       
       .lottery-card .lottery-card-schedule.text-xs {
         font-size: 10px;
+        line-height: 1.4em;
         -webkit-line-clamp: 3;
-        max-height: 4.2em; /* 3 lines fallback */
+        max-height: 4.2em; /* 3 lines × 1.4em line-height = 4.2em */
       }
     }
     
