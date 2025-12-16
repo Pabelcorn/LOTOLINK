@@ -765,13 +765,30 @@
     }
     
     #modal-card {
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
       background: white;
       border-radius: var(--radius-xl);
       max-width: 900px;
+      max-height: 90vh;
       margin: 20px auto;
+      overflow: hidden; /* Prevent overflow on the card itself */
+    }
+    
+    /* Fixed header - stays at top */
+    #modal-card > div:first-child {
+      flex-shrink: 0; /* Prevent header from shrinking */
+      position: relative;
+      z-index: 10;
+    }
+    
+    /* Scrollable content area */
+    #modal-card > div:last-child,
+    #modal-card .modal-content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     }
     
     /* Dark mode for modal */
@@ -789,9 +806,7 @@
         right: 0;
         bottom: 0;
         padding: 0;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
+        overflow: hidden; /* Prevent outer scroll */
         flex-direction: column;
       }
       
@@ -801,27 +816,42 @@
       }
       
       #modal-card {
-        position: relative;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         z-index: 2;
         width: 100%;
         max-width: 100%;
-        min-height: 100vh;
-        min-height: 100dvh;
-        max-height: none;
-        height: auto;
+        max-height: 100vh;
+        max-height: 100dvh;
+        height: 100vh;
+        height: 100dvh;
         margin: 0;
         border-radius: 0;
-        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
       
-      /* Sticky header - always visible */
+      /* Fixed header - stays at top */
       #modal-card > div:first-child {
-        position: sticky;
+        position: relative;
         top: 0;
         z-index: 1000;
         padding: 12px 16px;
         background: inherit;
         flex-shrink: 0;
+      }
+      
+      /* Scrollable content - takes remaining space */
+      #modal-card > div:last-child {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
       }
       
       /* Compact header elements */
@@ -858,11 +888,6 @@
       
       #modal-card .p-8 {
         padding: 16px;
-      }
-      
-      /* Bottom padding for iOS home indicator */
-      #modal-card > div:last-child {
-        padding-bottom: 80px;
       }
       
       /* Number grid - 5 columns on mobile */
@@ -1046,6 +1071,7 @@
     @media (min-width: 769px) and (max-width: 1024px) {
       #modal-card {
         max-width: 750px;
+        max-height: 85vh;
         margin: 30px auto;
       }
       
@@ -1072,6 +1098,7 @@
     @media (min-width: 1025px) and (max-width: 1440px) {
       #modal-card {
         max-width: 900px;
+        max-height: 85vh;
         margin: 40px auto;
       }
       
@@ -1101,6 +1128,7 @@
     @media (min-width: 1441px) {
       #modal-card {
         max-width: 1200px;
+        max-height: 90vh;
         margin: 50px auto;
       }
       
@@ -7935,7 +7963,8 @@
 
         
         
-        card.innerHTML = headerHtml + contentHtml;
+        // Wrap content in scrollable container
+        card.innerHTML = headerHtml + `<div class="modal-content-scroll">${contentHtml}</div>`;
       }
       
       function updateStake(value) {
