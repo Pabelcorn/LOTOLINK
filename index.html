@@ -99,7 +99,7 @@
       letter-spacing: -0.01em;
     }
     
-    /* Premium Button Styles */
+    /* Premium Button Styles - Responsive and Adaptive */
     .btn-apple-primary {
       background: linear-gradient(180deg, #0077ED 0%, #0071e3 100%);
       color: white;
@@ -107,11 +107,15 @@
       padding: 12px 24px;
       border-radius: var(--radius-full);
       font-weight: 600;
-      font-size: 15px;
+      font-size: clamp(13px, 2vw, 16px); /* Adaptive font sizing */
       letter-spacing: -0.01em;
       transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
       box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35);
       cursor: pointer;
+      min-height: 44px; /* Touch-friendly minimum */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .btn-apple-primary:hover {
       transform: translateY(-1px);
@@ -128,14 +132,27 @@
       padding: 12px 24px;
       border-radius: var(--radius-full);
       font-weight: 600;
-      font-size: 15px;
+      font-size: clamp(13px, 2vw, 16px); /* Adaptive font sizing */
       transition: all 0.2s ease;
+      min-height: 44px; /* Touch-friendly minimum */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .btn-apple-secondary:hover {
       background: rgba(0, 113, 227, 0.1);
     }
+    
+    /* Responsive button sizing */
+    @media (min-width: 1441px) {
+      .btn-apple-primary,
+      .btn-apple-secondary {
+        padding: 14px 28px;
+        min-height: 52px;
+      }
+    }
 
-    /* Glass Morphism Cards */
+    /* Glass Morphism Cards - Responsive */
     .glass-card {
       background: var(--glass-bg);
       backdrop-filter: blur(20px) saturate(180%);
@@ -143,6 +160,7 @@
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-lg);
+      padding: clamp(12px, 3vw, 24px); /* Adaptive padding */
     }
     
     .premium-card {
@@ -151,10 +169,26 @@
       box-shadow: var(--shadow-md);
       border: 1px solid rgba(0, 0, 0, 0.04);
       transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      padding: clamp(12px, 3vw, 24px); /* Adaptive padding */
     }
     .premium-card:hover {
       box-shadow: var(--shadow-lg);
       transform: translateY(-2px);
+    }
+    
+    /* Responsive card spacing */
+    @media (max-width: 640px) {
+      .glass-card,
+      .premium-card {
+        border-radius: var(--radius-md);
+      }
+    }
+    
+    @media (min-width: 1441px) {
+      .glass-card,
+      .premium-card {
+        border-radius: var(--radius-2xl);
+      }
     }
 
     /* Premium Header */
@@ -731,13 +765,30 @@
     }
     
     #modal-card {
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
       background: white;
       border-radius: var(--radius-xl);
       max-width: 900px;
+      max-height: 90vh;
       margin: 20px auto;
+      overflow: hidden; /* Prevent overflow on the card itself */
+    }
+    
+    /* Fixed header - stays at top */
+    #modal-card > div:first-child {
+      flex-shrink: 0; /* Prevent header from shrinking */
+      position: relative;
+      z-index: 10;
+    }
+    
+    /* Scrollable content area */
+    #modal-card > div:last-child,
+    #modal-card .modal-content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     }
     
     /* Dark mode for modal */
@@ -755,9 +806,7 @@
         right: 0;
         bottom: 0;
         padding: 0;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
+        overflow: hidden; /* Prevent outer scroll */
         flex-direction: column;
       }
       
@@ -767,27 +816,42 @@
       }
       
       #modal-card {
-        position: relative;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         z-index: 2;
         width: 100%;
         max-width: 100%;
-        min-height: 100vh;
-        min-height: 100dvh;
-        max-height: none;
-        height: auto;
+        max-height: 100vh;
+        max-height: 100dvh;
+        height: 100vh;
+        height: 100dvh;
         margin: 0;
         border-radius: 0;
-        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
       
-      /* Sticky header - always visible */
+      /* Fixed header - stays at top */
       #modal-card > div:first-child {
-        position: sticky;
+        position: relative;
         top: 0;
         z-index: 1000;
         padding: 12px 16px;
         background: inherit;
         flex-shrink: 0;
+      }
+      
+      /* Scrollable content - takes remaining space */
+      #modal-card > div:last-child {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
       }
       
       /* Compact header elements */
@@ -824,11 +888,6 @@
       
       #modal-card .p-8 {
         padding: 16px;
-      }
-      
-      /* Bottom padding for iOS home indicator */
-      #modal-card > div:last-child {
-        padding-bottom: 80px;
       }
       
       /* Number grid - 5 columns on mobile */
@@ -1008,6 +1067,175 @@
       }
     }
     
+    /* Tablet landscape (768px to 1024px) - Optimize for horizontal space */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      #modal-card {
+        max-width: 750px;
+        max-height: 85vh;
+        margin: 30px auto;
+      }
+      
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(10, 1fr);
+        gap: 10px;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 15px;
+        padding: 10px;
+        min-height: 48px;
+        min-width: 48px;
+      }
+      
+      /* Two-column layout for game type selection */
+      #modal-card .grid.grid-cols-1.md\\:grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+    }
+    
+    /* Large tablets and small desktops (1025px to 1440px) */
+    @media (min-width: 1025px) and (max-width: 1440px) {
+      #modal-card {
+        max-width: 900px;
+        max-height: 85vh;
+        margin: 40px auto;
+      }
+      
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(10, 1fr);
+        gap: 12px;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 16px;
+        padding: 12px;
+        min-height: 52px;
+        min-width: 52px;
+      }
+      
+      /* Restore 3-column layouts */
+      #modal-card .lg\\:grid-cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      #modal-card .lg\\:col-span-2 {
+        grid-column: span 2;
+      }
+    }
+    
+    /* Large desktops (1441px+) - Maximize space usage */
+    @media (min-width: 1441px) {
+      #modal-card {
+        max-width: 1200px;
+        max-height: 90vh;
+        margin: 50px auto;
+      }
+      
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(10, 1fr);
+        gap: 14px;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 18px;
+        padding: 14px;
+        min-height: 56px;
+        min-width: 56px;
+      }
+      
+      /* More spacious padding on larger screens */
+      #modal-card .p-6 {
+        padding: 32px;
+      }
+      
+      #modal-card .p-8 {
+        padding: 40px;
+      }
+    }
+    
+    /* Ultra-wide screens (1920px+) - Prevent excessive stretching */
+    @media (min-width: 1920px) {
+      #modal-card {
+        max-width: 1400px;
+      }
+      
+      #modal-card .grid-cols-10 {
+        gap: 16px;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 20px;
+        padding: 16px;
+        min-height: 60px;
+        min-width: 60px;
+      }
+    }
+    
+    /* ========================================
+       RESPONSIVE GRIDS FOR ALL MODALS
+       Apply to Play Modal and other modals
+       ======================================== */
+    
+    /* Mobile: 5 columns for all modals */
+    @media (max-width: 768px) {
+      .grid-cols-10 {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 8px !important;
+      }
+      
+      .grid-cols-10 button {
+        font-size: 14px !important;
+        padding: 8px !important;
+        min-height: 44px !important;
+        min-width: 44px !important;
+      }
+    }
+    
+    /* Small phones: 4-5 columns */
+    @media (max-width: 480px) {
+      .grid-cols-10 {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 6px !important;
+      }
+      
+      .grid-cols-10 button {
+        font-size: 13px !important;
+        padding: 6px !important;
+        min-height: 40px !important;
+        min-width: 40px !important;
+      }
+    }
+    
+    /* Extra small phones: 4 columns */
+    @media (max-width: 375px) {
+      .grid-cols-10 {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 5px !important;
+      }
+      
+      .grid-cols-10 button {
+        font-size: 12px !important;
+        padding: 4px !important;
+        min-height: 36px !important;
+        min-width: 36px !important;
+      }
+    }
+    
+    /* Smallest phones: tighter spacing */
+    @media (max-width: 320px) {
+      .grid-cols-10 {
+        gap: 4px !important;
+      }
+      
+      .grid-cols-10 button {
+        font-size: 11px !important;
+        padding: 3px !important;
+        min-height: 32px !important;
+        min-width: 32px !important;
+      }
+    }
+    
     /* Elegant Ticket Print Animation */
     .ticket-print {
       width: 340px; 
@@ -1118,15 +1346,28 @@
     }
     @keyframes loading { from { width: 0%; } to { width: 100%; } }
     
-    /* Premium Input Fields */
+    /* Premium Input Fields - Fully Responsive */
     input, select, textarea {
       border-radius: var(--radius-md);
       transition: all 0.2s ease;
+      font-size: clamp(14px, 2vw, 16px); /* Adaptive font size */
+      padding: clamp(10px, 2vw, 14px); /* Adaptive padding */
+      min-height: 44px; /* Touch-friendly minimum */
+      width: 100%; /* Full width by default */
+      box-sizing: border-box;
     }
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+    }
+    
+    /* Responsive input sizing */
+    @media (min-width: 1441px) {
+      input, select, textarea {
+        min-height: 52px;
+        border-radius: var(--radius-lg);
+      }
     }
     
     /* Elegant Scrollbar */
@@ -5177,58 +5418,60 @@
           {/* Play Modal - Step by Step */}
           {showPlayModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-              <div className="bg-white dark:bg-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
-                {/* Modal Header */}
-                <div className="p-6 bg-gray-50 dark:bg-slate-900 border-b dark:border-slate-700 flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">Jugando en</div>
-                      <div className="font-bold text-lg dark:text-white">{selectedBank?.name ?? '—'}</div>
+              <div className="bg-white dark:bg-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-fade-in">
+                {/* Modal Header - Fixed */}
+                <div className="flex-shrink-0">
+                  <div className="p-6 bg-gray-50 dark:bg-slate-900 border-b dark:border-slate-700 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">Jugando en</div>
+                        <div className="font-bold text-lg dark:text-white">{selectedBank?.name ?? '—'}</div>
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={() => setShowBranchSelector(!showBranchSelector)}
+                        className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors flex items-center gap-1 cursor-pointer"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        📍 Cambiar Sucursal
+                      </button>
                     </div>
-                    <button 
-                      type="button"
-                      onClick={() => setShowBranchSelector(!showBranchSelector)}
-                      className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors flex items-center gap-1 cursor-pointer"
-                      style={{ cursor: 'pointer' }}
-                    >
-                      📍 Cambiar Sucursal
-                    </button>
+                    <button onClick={closePlayModal} className="text-gray-400 hover:text-black dark:hover:text-white text-2xl">✕</button>
                   </div>
-                  <button onClick={closePlayModal} className="text-gray-400 hover:text-black dark:hover:text-white text-2xl">✕</button>
+                  
+                  {/* Branch Selector Dropdown */}
+                  {showBranchSelector && (
+                    <div className="p-4 bg-blue-50 dark:bg-slate-800 border-b dark:border-slate-700">
+                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Selecciona otra sucursal:</div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {DEFAULT_BANKS.map(bank => (
+                          <button
+                            type="button"
+                            key={bank.id}
+                            onClick={() => {
+                              setSelectedBank(bank);
+                              setShowBranchSelector(false);
+                            }}
+                            className={`p-3 rounded-lg text-left transition-all cursor-pointer ${
+                              selectedBank?.id === bank.id 
+                                ? 'bg-blue-600 text-white' 
+                                : 'bg-white dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600'
+                            }`}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <div className="font-medium dark:text-white">{bank.name}</div>
+                            <div className={`text-xs ${selectedBank?.id === bank.id ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                              📍 {bank.address}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
-                {/* Branch Selector Dropdown */}
-                {showBranchSelector && (
-                  <div className="p-4 bg-blue-50 dark:bg-slate-800 border-b dark:border-slate-700">
-                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Selecciona otra sucursal:</div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {DEFAULT_BANKS.map(bank => (
-                        <button
-                          type="button"
-                          key={bank.id}
-                          onClick={() => {
-                            setSelectedBank(bank);
-                            setShowBranchSelector(false);
-                          }}
-                          className={`p-3 rounded-lg text-left transition-all cursor-pointer ${
-                            selectedBank?.id === bank.id 
-                              ? 'bg-blue-600 text-white' 
-                              : 'bg-white dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600'
-                          }`}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <div className="font-medium dark:text-white">{bank.name}</div>
-                          <div className={`text-xs ${selectedBank?.id === bank.id ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
-                            📍 {bank.address}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Modal Body */}
-                <div className="p-8">
+                {/* Modal Body - Scrollable */}
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-8" style={{ WebkitOverflowScrolling: 'touch' }}>
                   {/* Step 1: Select Lottery */}
                   {playModalStep === 'lottery' && (
                     <div>
@@ -7786,7 +8029,8 @@
 
         
         
-        card.innerHTML = headerHtml + contentHtml;
+        // Wrap content in scrollable container
+        card.innerHTML = headerHtml + `<div class="modal-content-scroll">${contentHtml}</div>`;
       }
       
       function updateStake(value) {

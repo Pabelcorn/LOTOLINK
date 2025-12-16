@@ -96,9 +96,9 @@ const Bancas: React.FC = () => {
       </IonHeader>
       <IonContent fullscreen>
         {viewMode === 'list' ? (
-          <div style={{ padding: '16px 16px 100px 16px' }}>
+          <div className="banca-list">
             {filteredBancas.map((banca) => (
-              <IonCard key={banca.id} className="banca-card" button>
+              <IonCard key={banca.id} className="banca-card premium-card" button>
                 <IonCardContent>
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <div style={{
