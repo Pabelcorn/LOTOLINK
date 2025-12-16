@@ -1416,9 +1416,178 @@
       0% { background-position: -200% 0; }
       100% { background-position: 200% 0; }
     }
+    
+    /* ========================================
+       LOADING SCREEN STYLES
+       Custom L animation for LotoLink
+       ======================================== */
+    
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #0071e3 0%, #0077ED 50%, #5856d6 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+    
+    #loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .loading-logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 30px;
+      animation: logoFloat 2s ease-in-out infinite;
+    }
+    
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    .custom-l {
+      width: 100px;
+      height: 140px;
+      position: relative;
+      margin-bottom: 30px;
+    }
+    
+    .l-vertical {
+      position: absolute;
+      left: 20px;
+      top: 0;
+      width: 20px;
+      height: 0;
+      background: linear-gradient(180deg, #ffffff 0%, #e0e7ff 100%);
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+      animation: drawVertical 0.8s ease-out forwards;
+    }
+    
+    .l-horizontal {
+      position: absolute;
+      left: 20px;
+      bottom: 0;
+      width: 0;
+      height: 20px;
+      background: linear-gradient(90deg, #ffffff 0%, #e0e7ff 100%);
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+      animation: drawHorizontal 0.8s ease-out 0.8s forwards;
+    }
+    
+    @keyframes drawVertical {
+      0% { height: 0; }
+      100% { height: 120px; }
+    }
+    
+    @keyframes drawHorizontal {
+      0% { width: 0; }
+      100% { width: 60px; }
+    }
+    
+    .loading-text {
+      color: white;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      animation: fadeInUp 1s ease-out 1.6s both;
+    }
+    
+    .loading-subtext {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+      font-weight: 500;
+      animation: fadeInUp 1s ease-out 1.8s both;
+    }
+    
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite, fadeInUp 1s ease-out 2s both;
+      margin-top: 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-dots {
+      display: flex;
+      gap: 8px;
+      margin-top: 15px;
+      animation: fadeInUp 1s ease-out 2.2s both;
+    }
+    
+    .loading-dot {
+      width: 10px;
+      height: 10px;
+      background: white;
+      border-radius: 50%;
+      animation: dotPulse 1.4s ease-in-out infinite;
+    }
+    
+    .loading-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .loading-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes dotPulse {
+      0%, 100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+    }
   </style>
 </head>
 <body class="min-h-screen text-gray-900 antialiased">
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="custom-l">
+      <div class="l-vertical"></div>
+      <div class="l-horizontal"></div>
+    </div>
+    <div class="loading-text">LOTOLINK</div>
+    <div class="loading-subtext">Tu plataforma de lotería premium</div>
+    <div class="loading-spinner"></div>
+    <div class="loading-dots">
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+    </div>
+  </div>
 
   <div id="root"></div>
 
@@ -7001,6 +7170,19 @@
     }
 
     ReactDOM.render(<LotoLinkApp />, document.getElementById('root'));
+    
+    // Hide loading screen after React app is rendered and content is ready
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+          loadingScreen.classList.add('hidden');
+          setTimeout(() => {
+            loadingScreen.remove();
+          }, 500);
+        }
+      }, 2500); // Show loading screen for at least 2.5 seconds to showcase the animation
+    });
 
     /* --- MAP INIT LOGIC (Improved from MVP) --- */
     setInterval(() => {
