@@ -2413,7 +2413,7 @@
                 {/* Mobile Menu Toggle - Shows on mobile only */}
                 <button 
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100/80 dark:bg-white/10 hover:bg-gray-200/80 dark:hover:bg-white/20 transition-all"
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100/80 dark:bg-white/10 hover:bg-gray-200/80 dark:hover:bg-white/20 transition-all"
                   aria-label="Menú"
                 >
                   {isMobileMenuOpen ? (
@@ -2528,7 +2528,7 @@
           
           {/* Mobile Slide-out Menu */}
           {isMobileMenuOpen && (
-            <div className="fixed inset-0 z-50 lg:hidden">
+            <div className="fixed inset-0 z-50">
               {/* Backdrop */}
               <div 
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
@@ -6830,9 +6830,9 @@
             </div>
           )}
           
-          {/* Mobile Bottom Navigation Bar - Only visible on mobile devices */}
+          {/* Mobile Bottom Navigation Bar - Always visible */}
           {view !== 'portal' && !showWelcomeScreen && (
-            <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-slate-800" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+            <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-slate-800" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
               <div className="flex items-center justify-around px-2 py-2">
                 <button 
                   onClick={() => setView('home')}
