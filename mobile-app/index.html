@@ -5,6 +5,271 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <title>LotoLink — Premium Lottery App</title>
   
+  <!-- Force mobile design on all devices -->
+  <style>
+    /* ========================================
+       FORCE MOBILE RESPONSIVE DESIGN ON ALL DEVICES
+       Mobile layout adapts to screen size (phone, tablet, desktop)
+       ======================================== */
+    
+    /* Override Tailwind responsive classes to force mobile layout */
+    * {
+      box-sizing: border-box;
+    }
+    
+    html {
+      overflow-x: hidden !important;
+      font-size: 16px !important;
+      -webkit-text-size-adjust: 100%;
+    }
+    
+    body {
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    #root {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    
+    /* Force mobile layout classes */
+    .lg\:hidden {
+      display: flex !important;
+    }
+    
+    /* Hide desktop navigation - handle "hidden lg:flex" pattern */
+    .hidden.lg\:flex {
+      display: none !important;
+    }
+    
+    .hidden.lg\:block {
+      display: none !important;
+    }
+    
+    .hidden.lg\:grid {
+      display: none !important;
+    }
+    
+    .hidden.md\:flex {
+      display: none !important;
+    }
+    
+    .hidden.md\:block {
+      display: none !important;
+    }
+    
+    /* Force any desktop-showing classes to hide */
+    nav.hidden.lg\:flex,
+    div.hidden.lg\:flex,
+    button.hidden.lg\:flex,
+    div.hidden.md\:flex {
+      display: none !important;
+    }
+    
+    /* Force single column layouts */
+    .md\:grid-cols-2,
+    .md\:grid-cols-3,
+    .md\:grid-cols-4,
+    .lg\:grid-cols-2,
+    .lg\:grid-cols-3,
+    .lg\:grid-cols-4 {
+      grid-template-columns: 1fr !important;
+    }
+    
+    /* Force mobile column spans */
+    .lg\:col-span-2,
+    .lg\:col-span-3 {
+      grid-column: span 1 !important;
+    }
+    
+    /* Container padding - mobile style */
+    .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    
+    /* Hide desktop-only elements */
+    .desktop-hide {
+      display: none !important;
+    }
+    
+    /* Force mobile navigation to always show */
+    nav.lg\:hidden {
+      display: flex !important;
+    }
+    
+    /* Typography - mobile sizing that scales with screen */
+    h1, .text-4xl, .text-5xl {
+      font-size: clamp(1.5rem, 4vw, 2.5rem) !important;
+      line-height: 1.2 !important;
+    }
+    
+    h2, .text-3xl {
+      font-size: clamp(1.25rem, 3.5vw, 2rem) !important;
+    }
+    
+    h3, .text-2xl {
+      font-size: clamp(1.1rem, 3vw, 1.5rem) !important;
+    }
+    
+    /* Buttons - mobile touch targets */
+    .btn-apple-primary, .btn-apple-secondary {
+      min-height: 48px !important;
+    }
+    
+    /* Cards - mobile padding */
+    .premium-card {
+      padding: 16px !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+    
+    /* Form elements - mobile friendly */
+    input, select, textarea {
+      font-size: 16px !important;
+      min-height: 48px !important;
+      padding: 12px !important;
+    }
+    
+    /* Force grid to single column */
+    .grid-cols-2:not(.keep-cols), 
+    .grid-cols-3:not(.keep-cols), 
+    .grid-cols-4:not(.keep-cols) {
+      grid-template-columns: 1fr !important;
+    }
+    
+    /* Force flex layouts to column (mobile stack) */
+    .md\:flex-row,
+    .lg\:flex-row,
+    .sm\:flex-row {
+      flex-direction: column !important;
+    }
+    
+    /* Force flex items to stack */
+    .flex-col.md\:flex-row,
+    .flex-col.lg\:flex-row,
+    .flex-col.sm\:flex-row {
+      flex-direction: column !important;
+    }
+    
+    /* Force text alignment to mobile (center/left) */
+    .lg\:text-left {
+      text-align: left !important;
+    }
+    
+    /* Override responsive text sizes - scale with viewport (accessible minimums) */
+    .sm\:text-base { font-size: clamp(0.9375rem, 2vw, 1rem) !important; } /* min 15px */
+    .sm\:text-lg { font-size: clamp(1rem, 2.5vw, 1.25rem) !important; }
+    .sm\:text-xl { font-size: clamp(1.125rem, 2.75vw, 1.5rem) !important; }
+    .sm\:text-2xl { font-size: clamp(1.25rem, 3vw, 1.75rem) !important; }
+    .sm\:text-3xl { font-size: clamp(1.5rem, 3.5vw, 2rem) !important; }
+    .sm\:text-4xl { font-size: clamp(1.75rem, 4vw, 2.5rem) !important; }
+    .md\:text-5xl { font-size: clamp(1.875rem, 4.5vw, 3rem) !important; }
+    .lg\:text-6xl { font-size: clamp(2rem, 5vw, 3.5rem) !important; }
+    
+    /* Force buttons to maintain mobile flex behavior */
+    .flex-1.sm\:flex-initial,
+    .flex-1.md\:flex-initial,
+    .flex-1.lg\:flex-initial {
+      flex: 1 1 0% !important;
+    }
+    
+    /* Adaptive padding - scales with screen size */
+    .sm\:p-8 { padding: clamp(1rem, 2vw, 2rem) !important; }
+    .sm\:p-6 { padding: clamp(1rem, 2vw, 1.5rem) !important; }
+    .sm\:p-5 { padding: clamp(1rem, 1.5vw, 1.25rem) !important; }
+    .sm\:p-4 { padding: clamp(0.75rem, 1.5vw, 1rem) !important; }
+    .sm\:p-3 { padding: clamp(0.75rem, 1vw, 0.875rem) !important; }
+    .md\:p-12 { padding: clamp(1.5rem, 3vw, 3rem) !important; }
+    
+    .sm\:px-8 { padding-left: clamp(1rem, 2vw, 2rem) !important; padding-right: clamp(1rem, 2vw, 2rem) !important; }
+    .sm\:px-6 { padding-left: clamp(1rem, 2vw, 1.5rem) !important; padding-right: clamp(1rem, 2vw, 1.5rem) !important; }
+    .sm\:px-5 { padding-left: clamp(0.875rem, 1.5vw, 1.25rem) !important; padding-right: clamp(0.875rem, 1.5vw, 1.25rem) !important; }
+    .sm\:px-4 { padding-left: clamp(0.75rem, 1.5vw, 1rem) !important; padding-right: clamp(0.75rem, 1.5vw, 1rem) !important; }
+    .sm\:px-3 { padding-left: clamp(0.625rem, 1vw, 0.875rem) !important; padding-right: clamp(0.625rem, 1vw, 0.875rem) !important; }
+    
+    /* ========================================
+       ADAPTIVE ENHANCEMENTS FOR LARGER SCREENS
+       Bottom navigation and buttons scale appropriately
+       ======================================== */
+    
+    /* Bottom Navigation Bar - Adaptive sizing and centering */
+    /* Center on ALL screen sizes */
+    nav.fixed.bottom-0[class*="lg:hidden"] > div {
+      justify-content: center !important;
+      gap: clamp(0.5rem, 4vw, 2rem) !important;
+    }
+    
+    @media (min-width: 768px) {
+      /* Add max-width and extra padding for tablet/desktop */
+      nav.fixed.bottom-0[class*="lg:hidden"] > div {
+        max-width: 600px !important;
+        margin: 0 auto !important;
+        padding: 1rem 2rem !important;
+      }
+      
+      /* Enlarge bottom nav buttons on larger screens */
+      nav.fixed.bottom-0[class*="lg:hidden"] button {
+        width: clamp(4rem, 8vw, 6rem) !important;
+        padding: 0.75rem !important;
+      }
+      
+      nav.fixed.bottom-0[class*="lg:hidden"] button span:first-child {
+        font-size: clamp(1.5rem, 3vw, 2rem) !important;
+      }
+      
+      nav.fixed.bottom-0[class*="lg:hidden"] button span:last-child {
+        font-size: clamp(0.75rem, 1.5vw, 1rem) !important;
+      }
+      
+      /* Center play button - enlarge it on larger screens */
+      nav.fixed.bottom-0[class*="lg:hidden"] button [class*="w-14"] {
+        width: clamp(3.5rem, 6vw, 5rem) !important;
+        height: clamp(3.5rem, 6vw, 5rem) !important;
+        font-size: clamp(1.75rem, 3.5vw, 2.5rem) !important;
+      }
+    }
+    
+    /* Popular Plays "Agregar rápida" buttons - Adaptive layout */
+    @media (min-width: 640px) {
+      /* Make container flex row to put button on the right */
+      [class*="border-b"][class*="pb-2"]:has(button) {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+      }
+      
+      /* Text content takes available space */
+      [class*="border-b"][class*="pb-2"]:has(button) > div {
+        flex: 1 !important;
+        margin-right: 1rem !important;
+      }
+      
+      /* Agregar rápida button - larger and to the right */
+      [class*="border-b"][class*="pb-2"] > button[class*="border"] {
+        flex-shrink: 0 !important;
+        padding: 0.75rem 1.5rem !important;
+        font-size: 0.875rem !important;
+        min-width: 150px !important;
+        margin-top: 0 !important;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      /* Even larger on desktop */
+      [class*="border-b"][class*="pb-2"] > button[class*="border"] {
+        padding: 1rem 2rem !important;
+        font-size: 1rem !important;
+        min-width: 180px !important;
+      }
+    }
+  </style>
+  
   <!-- PWA Meta Tags -->
   <meta name="application-name" content="LotoLink">
   <meta name="description" content="La aplicación premium para jugar loterías en República Dominicana. Segura, rápida y fácil de usar.">
@@ -17,9 +282,23 @@
   <meta name="msapplication-tap-highlight" content="no">
   
   <!-- iOS Splash Screens & Favicon -->
-  <link rel="icon" type="image/png" href="./lotolink-logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./lotolink-logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./lotolink-logo.png">
+  <link rel="shortcut icon" href="./lotolink-logo.png">
   <link rel="apple-touch-icon" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="./lotolink-logo.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="./lotolink-logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="./lotolink-logo.png">
+  
+  <!-- Microsoft Tiles -->
+  <meta name="msapplication-TileImage" content="./lotolink-logo.png">
+  <meta name="msapplication-config" content="none">
   
   <!-- PWA Manifest (inline for single file) -->
   <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22LotoLink%22%2C%22short_name%22%3A%22LotoLink%22%2C%22description%22%3A%22La%20aplicaci%C3%B3n%20premium%20para%20jugar%20loter%C3%ADas%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f5f5f7%22%2C%22theme_color%22%3A%22%230071e3%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22lotolink-logo.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22lotolink-logo.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
@@ -36,9 +315,6 @@
   <!-- Chart.js (Gráficas para el Portal) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Stripe.js (Payment Processing) -->
-  <script src="https://js.stripe.com/v3/"></script>
-
   <!-- Apple SF Pro Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,6 +323,7 @@
   <style>
     /* ========================================
        APPLE-INSPIRED ELEGANT DESIGN SYSTEM
+       FORCE MOBILE RESPONSIVE DESIGN ON ALL DEVICES
        ======================================== */
     
     :root {
@@ -99,7 +376,7 @@
       letter-spacing: -0.01em;
     }
     
-    /* Premium Button Styles - Responsive and Adaptive */
+    /* Premium Button Styles */
     .btn-apple-primary {
       background: linear-gradient(180deg, #0077ED 0%, #0071e3 100%);
       color: white;
@@ -107,15 +384,11 @@
       padding: 12px 24px;
       border-radius: var(--radius-full);
       font-weight: 600;
-      font-size: clamp(13px, 2vw, 16px); /* Adaptive font sizing */
+      font-size: 15px;
       letter-spacing: -0.01em;
       transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
       box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35);
       cursor: pointer;
-      min-height: 44px; /* Touch-friendly minimum */
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
     }
     .btn-apple-primary:hover {
       transform: translateY(-1px);
@@ -132,27 +405,14 @@
       padding: 12px 24px;
       border-radius: var(--radius-full);
       font-weight: 600;
-      font-size: clamp(13px, 2vw, 16px); /* Adaptive font sizing */
+      font-size: 15px;
       transition: all 0.2s ease;
-      min-height: 44px; /* Touch-friendly minimum */
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
     }
     .btn-apple-secondary:hover {
       background: rgba(0, 113, 227, 0.1);
     }
-    
-    /* Responsive button sizing */
-    @media (min-width: 1441px) {
-      .btn-apple-primary,
-      .btn-apple-secondary {
-        padding: 14px 28px;
-        min-height: 52px;
-      }
-    }
 
-    /* Glass Morphism Cards - Responsive */
+    /* Glass Morphism Cards */
     .glass-card {
       background: var(--glass-bg);
       backdrop-filter: blur(20px) saturate(180%);
@@ -160,7 +420,6 @@
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-lg);
-      padding: clamp(12px, 3vw, 24px); /* Adaptive padding */
     }
     
     .premium-card {
@@ -169,26 +428,10 @@
       box-shadow: var(--shadow-md);
       border: 1px solid rgba(0, 0, 0, 0.04);
       transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-      padding: clamp(12px, 3vw, 24px); /* Adaptive padding */
     }
     .premium-card:hover {
       box-shadow: var(--shadow-lg);
       transform: translateY(-2px);
-    }
-    
-    /* Responsive card spacing */
-    @media (max-width: 640px) {
-      .glass-card,
-      .premium-card {
-        border-radius: var(--radius-md);
-      }
-    }
-    
-    @media (min-width: 1441px) {
-      .glass-card,
-      .premium-card {
-        border-radius: var(--radius-2xl);
-      }
     }
 
     /* Premium Header */
@@ -677,28 +920,28 @@
       -webkit-overflow-scrolling: touch;
     }
     
-    /* Mobile-specific utility classes */
-    @media (max-width: 640px) {
-      .mobile-full-width {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      
-      .mobile-stack {
-        flex-direction: column !important;
-      }
-      
-      .mobile-center {
-        text-align: center !important;
-        justify-content: center !important;
-      }
-      
-      .mobile-hide {
-        display: none !important;
-      }
+    /* Mobile-specific utility classes - ALWAYS ACTIVE */
+    .mobile-full-width {
+      width: 100% !important;
+      max-width: 100% !important;
     }
     
-
+    .mobile-stack {
+      flex-direction: column !important;
+    }
+    
+    .mobile-center {
+      text-align: center !important;
+      justify-content: center !important;
+    }
+    
+    .mobile-hide {
+      display: none !important;
+    }
+    
+    .desktop-hide {
+      display: none !important;
+    }
     
     /* PWA Splash screen styles */
     .pwa-splash {
@@ -748,487 +991,354 @@
 
     .modal-scroll { max-height: calc(100vh - 160px); overflow: auto; }
     
-    /* ========================================
-       LOTTERY MODAL - MOBILE-FIRST RESPONSIVE
-       Simplified, clean design for ALL screen sizes
-       ======================================== */
-    
-    /* Base modal styles - work for all screens */
+    /* Mobile Game Panel - COMPLETELY FIXED FOR ALL DEVICES */
     #modal-root {
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
     }
     
     #modal-card {
-      display: flex;
-      flex-direction: column;
-      background: white;
-      border-radius: var(--radius-xl);
-      max-width: 900px;
-      max-height: 90vh;
-      margin: 20px auto;
-      overflow: hidden; /* Prevent overflow on the card itself */
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
     }
     
-    /* Fixed header - stays at top */
-    #modal-card > div:first-child {
-      flex-shrink: 0; /* Prevent header from shrinking */
-      position: relative;
-      z-index: 10;
-    }
-    
-    /* Scrollable content area */
-    #modal-card > div:last-child,
-    #modal-card .modal-content-scroll {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-    }
-    
-    /* Dark mode for modal */
-    .dark #modal-card {
-      background: #1c1c1e;
-      color: #f5f5f7;
-    }
-    
-    /* Mobile-first responsive design (320px+) */
+    /* MOBILE: Full-height scrollable game panel */
     @media (max-width: 768px) {
       #modal-root {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 0;
-        overflow: hidden; /* Prevent outer scroll */
-        flex-direction: column;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        padding: 0 !important;
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        flex-direction: column !important;
       }
       
       #modal-backdrop {
-        position: fixed;
-        z-index: 1;
+        position: fixed !important;
+        z-index: 1 !important;
       }
       
       #modal-card {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 2;
-        width: 100%;
-        max-width: 100%;
-        max-height: 100vh;
-        max-height: 100dvh;
-        height: 100vh;
-        height: 100dvh;
-        margin: 0;
-        border-radius: 0;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
+        position: relative !important;
+        z-index: 2 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        max-height: none !important;
+        height: auto !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        flex: 1 !important;
       }
       
-      /* Fixed header - stays at top */
+      /* Header - STICKY at top, always visible */
       #modal-card > div:first-child {
-        position: relative;
-        top: 0;
-        z-index: 1000;
-        padding: 12px 16px;
-        background: inherit;
-        flex-shrink: 0;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        padding: 8px 10px !important;
+        margin: 0 !important;
+        flex-shrink: 0 !important;
       }
       
-      /* Scrollable content - takes remaining space */
-      #modal-card > div:last-child {
-        flex: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: calc(20px + env(safe-area-inset-bottom));
-      }
-      
-      /* Compact header elements */
+      /* Header content compact */
       #modal-card > div:first-child .w-16,
       #modal-card > div:first-child .w-16.h-16 {
-        width: 40px;
-        height: 40px;
-        flex-shrink: 0;
+        width: 36px !important;
+        height: 36px !important;
+        flex-shrink: 0 !important;
       }
       
       #modal-card > div:first-child h2 {
-        font-size: 1.125rem;
-        line-height: 1.3;
+        font-size: 1.1rem !important;
+        line-height: 1.2 !important;
       }
       
-      /* Hide subtitle on mobile to save space */
       #modal-card > div:first-child .text-sm {
-        display: none;
+        font-size: 0.65rem !important;
+        display: none !important;
       }
       
-      /* Close button - touch-friendly */
+      /* Close button always visible and accessible */
       #modal-card > div:first-child button {
-        min-width: 44px;
-        min-height: 44px;
-        padding: 8px 12px;
-        font-size: 13px;
-        flex-shrink: 0;
+        min-width: 50px !important;
+        padding: 5px 8px !important;
+        font-size: 11px !important;
+        flex-shrink: 0 !important;
       }
       
-      /* Content spacing */
+      #modal-card > div:first-child .flex.items-center.gap-2 {
+        gap: 4px !important;
+      }
+      
+      /* Content area - scrollable */
+      #modal-card > div:not(:first-child) {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      
+      /* All padding sections more compact */
       #modal-card .p-6 {
-        padding: 16px;
-      }
-      
-      #modal-card .p-8 {
-        padding: 16px;
-      }
-      
-      /* Number grid - 5 columns on mobile */
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 8px;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 14px;
-        padding: 8px;
-        min-height: 44px;
-        min-width: 44px;
-        aspect-ratio: 1;
-      }
-      
-      /* Game type cards - single column */
-      #modal-card .grid.grid-cols-1.md\\:grid-cols-2 {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-      
-      #modal-card button.p-6 {
-        padding: 16px;
-      }
-      
-      #modal-card .w-16.h-16 {
-        width: 48px;
-        height: 48px;
-      }
-      
-      #modal-card .text-2xl.font-bold {
-        font-size: 1.25rem;
-      }
-      
-      #modal-card .text-3xl.font-bold {
-        font-size: 1.5rem;
-      }
-      
-      /* 3-column layout becomes 1 column */
-      #modal-card .lg\\:grid-cols-3,
-      #modal-card .grid-cols-1.lg\\:grid-cols-3 {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-      
-      #modal-card .lg\\:col-span-2 {
-        grid-column: span 1;
-      }
-      
-      /* Step info bar */
-      #modal-card .mb-4.p-4 {
-        padding: 12px;
-        margin-bottom: 12px;
-      }
-      
-      #modal-card .mb-4.p-4 button {
-        padding: 6px 12px;
-        font-size: 12px;
-      }
-      
-      /* Sidebar */
-      #modal-card .bg-gray-50.dark\\:bg-slate-900 {
-        padding: 16px;
-      }
-      
-      #modal-card .bg-gray-50.dark\\:bg-slate-900 .text-2xl {
-        font-size: 1.25rem;
-      }
-      
-      /* Banca cards */
-      #modal-card .border-2.dark\\:border-slate-600 {
-        padding: 12px;
-      }
-      
-      #modal-card .border-2.dark\\:border-slate-600 .w-12 {
-        width: 40px;
-        height: 40px;
-      }
-    }
-    
-    /* Small phones (max 480px) */
-    @media (max-width: 480px) {
-      #modal-card > div:first-child {
-        padding: 10px 12px;
-      }
-      
-      #modal-card > div:first-child .w-16,
-      #modal-card > div:first-child .w-16.h-16 {
-        width: 36px;
-        height: 36px;
-      }
-      
-      #modal-card > div:first-child h2 {
-        font-size: 1rem;
-      }
-      
-      #modal-card .grid-cols-10 {
-        gap: 6px;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 13px;
-        padding: 6px;
-        min-height: 40px;
-        min-width: 40px;
-      }
-      
-      #modal-card .p-6,
-      #modal-card .p-8 {
-        padding: 12px;
-      }
-      
-      #modal-card .text-xl {
-        font-size: 1rem;
-      }
-      
-      #modal-card .text-lg {
-        font-size: 0.95rem;
-      }
-    }
-    
-    /* Extra small phones (max 375px) */
-    @media (max-width: 375px) {
-      #modal-card > div:first-child {
-        padding: 8px 10px;
-      }
-      
-      #modal-card > div:first-child .w-16,
-      #modal-card > div:first-child .w-16.h-16 {
-        width: 32px;
-        height: 32px;
-      }
-      
-      #modal-card > div:first-child h2 {
-        font-size: 0.95rem;
-      }
-      
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 5px;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 12px;
-        padding: 4px;
-        min-height: 36px;
-        min-width: 36px;
-      }
-      
-      #modal-card .p-6,
-      #modal-card .p-8 {
-        padding: 10px;
-      }
-      
-      #modal-card .w-16.h-16 {
-        width: 40px;
-        height: 40px;
-      }
-    }
-    
-    /* Smallest phones (max 320px) */
-    @media (max-width: 320px) {
-      #modal-card .grid-cols-10 {
-        gap: 4px;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 11px;
-        padding: 3px;
-        min-height: 32px;
-        min-width: 32px;
-      }
-      
-      #modal-card > div:first-child h2 {
-        font-size: 0.9rem;
-      }
-    }
-    
-    /* Tablet landscape (768px to 1024px) - Optimize for horizontal space */
-    @media (min-width: 769px) and (max-width: 1024px) {
-      #modal-card {
-        max-width: 750px;
-        max-height: 85vh;
-        margin: 30px auto;
-      }
-      
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(10, 1fr);
-        gap: 10px;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 15px;
-        padding: 10px;
-        min-height: 48px;
-        min-width: 48px;
-      }
-      
-      /* Two-column layout for game type selection */
-      #modal-card .grid.grid-cols-1.md\\:grid-cols-2 {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-      }
-    }
-    
-    /* Large tablets and small desktops (1025px to 1440px) */
-    @media (min-width: 1025px) and (max-width: 1440px) {
-      #modal-card {
-        max-width: 900px;
-        max-height: 85vh;
-        margin: 40px auto;
-      }
-      
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(10, 1fr);
-        gap: 12px;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 16px;
-        padding: 12px;
-        min-height: 52px;
-        min-width: 52px;
-      }
-      
-      /* Restore 3-column layouts */
-      #modal-card .lg\\:grid-cols-3 {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      
-      #modal-card .lg\\:col-span-2 {
-        grid-column: span 2;
-      }
-    }
-    
-    /* Large desktops (1441px+) - Maximize space usage */
-    @media (min-width: 1441px) {
-      #modal-card {
-        max-width: 1200px;
-        max-height: 90vh;
-        margin: 50px auto;
-      }
-      
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(10, 1fr);
-        gap: 14px;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 18px;
-        padding: 14px;
-        min-height: 56px;
-        min-width: 56px;
-      }
-      
-      /* More spacious padding on larger screens */
-      #modal-card .p-6 {
-        padding: 32px;
-      }
-      
-      #modal-card .p-8 {
-        padding: 40px;
-      }
-    }
-    
-    /* Ultra-wide screens (1920px+) - Prevent excessive stretching */
-    @media (min-width: 1920px) {
-      #modal-card {
-        max-width: 1400px;
-      }
-      
-      #modal-card .grid-cols-10 {
-        gap: 16px;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 20px;
-        padding: 16px;
-        min-height: 60px;
-        min-width: 60px;
-      }
-    }
-    
-    /* ========================================
-       RESPONSIVE GRIDS FOR ALL MODALS
-       Apply to Play Modal and other modals
-       ======================================== */
-    
-    /* Mobile: 5 columns for all modals */
-    @media (max-width: 768px) {
-      .grid-cols-10 {
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 8px !important;
-      }
-      
-      .grid-cols-10 button {
-        font-size: 14px !important;
         padding: 8px !important;
-        min-height: 44px !important;
-        min-width: 44px !important;
       }
-    }
-    
-    /* Small phones: 4-5 columns */
-    @media (max-width: 480px) {
-      .grid-cols-10 {
+      
+      #modal-card .p-8 {
+        padding: 10px !important;
+      }
+      
+      /* Add safe padding at bottom for iOS home indicator */
+      #modal-card > div:last-child {
+        padding-bottom: 100px !important;
+      }
+      
+      /* Number grid - 5 columns with proper spacing */
+      #modal-card .grid-cols-10 {
         grid-template-columns: repeat(5, 1fr) !important;
         gap: 6px !important;
       }
       
-      .grid-cols-10 button {
-        font-size: 13px !important;
+      #modal-card .grid-cols-10 button {
+        font-size: 12px !important;
+        padding: 4px !important;
+        min-height: 38px !important;
+        min-width: 38px !important;
+        aspect-ratio: 1 !important;
+      }
+      
+      /* Game type cards - single column */
+      #modal-card .grid.grid-cols-1.md\\:grid-cols-2 {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+      }
+      
+      #modal-card button.p-6 {
+        padding: 8px !important;
+      }
+      
+      #modal-card .w-16.h-16 {
+        width: 40px !important;
+        height: 40px !important;
+      }
+      
+      #modal-card .text-2xl.font-bold {
+        font-size: 1rem !important;
+      }
+      
+      #modal-card .text-3xl.font-bold {
+        font-size: 1.1rem !important;
+      }
+      
+      /* 3-column layout becomes 1 column (Step 3) */
+      #modal-card .lg\\:grid-cols-3,
+      #modal-card .grid-cols-1.lg\\:grid-cols-3 {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+      
+      #modal-card .lg\\:col-span-2 {
+        grid-column: span 1 !important;
+      }
+      
+      /* Step info bar compact */
+      #modal-card .mb-4.p-4 {
         padding: 6px !important;
-        min-height: 40px !important;
-        min-width: 40px !important;
+        margin-bottom: 6px !important;
+      }
+      
+      #modal-card .mb-4.p-4 button {
+        padding: 3px 6px !important;
+        font-size: 10px !important;
+      }
+      
+      /* Sidebar compact */
+      #modal-card .bg-gray-50.dark\\:bg-slate-900 {
+        padding: 10px !important;
+      }
+      
+      #modal-card .bg-gray-50.dark\\:bg-slate-900 .text-2xl {
+        font-size: 1.1rem !important;
+      }
+      
+      /* Step 1 banca cards compact */
+      #modal-card .border-2.dark\\:border-slate-600 {
+        padding: 8px !important;
+      }
+      
+      #modal-card .border-2.dark\\:border-slate-600 .w-12 {
+        width: 36px !important;
+        height: 36px !important;
       }
     }
     
-    /* Extra small phones: 4 columns */
+    @media (max-width: 480px) {
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 5px !important;
+      }
+      
+      #modal-card .grid-cols-5 {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 5px !important;
+      }
+      
+      #modal-card .grid-cols-10 button,
+      #modal-card .grid-cols-5 button {
+        font-size: 11px !important;
+        padding: 3px !important;
+        min-height: 34px !important;
+        min-width: 34px !important;
+      }
+      
+      #modal-card > div:first-child {
+        padding: 6px 8px !important;
+      }
+      
+      #modal-card > div:first-child .w-16,
+      #modal-card > div:first-child .w-16.h-16 {
+        width: 30px !important;
+        height: 30px !important;
+      }
+      
+      #modal-card > div:first-child h2 {
+        font-size: 0.95rem !important;
+      }
+      
+      #modal-card .text-xl {
+        font-size: 0.9rem !important;
+      }
+      
+      #modal-card .text-lg {
+        font-size: 0.8rem !important;
+      }
+    }
+    
     @media (max-width: 375px) {
-      .grid-cols-10 {
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 4px !important;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 10px !important;
+        padding: 2px !important;
+        min-height: 30px !important;
+        min-width: 30px !important;
+      }
+      
+      #modal-card .p-6,
+      #modal-card .p-8 {
+        padding: 6px !important;
+      }
+      
+      #modal-card > div:first-child h2 {
+        font-size: 0.85rem !important;
+      }
+    }
+    
+    @media (max-width: 320px) {
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 3px !important;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 9px !important;
+        padding: 1px !important;
+        min-height: 26px !important;
+        min-width: 26px !important;
+      }
+    }
+      
+      #modal-card > div:first-child h2 {
+        font-size: 1rem !important;
+      }
+      
+      /* Smaller text */
+      #modal-card .text-xl {
+        font-size: 0.95rem !important;
+      }
+      
+      #modal-card .text-lg {
+        font-size: 0.85rem !important;
+      }
+    }
+    
+    @media (max-width: 375px) {
+      #modal-card .grid-cols-10 {
         grid-template-columns: repeat(4, 1fr) !important;
         gap: 5px !important;
       }
       
-      .grid-cols-10 button {
-        font-size: 12px !important;
-        padding: 4px !important;
-        min-height: 36px !important;
-        min-width: 36px !important;
-      }
-    }
-    
-    /* Smallest phones: tighter spacing */
-    @media (max-width: 320px) {
-      .grid-cols-10 {
-        gap: 4px !important;
-      }
-      
-      .grid-cols-10 button {
+      #modal-card .grid-cols-10 button {
         font-size: 11px !important;
         padding: 3px !important;
         min-height: 32px !important;
         min-width: 32px !important;
+      }
+      
+      #modal-card .p-6,
+      #modal-card .p-8 {
+        padding: 8px !important;
+        padding-bottom: 100px !important;
+      }
+    }
+    
+    @media (max-width: 320px) {
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 4px !important;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 10px !important;
+        padding: 2px !important;
+        min-height: 28px !important;
+        min-width: 28px !important;
+      }
+    }
+        font-size: 0.9rem !important;
+      }
+    }
+    
+    @media (max-width: 375px) {
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 4px !important;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 12px !important;
+        padding: 6px !important;
+        min-height: 38px;
+      }
+      
+      #modal-card .p-6,
+      #modal-card .p-8 {
+        padding: 10px !important;
+        padding-bottom: 80px !important;
+      }
+    }
+    
+    @media (max-width: 320px) {
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 3px !important;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 11px !important;
+        padding: 4px !important;
+        min-height: 34px;
       }
     }
     
@@ -1268,52 +1378,23 @@
       100% { transform: translateY(0) scale(1); opacity: 1; }
     }
     
-    /* Dark mode for modal card - consolidated */
-    .dark #modal-card,
-    #modal-card.lottery-dark-mode {
-      background: #1c1c1e;
-      color: #f5f5f7;
-    }
+    /* Dark mode for modal card */
+    .dark #modal-card { background: #1c1c1e; color: #f5f5f7; }
+    .dark #modal-card .bg-white { background: #2c2c2e !important; }
+    .dark #modal-card .text-gray-500 { color: #a1a1a6 !important; }
+    .dark #modal-card .border { border-color: rgba(255,255,255,0.1) !important; }
+    .dark #modal-card .bg-gray-50 { background: rgba(255,255,255,0.05) !important; }
     
-    .dark #modal-card .bg-white,
-    #modal-card.lottery-dark-mode .bg-white {
-      background: #2c2c2e;
-    }
-    
-    .dark #modal-card .bg-gray-50,
-    #modal-card.lottery-dark-mode .bg-gray-50 {
-      background: rgba(255,255,255,0.05);
-    }
-    
-    .dark #modal-card .bg-blue-50,
-    #modal-card.lottery-dark-mode .bg-blue-50 {
-      background: rgba(0, 113, 227, 0.15);
-    }
-    
-    .dark #modal-card .bg-green-50,
-    #modal-card.lottery-dark-mode .bg-green-50 {
-      background: rgba(52, 199, 89, 0.15);
-    }
-    
-    .dark #modal-card .text-gray-500,
-    #modal-card.lottery-dark-mode .text-gray-500 {
-      color: #a1a1a6;
-    }
-    
-    .dark #modal-card .text-gray-600,
-    #modal-card.lottery-dark-mode .text-gray-600 {
-      color: #8e8e93;
-    }
-    
-    .dark #modal-card .text-gray-700,
-    #modal-card.lottery-dark-mode .text-gray-700 {
-      color: #c7c7cc;
-    }
-    
-    .dark #modal-card .border,
-    #modal-card.lottery-dark-mode .border {
-      border-color: rgba(255,255,255,0.1);
-    }
+    /* Lottery modal specific dark mode */
+    #modal-card.lottery-dark-mode { background: #1c1c1e; color: #f5f5f7; }
+    #modal-card.lottery-dark-mode .bg-white { background: #2c2c2e !important; }
+    #modal-card.lottery-dark-mode .text-gray-500 { color: #a1a1a6 !important; }
+    #modal-card.lottery-dark-mode .text-gray-600 { color: #8e8e93 !important; }
+    #modal-card.lottery-dark-mode .text-gray-700 { color: #c7c7cc !important; }
+    #modal-card.lottery-dark-mode .border { border-color: rgba(255,255,255,0.1) !important; }
+    #modal-card.lottery-dark-mode .bg-gray-50 { background: rgba(255,255,255,0.05) !important; }
+    #modal-card.lottery-dark-mode .bg-blue-50 { background: rgba(0, 113, 227, 0.15) !important; }
+    #modal-card.lottery-dark-mode .bg-green-50 { background: rgba(52, 199, 89, 0.15) !important; }
     
     /* Premium Number Button */
     .num-btn { 
@@ -1342,28 +1423,15 @@
     }
     @keyframes loading { from { width: 0%; } to { width: 100%; } }
     
-    /* Premium Input Fields - Fully Responsive */
+    /* Premium Input Fields */
     input, select, textarea {
       border-radius: var(--radius-md);
       transition: all 0.2s ease;
-      font-size: clamp(14px, 2vw, 16px); /* Adaptive font size */
-      padding: clamp(10px, 2vw, 14px); /* Adaptive padding */
-      min-height: 44px; /* Touch-friendly minimum */
-      width: 100%; /* Full width by default */
-      box-sizing: border-box;
     }
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
-    }
-    
-    /* Responsive input sizing */
-    @media (min-width: 1441px) {
-      input, select, textarea {
-        min-height: 52px;
-        border-radius: var(--radius-lg);
-      }
     }
     
     /* Elegant Scrollbar */
@@ -2413,7 +2481,7 @@
                 {/* Mobile Menu Toggle - Shows on mobile only */}
                 <button 
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100/80 dark:bg-white/10 hover:bg-gray-200/80 dark:hover:bg-white/20 transition-all"
+                  className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100/80 dark:bg-white/10 hover:bg-gray-200/80 dark:hover:bg-white/20 transition-all"
                   aria-label="Menú"
                 >
                   {isMobileMenuOpen ? (
@@ -2438,6 +2506,16 @@
                   LotoLink
                   
                 </div>
+                
+                {/* Desktop Navigation - Hidden on mobile/tablet */}
+                <nav className="hidden lg:flex gap-2 text-sm ml-6 mr-6">
+                  <button onClick={() => handleNavClick('home')} className="px-4 py-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 font-medium transition-all">Inicio</button>
+                  <button onClick={() => handleNavClick('how')} className="px-4 py-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 font-medium transition-all">Cómo funciona</button>
+                  <button onClick={() => handleNavClick('demo')} className="px-4 py-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 font-medium transition-all">Demo/Mapa</button>
+                  <button onClick={() => handleNavClick('loterias')} className="px-4 py-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 font-medium transition-all">Loterías</button>
+                  <button onClick={() => handleNavClick('bancas')} className="px-4 py-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 font-medium transition-all">Bancas</button>
+                  <button onClick={() => handleNavClick('rankings')} className="px-4 py-2 pr-[52px] rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 font-medium transition-all">Rankings</button>
+                </nav>
               </div>
               
               <div className="w-8"></div>
@@ -2528,7 +2606,7 @@
           
           {/* Mobile Slide-out Menu */}
           {isMobileMenuOpen && (
-            <div className="fixed inset-0 z-50">
+            <div className="fixed inset-0 z-50 lg:hidden">
               {/* Backdrop */}
               <div 
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
@@ -3982,7 +4060,7 @@
       const [showAuthModal, setShowAuthModal] = useState(false);
       const [isCartOpen, setIsCartOpen] = useState(false);
       const [theme, setTheme] = useState(() => localStorage.getItem('ll_theme') || 'light');
-      const [showInstallGuide, setShowInstallGuide] = useState(null); // 'ios' | 'android' | null
+      const [showInstallGuide, setShowInstallGuide] = useState(null); // 'ios' | 'android' | 'desktop' | null
       
       // Real-time lottery results from loteriasdominicanas.com
       const { feed: resultsFeed, isConnected: isLotteryConnected, lastUpdate: lotteryLastUpdate } = useLotteryResults(30000);
@@ -5187,11 +5265,25 @@
                             <div className="text-lg font-bold -mt-1">Android</div>
                           </div>
                         </a>
-
+                        
+                        {/* Desktop Button - Direct download */}
+                        <a 
+                          href="https://github.com/pabelsims-ux/LOTLINK/releases/latest/download/LotoLink-Desktop.zip"
+                          download
+                          className="flex items-center gap-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg min-w-[200px] border border-white/30 no-underline"
+                        >
+                          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          <div className="text-left">
+                            <div className="text-[10px] opacity-80">Descargar para</div>
+                            <div className="text-lg font-bold -mt-1">Windows / Mac / Linux</div>
+                          </div>
+                        </a>
                       </div>
                       
                       <p className="mt-6 text-xs text-blue-200 opacity-75">
-                        📱 App nativa desarrollada con React Native
+                        📱 Apps nativas desarrolladas con React Native (móvil) y Electron (escritorio)
                       </p>
                       
                       {/* PWA Alternative */}
@@ -5203,7 +5295,7 @@
                               window.deferredPrompt.prompt();
                             } else {
                               const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                              setShowInstallGuide(isMobile ? (/iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'ios' : 'android') : 'android');
+                              setShowInstallGuide(isMobile ? (/iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'ios' : 'android') : 'desktop');
                             }
                           }}
                           className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all"
@@ -5390,60 +5482,58 @@
           {/* Play Modal - Step by Step */}
           {showPlayModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-              <div className="bg-white dark:bg-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-fade-in">
-                {/* Modal Header - Fixed */}
-                <div className="flex-shrink-0">
-                  <div className="p-6 bg-gray-50 dark:bg-slate-900 border-b dark:border-slate-700 flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Jugando en</div>
-                        <div className="font-bold text-lg dark:text-white">{selectedBank?.name ?? '—'}</div>
-                      </div>
-                      <button 
-                        type="button"
-                        onClick={() => setShowBranchSelector(!showBranchSelector)}
-                        className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors flex items-center gap-1 cursor-pointer"
-                        style={{ cursor: 'pointer' }}
-                      >
-                        📍 Cambiar Sucursal
-                      </button>
+              <div className="bg-white dark:bg-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+                {/* Modal Header */}
+                <div className="p-6 bg-gray-50 dark:bg-slate-900 border-b dark:border-slate-700 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">Jugando en</div>
+                      <div className="font-bold text-lg dark:text-white">{selectedBank?.name ?? '—'}</div>
                     </div>
-                    <button onClick={closePlayModal} className="text-gray-400 hover:text-black dark:hover:text-white text-2xl">✕</button>
+                    <button 
+                      type="button"
+                      onClick={() => setShowBranchSelector(!showBranchSelector)}
+                      className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors flex items-center gap-1 cursor-pointer"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      📍 Cambiar Sucursal
+                    </button>
                   </div>
-                  
-                  {/* Branch Selector Dropdown */}
-                  {showBranchSelector && (
-                    <div className="p-4 bg-blue-50 dark:bg-slate-800 border-b dark:border-slate-700">
-                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Selecciona otra sucursal:</div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {DEFAULT_BANKS.map(bank => (
-                          <button
-                            type="button"
-                            key={bank.id}
-                            onClick={() => {
-                              setSelectedBank(bank);
-                              setShowBranchSelector(false);
-                            }}
-                            className={`p-3 rounded-lg text-left transition-all cursor-pointer ${
-                              selectedBank?.id === bank.id 
-                                ? 'bg-blue-600 text-white' 
-                                : 'bg-white dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600'
-                            }`}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            <div className="font-medium dark:text-white">{bank.name}</div>
-                            <div className={`text-xs ${selectedBank?.id === bank.id ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
-                              📍 {bank.address}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <button onClick={closePlayModal} className="text-gray-400 hover:text-black dark:hover:text-white text-2xl">✕</button>
                 </div>
                 
-                {/* Modal Body - Scrollable */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-8" style={{ WebkitOverflowScrolling: 'touch' }}>
+                {/* Branch Selector Dropdown */}
+                {showBranchSelector && (
+                  <div className="p-4 bg-blue-50 dark:bg-slate-800 border-b dark:border-slate-700">
+                    <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Selecciona otra sucursal:</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {DEFAULT_BANKS.map(bank => (
+                        <button
+                          type="button"
+                          key={bank.id}
+                          onClick={() => {
+                            setSelectedBank(bank);
+                            setShowBranchSelector(false);
+                          }}
+                          className={`p-3 rounded-lg text-left transition-all cursor-pointer ${
+                            selectedBank?.id === bank.id 
+                              ? 'bg-blue-600 text-white' 
+                              : 'bg-white dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600'
+                          }`}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <div className="font-medium dark:text-white">{bank.name}</div>
+                          <div className={`text-xs ${selectedBank?.id === bank.id ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                            📍 {bank.address}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Modal Body */}
+                <div className="p-8">
                   {/* Step 1: Select Lottery */}
                   {playModalStep === 'lottery' && (
                     <div>
@@ -6344,13 +6434,16 @@
                 {/* Header */}
                 <div className={`p-6 text-white text-center ${
                   showInstallGuide === 'ios' ? 'bg-gradient-to-r from-gray-800 to-gray-900' :
-                  'bg-gradient-to-r from-green-600 to-green-700'
+                  showInstallGuide === 'android' ? 'bg-gradient-to-r from-green-600 to-green-700' :
+                  'bg-gradient-to-r from-blue-600 to-indigo-700'
                 }`}>
                   <div className="text-5xl mb-3">
-                    {showInstallGuide === 'ios' ? '🍎' : '🤖'}
+                    {showInstallGuide === 'ios' ? '🍎' : showInstallGuide === 'android' ? '🤖' : '💻'}
                   </div>
                   <h3 className="text-xl font-bold">
-                    {showInstallGuide === 'ios' ? 'Instalar en iPhone/iPad' : 'Instalar en Android'}
+                    {showInstallGuide === 'ios' ? 'Instalar en iPhone/iPad' :
+                     showInstallGuide === 'android' ? 'Instalar en Android' :
+                     'Instalar en PC/Mac'}
                   </h3>
                 </div>
                 
@@ -6438,7 +6531,97 @@
                       </div>
                     </div>
                   )}
-
+                  
+                  {/* Desktop Instructions */}
+                  {showInstallGuide === 'desktop' && (
+                    <div className="space-y-4">
+                      {/* Important notice about local files */}
+                      <div className="p-4 bg-amber-50 dark:bg-amber-900/30 rounded-xl border border-amber-200 dark:border-amber-700">
+                        <p className="text-sm text-amber-800 dark:text-amber-200 font-medium flex items-center gap-2">
+                          <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          Si abriste el archivo directamente, el icono no aparecerá. La app debe estar en un servidor web.
+                        </p>
+                      </div>
+                      
+                      {/* Visual browser mockup */}
+                      <div className="bg-gray-100 dark:bg-slate-700 rounded-xl p-3">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">Así se ve en Chrome/Edge:</p>
+                        {/* Browser mockup */}
+                        <div className="bg-gray-200 dark:bg-slate-600 rounded-lg overflow-hidden">
+                          {/* Tab bar */}
+                          <div className="bg-gray-300 dark:bg-slate-500 px-2 py-1 flex items-center gap-1">
+                            <div className="flex gap-1">
+                              <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                              <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                              <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                            </div>
+                            <div className="flex-1 mx-4 bg-white dark:bg-slate-400 rounded px-2 py-0.5 text-[10px] text-gray-600 truncate">
+                              🎱 LotoLink
+                            </div>
+                          </div>
+                          {/* Address bar with install icon highlighted */}
+                          <div className="bg-white dark:bg-slate-700 px-2 py-1 flex items-center gap-2 border-b dark:border-slate-600">
+                            <div className="flex gap-1 text-gray-400">
+                              <span>←</span><span>→</span><span>↻</span>
+                            </div>
+                            <div className="flex-1 bg-gray-100 dark:bg-slate-600 rounded-full px-3 py-1 text-[10px] text-gray-600 dark:text-gray-300 flex items-center">
+                              <span className="text-green-600 dark:text-green-400 mr-1">🔒</span>
+                              <span className="truncate">lotolink.com</span>
+                              {/* Install icon - highlighted */}
+                              <span className="ml-auto flex items-center gap-1">
+                                <span className="relative animate-pulse">
+                                  <span className="absolute -inset-1 bg-blue-400 rounded opacity-50"></span>
+                                  <span className="relative bg-blue-500 text-white px-1 py-0.5 rounded text-[8px] font-bold">⊕</span>
+                                </span>
+                              </span>
+                            </div>
+                            <span className="text-gray-400 text-sm">⋮</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 text-center font-medium">
+                          ↑ Busca este icono ⊕ al final de la barra de direcciones
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-xl">
+                        <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white">Abre en Chrome o Edge</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">La página debe cargarse desde un servidor (https://...)</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-xl">
+                        <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white">Haz clic en el icono ⊕</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            Está al final de la barra de direcciones (ver imagen arriba)
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-xl">
+                        <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white">Confirma "Instalar"</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            Alternativa: menú <span className="bg-gray-200 dark:bg-slate-600 px-1.5 py-0.5 rounded font-mono">⋮</span> → "Instalar LotoLink..."
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+                        <div className="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">✓</div>
+                        <div>
+                          <p className="font-semibold text-green-800 dark:text-green-300">¡Listo!</p>
+                          <p className="text-sm text-green-700 dark:text-green-400">La app se abrirá en su propia ventana sin barras del navegador</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Close button */}
                   <button
@@ -6827,9 +7010,9 @@
             </div>
           )}
           
-          {/* Mobile Bottom Navigation Bar - Always visible */}
+          {/* Mobile Bottom Navigation Bar - Only visible on mobile devices */}
           {view !== 'portal' && !showWelcomeScreen && (
-            <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-slate-800" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-slate-800" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
               <div className="flex items-center justify-around px-2 py-2">
                 <button 
                   onClick={() => setView('home')}
@@ -7908,8 +8091,7 @@
 
         
         
-        // Wrap content in scrollable container
-        card.innerHTML = headerHtml + `<div class="modal-content-scroll">${contentHtml}</div>`;
+        card.innerHTML = headerHtml + contentHtml;
       }
       
       function updateStake(value) {
@@ -7979,7 +8161,7 @@
             </div>
           `;
         } else if (deferredPrompt || isAndroid) {
-          // Android with install prompt
+          // Android/Desktop with install prompt
           banner.innerHTML = `
             <div class="max-w-md mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 flex items-center gap-4">
               <img src="./lotolink-logo.png" alt="LotoLink Logo" class="w-14 h-14 rounded-2xl flex-shrink-0 shadow-lg object-contain" />
