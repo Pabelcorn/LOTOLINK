@@ -991,354 +991,482 @@
 
     .modal-scroll { max-height: calc(100vh - 160px); overflow: auto; }
     
-    /* Mobile Game Panel - COMPLETELY FIXED FOR ALL DEVICES */
+    /* Base modal styles - work for all screens */
     #modal-root {
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      -webkit-overflow-scrolling: touch !important;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     }
     
     #modal-card {
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      -webkit-overflow-scrolling: touch !important;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: var(--radius-xl);
+      max-width: 900px;
+      max-height: 90vh;
+      margin: 20px auto;
+      overflow: hidden; /* Prevent overflow on the card itself */
     }
     
-    /* MOBILE: Full-height scrollable game panel */
+    /* Fixed header - stays at top */
+    #modal-card > div:first-child {
+      flex-shrink: 0; /* Prevent header from shrinking */
+      position: relative;
+      z-index: 10;
+    }
+    
+    /* Scrollable content area */
+    #modal-card > div:last-child,
+    #modal-card .modal-content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Dark mode for modal */
+    .dark #modal-card {
+      background: #1c1c1e;
+      color: #f5f5f7;
+    }
+    
+    /* Mobile-first responsive design (320px+) */
     @media (max-width: 768px) {
       #modal-root {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        padding: 0 !important;
-        overflow-y: scroll !important;
-        overflow-x: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
-        flex-direction: column !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 0;
+        overflow: hidden; /* Prevent outer scroll */
+        flex-direction: column;
       }
       
       #modal-backdrop {
-        position: fixed !important;
-        z-index: 1 !important;
+        position: fixed;
+        z-index: 1;
       }
       
       #modal-card {
-        position: relative !important;
-        z-index: 2 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-height: 100vh !important;
-        min-height: 100dvh !important;
-        max-height: none !important;
-        height: auto !important;
-        margin: 0 !important;
-        border-radius: 0 !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
-        flex: 1 !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100vh;
+        max-height: 100dvh;
+        height: 100vh;
+        height: 100dvh;
+        margin: 0;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
       
-      /* Header - STICKY at top, always visible */
+      /* Fixed header - stays at top */
       #modal-card > div:first-child {
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 1000 !important;
-        padding: 8px 10px !important;
-        margin: 0 !important;
-        flex-shrink: 0 !important;
+        position: relative;
+        top: 0;
+        z-index: 1000;
+        padding: 12px 16px;
+        background: inherit;
+        flex-shrink: 0;
       }
       
-      /* Header content compact */
+      /* Scrollable content - takes remaining space */
+      #modal-card > div:last-child {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      }
+      
+      /* Compact header elements */
       #modal-card > div:first-child .w-16,
       #modal-card > div:first-child .w-16.h-16 {
-        width: 36px !important;
-        height: 36px !important;
-        flex-shrink: 0 !important;
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
       }
       
       #modal-card > div:first-child h2 {
-        font-size: 1.1rem !important;
-        line-height: 1.2 !important;
+        font-size: 1.125rem;
+        line-height: 1.3;
       }
       
+      /* Hide subtitle on mobile to save space */
       #modal-card > div:first-child .text-sm {
-        font-size: 0.65rem !important;
-        display: none !important;
+        display: none;
       }
       
-      /* Close button always visible and accessible */
+      /* Close button - touch-friendly */
       #modal-card > div:first-child button {
-        min-width: 50px !important;
-        padding: 5px 8px !important;
-        font-size: 11px !important;
-        flex-shrink: 0 !important;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 8px 12px;
+        font-size: 13px;
+        flex-shrink: 0;
       }
       
-      #modal-card > div:first-child .flex.items-center.gap-2 {
-        gap: 4px !important;
-      }
-      
-      /* Content area - scrollable */
-      #modal-card > div:not(:first-child) {
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-      }
-      
-      /* All padding sections more compact */
+      /* Content spacing */
       #modal-card .p-6 {
-        padding: 8px !important;
+        padding: 16px;
       }
       
       #modal-card .p-8 {
-        padding: 10px !important;
+        padding: 16px;
       }
       
-      /* Add safe padding at bottom for iOS home indicator */
-      #modal-card > div:last-child {
-        padding-bottom: 100px !important;
-      }
-      
-      /* Number grid - 5 columns with proper spacing */
+      /* Number grid - 5 columns on mobile */
       #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 6px !important;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
       }
       
       #modal-card .grid-cols-10 button {
-        font-size: 12px !important;
-        padding: 4px !important;
-        min-height: 38px !important;
-        min-width: 38px !important;
-        aspect-ratio: 1 !important;
+        font-size: 14px;
+        padding: 8px;
+        min-height: 44px;
+        min-width: 44px;
+        aspect-ratio: 1;
       }
       
       /* Game type cards - single column */
       #modal-card .grid.grid-cols-1.md\\:grid-cols-2 {
-        grid-template-columns: 1fr !important;
-        gap: 8px !important;
+        grid-template-columns: 1fr;
+        gap: 12px;
       }
       
       #modal-card button.p-6 {
-        padding: 8px !important;
+        padding: 16px;
       }
       
       #modal-card .w-16.h-16 {
-        width: 40px !important;
-        height: 40px !important;
+        width: 48px;
+        height: 48px;
       }
       
       #modal-card .text-2xl.font-bold {
-        font-size: 1rem !important;
+        font-size: 1.25rem;
       }
       
       #modal-card .text-3xl.font-bold {
-        font-size: 1.1rem !important;
+        font-size: 1.5rem;
       }
       
-      /* 3-column layout becomes 1 column (Step 3) */
+      /* 3-column layout becomes 1 column */
       #modal-card .lg\\:grid-cols-3,
       #modal-card .grid-cols-1.lg\\:grid-cols-3 {
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
+        grid-template-columns: 1fr;
+        gap: 16px;
       }
       
       #modal-card .lg\\:col-span-2 {
-        grid-column: span 1 !important;
+        grid-column: span 1;
       }
       
-      /* Step info bar compact */
+      /* Step info bar */
       #modal-card .mb-4.p-4 {
-        padding: 6px !important;
-        margin-bottom: 6px !important;
+        padding: 12px;
+        margin-bottom: 12px;
       }
       
       #modal-card .mb-4.p-4 button {
-        padding: 3px 6px !important;
-        font-size: 10px !important;
+        padding: 6px 12px;
+        font-size: 12px;
       }
       
-      /* Sidebar compact */
+      /* Sidebar */
       #modal-card .bg-gray-50.dark\\:bg-slate-900 {
-        padding: 10px !important;
+        padding: 16px;
       }
       
       #modal-card .bg-gray-50.dark\\:bg-slate-900 .text-2xl {
-        font-size: 1.1rem !important;
+        font-size: 1.25rem;
       }
       
-      /* Step 1 banca cards compact */
+      /* Banca cards */
       #modal-card .border-2.dark\\:border-slate-600 {
-        padding: 8px !important;
+        padding: 12px;
       }
       
       #modal-card .border-2.dark\\:border-slate-600 .w-12 {
-        width: 36px !important;
-        height: 36px !important;
+        width: 40px;
+        height: 40px;
       }
     }
     
+    /* Small phones (max 480px) */
     @media (max-width: 480px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 5px !important;
-      }
-      
-      #modal-card .grid-cols-5 {
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 5px !important;
-      }
-      
-      #modal-card .grid-cols-10 button,
-      #modal-card .grid-cols-5 button {
-        font-size: 11px !important;
-        padding: 3px !important;
-        min-height: 34px !important;
-        min-width: 34px !important;
-      }
-      
       #modal-card > div:first-child {
-        padding: 6px 8px !important;
+        padding: 10px 12px;
       }
       
       #modal-card > div:first-child .w-16,
       #modal-card > div:first-child .w-16.h-16 {
-        width: 30px !important;
-        height: 30px !important;
+        width: 36px;
+        height: 36px;
       }
       
       #modal-card > div:first-child h2 {
-        font-size: 0.95rem !important;
+        font-size: 1rem;
       }
       
-      #modal-card .text-xl {
-        font-size: 0.9rem !important;
-      }
-      
-      #modal-card .text-lg {
-        font-size: 0.8rem !important;
-      }
-    }
-    
-    @media (max-width: 375px) {
       #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 4px !important;
+        gap: 6px;
       }
       
       #modal-card .grid-cols-10 button {
-        font-size: 10px !important;
-        padding: 2px !important;
-        min-height: 30px !important;
-        min-width: 30px !important;
+        font-size: 13px;
+        padding: 6px;
+        min-height: 40px;
+        min-width: 40px;
       }
       
       #modal-card .p-6,
       #modal-card .p-8 {
-        padding: 6px !important;
+        padding: 12px;
       }
       
-      #modal-card > div:first-child h2 {
-        font-size: 0.85rem !important;
-      }
-    }
-    
-    @media (max-width: 320px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 3px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 9px !important;
-        padding: 1px !important;
-        min-height: 26px !important;
-        min-width: 26px !important;
-      }
-    }
-      
-      #modal-card > div:first-child h2 {
-        font-size: 1rem !important;
-      }
-      
-      /* Smaller text */
       #modal-card .text-xl {
-        font-size: 0.95rem !important;
+        font-size: 1rem;
       }
       
       #modal-card .text-lg {
-        font-size: 0.85rem !important;
+        font-size: 0.95rem;
       }
     }
     
+    /* Extra small phones (max 375px) */
     @media (max-width: 375px) {
+      #modal-card > div:first-child {
+        padding: 8px 10px;
+      }
+      
+      #modal-card > div:first-child .w-16,
+      #modal-card > div:first-child .w-16.h-16 {
+        width: 32px;
+        height: 32px;
+      }
+      
+      #modal-card > div:first-child h2 {
+        font-size: 0.95rem;
+      }
+      
       #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 12px;
+        padding: 4px;
+        min-height: 36px;
+        min-width: 36px;
+      }
+      
+      #modal-card .p-6,
+      #modal-card .p-8 {
+        padding: 10px;
+      }
+      
+      #modal-card .w-16.h-16 {
+        width: 40px;
+        height: 40px;
+      }
+    }
+    
+    /* Smallest phones (max 320px) */
+    @media (max-width: 320px) {
+      #modal-card .grid-cols-10 {
+        gap: 4px;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 11px;
+        padding: 3px;
+        min-height: 32px;
+        min-width: 32px;
+      }
+      
+      #modal-card > div:first-child h2 {
+        font-size: 0.9rem;
+      }
+    }
+    
+    /* Tablet landscape (768px to 1024px) - Optimize for horizontal space */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      #modal-card {
+        max-width: 750px;
+        max-height: 85vh;
+        margin: 30px auto;
+      }
+      
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(10, 1fr);
+        gap: 10px;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 15px;
+        padding: 10px;
+        min-height: 48px;
+        min-width: 48px;
+      }
+      
+      /* Two-column layout for game type selection */
+      #modal-card .grid.grid-cols-1.md\\:grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+    }
+    
+    /* Large tablets and small desktops (1025px to 1440px) */
+    @media (min-width: 1025px) and (max-width: 1440px) {
+      #modal-card {
+        max-width: 900px;
+        max-height: 85vh;
+        margin: 40px auto;
+      }
+      
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(10, 1fr);
+        gap: 12px;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 16px;
+        padding: 12px;
+        min-height: 52px;
+        min-width: 52px;
+      }
+      
+      /* Restore 3-column layouts */
+      #modal-card .lg\\:grid-cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      #modal-card .lg\\:col-span-2 {
+        grid-column: span 2;
+      }
+    }
+    
+    /* Large desktops (1441px+) - Maximize space usage */
+    @media (min-width: 1441px) {
+      #modal-card {
+        max-width: 1200px;
+        max-height: 90vh;
+        margin: 50px auto;
+      }
+      
+      #modal-card .grid-cols-10 {
+        grid-template-columns: repeat(10, 1fr);
+        gap: 14px;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 18px;
+        padding: 14px;
+        min-height: 56px;
+        min-width: 56px;
+      }
+      
+      /* More spacious padding on larger screens */
+      #modal-card .p-6 {
+        padding: 32px;
+      }
+      
+      #modal-card .p-8 {
+        padding: 40px;
+      }
+    }
+    
+    /* Ultra-wide screens (1920px+) - Prevent excessive stretching */
+    @media (min-width: 1920px) {
+      #modal-card {
+        max-width: 1400px;
+      }
+      
+      #modal-card .grid-cols-10 {
+        gap: 16px;
+      }
+      
+      #modal-card .grid-cols-10 button {
+        font-size: 20px;
+        padding: 16px;
+        min-height: 60px;
+        min-width: 60px;
+      }
+    }
+    
+    /* ========================================
+       RESPONSIVE GRIDS FOR ALL MODALS
+       Apply to Play Modal and other modals
+       ======================================== */
+    
+    /* Mobile: 5 columns for all modals */
+    @media (max-width: 768px) {
+      .grid-cols-10 {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 8px !important;
+      }
+      
+      .grid-cols-10 button {
+        font-size: 14px !important;
+        padding: 8px !important;
+        min-height: 44px !important;
+        min-width: 44px !important;
+      }
+    }
+    
+    /* Small phones: 4-5 columns */
+    @media (max-width: 480px) {
+      .grid-cols-10 {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 6px !important;
+      }
+      
+      .grid-cols-10 button {
+        font-size: 13px !important;
+        padding: 6px !important;
+        min-height: 40px !important;
+        min-width: 40px !important;
+      }
+    }
+    
+    /* Extra small phones: 4 columns */
+    @media (max-width: 375px) {
+      .grid-cols-10 {
         grid-template-columns: repeat(4, 1fr) !important;
         gap: 5px !important;
       }
       
-      #modal-card .grid-cols-10 button {
+      .grid-cols-10 button {
+        font-size: 12px !important;
+        padding: 4px !important;
+        min-height: 36px !important;
+        min-width: 36px !important;
+      }
+    }
+    
+    /* Smallest phones: tighter spacing */
+    @media (max-width: 320px) {
+      .grid-cols-10 {
+        gap: 4px !important;
+      }
+      
+      .grid-cols-10 button {
         font-size: 11px !important;
         padding: 3px !important;
         min-height: 32px !important;
         min-width: 32px !important;
-      }
-      
-      #modal-card .p-6,
-      #modal-card .p-8 {
-        padding: 8px !important;
-        padding-bottom: 100px !important;
-      }
-    }
-    
-    @media (max-width: 320px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 4px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 10px !important;
-        padding: 2px !important;
-        min-height: 28px !important;
-        min-width: 28px !important;
-      }
-    }
-        font-size: 0.9rem !important;
-      }
-    }
-    
-    @media (max-width: 375px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 4px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 12px !important;
-        padding: 6px !important;
-        min-height: 38px;
-      }
-      
-      #modal-card .p-6,
-      #modal-card .p-8 {
-        padding: 10px !important;
-        padding-bottom: 80px !important;
-      }
-    }
-    
-    @media (max-width: 320px) {
-      #modal-card .grid-cols-10 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 3px !important;
-      }
-      
-      #modal-card .grid-cols-10 button {
-        font-size: 11px !important;
-        padding: 4px !important;
-        min-height: 34px;
       }
     }
     
