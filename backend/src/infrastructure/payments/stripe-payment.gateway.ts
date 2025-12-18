@@ -1,4 +1,4 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import {
@@ -11,6 +11,7 @@ import {
   CreatePaymentMethodRequest,
   TokenizeCardRequest,
 } from './payment-gateway.port';
+import { SettingsService } from '../../application/services/settings.service';
 
 /**
  * Stripe Payment Gateway Adapter
@@ -32,7 +33,11 @@ export class StripePaymentGateway implements PaymentGateway {
   private readonly stripe: Stripe | null;
   private readonly customers: Map<string, string> = new Map(); // userId -> Stripe customerId
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(forwardRef(() => SettingsService))
+    private readonly settingsService: SettingsService,
+  ) {
     this.secretKey = this.configService.get<string>('STRIPE_SECRET_KEY', '');
     this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET', '');
     
@@ -74,8 +79,51 @@ export class StripePaymentGateway implements PaymentGateway {
       // Get or create Stripe customer
       const customerId = await this.getOrCreateCustomer(request.userId);
 
+      // Calculate commission if configured - check settings first, then env vars
+      let commissionPercentage = this.configService.get<number>('COMMISSION_PERCENTAGE', 0);
+      let commissionAccountId = this.configService.get<string>('COMMISSION_STRIPE_ACCOUNT_ID');
+      let cardProcessingAccountId = this.configService.get<string>('CARD_PROCESSING_ACCOUNT_ID');
+
+      try {
+        const dbCommissionPercentage = await this.settingsService.get('commission.percentage');
+        const dbCommissionAccountId = await this.settingsService.get('commission.stripeAccountId');
+        const dbCardProcessingAccountId = await this.settingsService.get('commission.cardProcessingAccountId');
+
+        if (dbCommissionPercentage) {
+          const parsed = parseFloat(dbCommissionPercentage);
+          if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+            commissionPercentage = parsed;
+          } else {
+            this.logger.warn(`Invalid commission percentage in database: ${dbCommissionPercentage}`);
+          }
+        }
+        if (dbCommissionAccountId) commissionAccountId = dbCommissionAccountId;
+        if (dbCardProcessingAccountId) cardProcessingAccountId = dbCardProcessingAccountId;
+      } catch (error) {
+        this.logger.debug('Settings service not available, using env vars for commission');
+      }
+      
+      let transferData: any = undefined;
+      let applicationFeeAmount: number | undefined = undefined;
+
+      // If commission account is configured, calculate the commission and set up transfer
+      if (commissionPercentage > 0 && commissionAccountId) {
+        // Commission is taken from the payment amount
+        // Convert to cents: amount * percentage / 100 * 100 (for cents conversion)
+        applicationFeeAmount = Math.round(request.amount * commissionPercentage); // already in cents
+        
+        // If card processing account is configured, route net payment there
+        if (cardProcessingAccountId) {
+          transferData = {
+            destination: cardProcessingAccountId,
+          };
+        }
+
+        this.logger.log(`Commission configured: ${commissionPercentage}% = ${applicationFeeAmount / 100} ${request.currency}, destination: ${cardProcessingAccountId || 'platform account'}`);
+      }
+
       // Create payment intent with automatic confirmation
-      const paymentIntent = await this.stripe.paymentIntents.create({
+      const paymentIntentParams: Stripe.PaymentIntentCreateParams = {
         amount: Math.round(request.amount * 100), // Stripe uses cents
         currency: request.currency.toLowerCase(),
         customer: customerId,
@@ -87,9 +135,21 @@ export class StripePaymentGateway implements PaymentGateway {
         description: request.description,
         metadata: {
           userId: request.userId,
+          commissionPercentage: commissionPercentage.toString(),
+          commissionAmount: applicationFeeAmount ? (applicationFeeAmount / 100).toString() : '0',
           ...request.metadata,
         },
-      });
+      };
+
+      // Add commission/transfer configuration if available
+      if (applicationFeeAmount) {
+        paymentIntentParams.application_fee_amount = applicationFeeAmount;
+      }
+      if (transferData) {
+        paymentIntentParams.transfer_data = transferData;
+      }
+
+      const paymentIntent = await this.stripe.paymentIntents.create(paymentIntentParams);
       
       this.logger.log(`Charge successful: ${paymentIntent.id}`);
       
