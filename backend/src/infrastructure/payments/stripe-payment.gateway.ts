@@ -1,4 +1,4 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import {
@@ -11,6 +11,7 @@ import {
   CreatePaymentMethodRequest,
   TokenizeCardRequest,
 } from './payment-gateway.port';
+import { SettingsService } from '../../application/services/settings.service';
 
 /**
  * Stripe Payment Gateway Adapter
@@ -32,7 +33,11 @@ export class StripePaymentGateway implements PaymentGateway {
   private readonly stripe: Stripe | null;
   private readonly customers: Map<string, string> = new Map(); // userId -> Stripe customerId
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(forwardRef(() => SettingsService))
+    private readonly settingsService: SettingsService,
+  ) {
     this.secretKey = this.configService.get<string>('STRIPE_SECRET_KEY', '');
     this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET', '');
     
@@ -74,10 +79,22 @@ export class StripePaymentGateway implements PaymentGateway {
       // Get or create Stripe customer
       const customerId = await this.getOrCreateCustomer(request.userId);
 
-      // Calculate commission if configured
-      const commissionPercentage = this.configService.get<number>('COMMISSION_PERCENTAGE', 0);
-      const commissionAccountId = this.configService.get<string>('COMMISSION_STRIPE_ACCOUNT_ID');
-      const cardProcessingAccountId = this.configService.get<string>('CARD_PROCESSING_ACCOUNT_ID');
+      // Calculate commission if configured - check settings first, then env vars
+      let commissionPercentage = this.configService.get<number>('COMMISSION_PERCENTAGE', 0);
+      let commissionAccountId = this.configService.get<string>('COMMISSION_STRIPE_ACCOUNT_ID');
+      let cardProcessingAccountId = this.configService.get<string>('CARD_PROCESSING_ACCOUNT_ID');
+
+      try {
+        const dbCommissionPercentage = await this.settingsService.get('commission.percentage');
+        const dbCommissionAccountId = await this.settingsService.get('commission.stripeAccountId');
+        const dbCardProcessingAccountId = await this.settingsService.get('commission.cardProcessingAccountId');
+
+        if (dbCommissionPercentage) commissionPercentage = parseFloat(dbCommissionPercentage);
+        if (dbCommissionAccountId) commissionAccountId = dbCommissionAccountId;
+        if (dbCardProcessingAccountId) cardProcessingAccountId = dbCardProcessingAccountId;
+      } catch (error) {
+        this.logger.debug('Settings service not available, using env vars for commission');
+      }
       
       let transferData: any = undefined;
       let applicationFeeAmount: number | undefined = undefined;

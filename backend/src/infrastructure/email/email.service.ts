@@ -1,7 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
+import { SettingsService } from '../../application/services/settings.service';
 
 export interface EmailOptions {
   to: string;
@@ -14,33 +15,57 @@ export interface EmailOptions {
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private transporter: Transporter | null = null;
-  private readonly enabled: boolean;
-  private readonly from: string;
 
-  constructor(private readonly configService: ConfigService) {
-    this.enabled = this.configService.get<boolean>('EMAIL_ENABLED', false);
-    this.from = this.configService.get<string>(
-      'EMAIL_FROM',
-      'noreply@lotolink.com'
-    );
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(forwardRef(() => SettingsService))
+    private readonly settingsService: SettingsService,
+  ) {
+    this.initializeFromEnv();
+  }
 
-    if (this.enabled) {
+  private async initializeFromEnv(): Promise<void> {
+    const enabled = this.configService.get<boolean>('EMAIL_ENABLED', false);
+    
+    if (enabled) {
       this.initializeTransporter();
     } else {
-      this.logger.warn('Email service is disabled. Set EMAIL_ENABLED=true to enable.');
+      this.logger.warn('Email service is disabled. Set EMAIL_ENABLED=true or configure via admin panel.');
     }
   }
 
-  private initializeTransporter(): void {
-    const host = this.configService.get<string>('EMAIL_HOST');
-    const port = this.configService.get<number>('EMAIL_PORT', 587);
-    const secure = this.configService.get<boolean>('EMAIL_SECURE', false);
-    const user = this.configService.get<string>('EMAIL_USER');
-    const pass = this.configService.get<string>('EMAIL_PASSWORD');
+  async reinitialize(): Promise<void> {
+    this.logger.log('Reinitializing email service with updated settings');
+    await this.initializeTransporter();
+  }
+
+  private async initializeTransporter(): Promise<void> {
+    // Try to get settings from database first, fall back to env vars
+    let host = this.configService.get<string>('EMAIL_HOST');
+    let port = this.configService.get<number>('EMAIL_PORT', 587);
+    let secure = this.configService.get<boolean>('EMAIL_SECURE', false);
+    let user = this.configService.get<string>('EMAIL_USER');
+    let pass = this.configService.get<string>('EMAIL_PASSWORD');
+
+    try {
+      const dbHost = await this.settingsService.get('email.host');
+      const dbPort = await this.settingsService.get('email.port');
+      const dbSecure = await this.settingsService.get('email.secure');
+      const dbUser = await this.settingsService.get('email.user');
+      const dbPass = await this.settingsService.get('email.password');
+
+      if (dbHost) host = dbHost;
+      if (dbPort) port = parseInt(dbPort);
+      if (dbSecure) secure = dbSecure === 'true';
+      if (dbUser) user = dbUser;
+      if (dbPass) pass = dbPass;
+    } catch (error) {
+      this.logger.debug('Settings service not yet available, using env vars');
+    }
 
     if (!host || !user || !pass) {
       this.logger.error(
-        'Email configuration is incomplete. Please set EMAIL_HOST, EMAIL_USER, and EMAIL_PASSWORD.'
+        'Email configuration is incomplete. Please configure via admin panel or set EMAIL_HOST, EMAIL_USER, and EMAIL_PASSWORD.'
       );
       return;
     }
@@ -63,19 +88,41 @@ export class EmailService {
   }
 
   async sendEmail(options: EmailOptions): Promise<boolean> {
-    if (!this.enabled) {
+    // Check if email is enabled from settings or env
+    let enabled = this.configService.get<boolean>('EMAIL_ENABLED', false);
+    try {
+      const dbEnabled = await this.settingsService.get('email.enabled');
+      if (dbEnabled) enabled = dbEnabled === 'true';
+    } catch (error) {
+      // Settings service not available yet
+    }
+
+    if (!enabled) {
       this.logger.debug('Email sending is disabled.');
       return false;
     }
 
     if (!this.transporter) {
-      this.logger.error('Email transporter is not initialized');
-      return false;
+      // Try to initialize if not already done
+      await this.initializeTransporter();
+      if (!this.transporter) {
+        this.logger.error('Email transporter is not initialized');
+        return false;
+      }
     }
 
     try {
+      // Get from address from settings or env
+      let from = this.configService.get<string>('EMAIL_FROM', 'noreply@lotolink.com');
+      try {
+        const dbFrom = await this.settingsService.get('email.from');
+        if (dbFrom) from = dbFrom;
+      } catch (error) {
+        // Use env var
+      }
+
       const mailOptions: any = {
-        from: this.from,
+        from,
         to: options.to,
         subject: options.subject,
         html: options.html,
@@ -104,10 +151,18 @@ export class EmailService {
     location: string;
     bankAccount: string;
   }): Promise<boolean> {
-    const adminEmail = this.configService.get<string>(
+    let adminEmail = this.configService.get<string>(
       'ADMIN_EMAIL',
       'admin@lotolink.com'
     );
+
+    // Try to get admin email from settings
+    try {
+      const dbAdminEmail = await this.settingsService.get('email.adminEmail');
+      if (dbAdminEmail) adminEmail = dbAdminEmail;
+    } catch (error) {
+      // Use env var
+    }
 
     const html = `
       <h2>Nueva Solicitud de Registro de Banca</h2>
@@ -163,10 +218,18 @@ Datos de Pago:
     location: string;
     phone: string;
   }): Promise<boolean> {
-    const adminEmail = this.configService.get<string>(
+    let adminEmail = this.configService.get<string>(
       'ADMIN_EMAIL',
       'admin@lotolink.com'
     );
+
+    // Try to get admin email from settings
+    try {
+      const dbAdminEmail = await this.settingsService.get('email.adminEmail');
+      if (dbAdminEmail) adminEmail = dbAdminEmail;
+    } catch (error) {
+      // Use env var
+    }
 
     const html = `
       <h2>Nueva Solicitud de Contacto - Únete a LotoLink</h2>

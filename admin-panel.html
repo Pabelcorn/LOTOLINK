@@ -486,6 +486,7 @@
             <button class="tab-button" onclick="switchTab('pending')">⏳ Solicitudes Pendientes</button>
             <button class="tab-button" onclick="switchTab('all')">📋 Todas las Bancas</button>
             <button class="tab-button" onclick="switchTab('stats')">📊 Estadísticas</button>
+            <button class="tab-button" onclick="switchTab('settings')">⚙️ Configuración</button>
         </div>
 
         <!-- Register Tab -->
@@ -623,6 +624,108 @@
                 </div>
             </div>
         </div>
+
+        <!-- Settings Tab -->
+        <div id="settings-tab" class="tab-content">
+            <div class="card">
+                <h2>⚙️ Configuración del Sistema</h2>
+                <div id="settings-alert"></div>
+                
+                <!-- Email Settings Section -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📧 Configuración de Email</h3>
+                    <form id="email-settings-form">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="email-enabled" name="emailEnabled">
+                                Habilitar notificaciones por email
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email-host">Servidor SMTP (Host)</label>
+                            <input type="text" id="email-host" name="emailHost" placeholder="smtp.gmail.com">
+                            <small style="color: #666;">Ejemplo: smtp.gmail.com, smtp-mail.outlook.com</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email-port">Puerto SMTP</label>
+                            <input type="number" id="email-port" name="emailPort" placeholder="587" min="1" max="65535">
+                            <small style="color: #666;">Común: 587 (TLS), 465 (SSL)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="email-secure" name="emailSecure">
+                                Usar SSL/TLS
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email-user">Usuario SMTP</label>
+                            <input type="text" id="email-user" name="emailUser" placeholder="tu-email@gmail.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email-password">Contraseña SMTP</label>
+                            <input type="password" id="email-password" name="emailPassword" placeholder="••••••••">
+                            <small style="color: #666;">Para Gmail, usa una contraseña de aplicación</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email-from">Email de envío (From)</label>
+                            <input type="email" id="email-from" name="emailFrom" placeholder="noreply@lotolink.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="admin-email">Email del administrador</label>
+                            <input type="email" id="admin-email" name="adminEmail" placeholder="admin@lotolink.com">
+                            <small style="color: #666;">Recibirás las notificaciones aquí</small>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Commission Settings Section -->
+                <div style="margin-bottom: 30px; padding-top: 30px; border-top: 2px solid #e0e0e0;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">💳 Configuración de Comisiones</h3>
+                    <form id="commission-settings-form">
+                        <div class="form-group">
+                            <label for="commission-percentage">Porcentaje de comisión (%)</label>
+                            <input type="number" id="commission-percentage" name="commissionPercentage" 
+                                   placeholder="5.0" min="0" max="100" step="0.1">
+                            <small style="color: #666;">Porcentaje que se retiene de cada pago con tarjeta</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="commission-account">Cuenta Stripe para comisiones</label>
+                            <input type="text" id="commission-account" name="commissionStripeAccountId" 
+                                   placeholder="acct_xxxxxxxxxx">
+                            <small style="color: #666;">ID de cuenta Stripe donde se retienen las comisiones</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="processing-account">Cuenta Stripe para procesamiento</label>
+                            <input type="text" id="processing-account" name="cardProcessingAccountId" 
+                                   placeholder="acct_xxxxxxxxxx">
+                            <small style="color: #666;">ID de cuenta Stripe donde se transfieren los pagos netos</small>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="button-group" style="padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                    <button type="button" class="btn btn-primary" onclick="saveSettings()">
+                        💾 Guardar Configuración
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="loadSettings()">
+                        🔄 Recargar
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="testEmailSettings()">
+                        📧 Probar Email
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Credentials Modal -->
@@ -722,6 +825,8 @@
                 loadAllBancas();
             } else if (tabName === 'stats') {
                 loadStats();
+            } else if (tabName === 'settings') {
+                loadSettings();
             }
         }
 
@@ -973,6 +1078,163 @@
         }
 
         // Logout admin
+        // ============================================
+        // SETTINGS FUNCTIONS
+        // ============================================
+        async function loadSettings() {
+            const settingsAlert = document.getElementById('settings-alert');
+            try {
+                const user = JSON.parse(localStorage.getItem('ll_user') || '{}');
+                const token = user.accessToken || localStorage.getItem('ll_token');
+                
+                if (!token) {
+                    throw new Error('No se encontró token de autenticación');
+                }
+
+                const response = await fetch(`${API_BASE}/admin/settings`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar configuración');
+                }
+
+                const settings = await response.json();
+                
+                // Load email settings
+                document.getElementById('email-enabled').checked = settings.emailEnabled || false;
+                document.getElementById('email-host').value = settings.emailHost || '';
+                document.getElementById('email-port').value = settings.emailPort || 587;
+                document.getElementById('email-secure').checked = settings.emailSecure || false;
+                document.getElementById('email-user').value = settings.emailUser || '';
+                document.getElementById('email-password').value = ''; // Don't show password
+                document.getElementById('email-from').value = settings.emailFrom || '';
+                document.getElementById('admin-email').value = settings.adminEmail || '';
+                
+                // Load commission settings
+                document.getElementById('commission-percentage').value = settings.commissionPercentage || 0;
+                document.getElementById('commission-account').value = settings.commissionStripeAccountId || '';
+                document.getElementById('processing-account').value = settings.cardProcessingAccountId || '';
+
+                settingsAlert.innerHTML = '<div class="alert alert-success">✅ Configuración cargada exitosamente</div>';
+                setTimeout(() => settingsAlert.innerHTML = '', 3000);
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                settingsAlert.innerHTML = `<div class="alert alert-error">❌ Error al cargar configuración: ${error.message}</div>`;
+            }
+        }
+
+        async function saveSettings() {
+            const settingsAlert = document.getElementById('settings-alert');
+            try {
+                const user = JSON.parse(localStorage.getItem('ll_user') || '{}');
+                const token = user.accessToken || localStorage.getItem('ll_token');
+                
+                if (!token) {
+                    throw new Error('No se encontró token de autenticación');
+                }
+
+                const settings = {
+                    // Email settings
+                    emailEnabled: document.getElementById('email-enabled').checked,
+                    emailHost: document.getElementById('email-host').value,
+                    emailPort: parseInt(document.getElementById('email-port').value) || 587,
+                    emailSecure: document.getElementById('email-secure').checked,
+                    emailUser: document.getElementById('email-user').value,
+                    emailFrom: document.getElementById('email-from').value,
+                    adminEmail: document.getElementById('admin-email').value,
+                    // Commission settings
+                    commissionPercentage: parseFloat(document.getElementById('commission-percentage').value) || 0,
+                    commissionStripeAccountId: document.getElementById('commission-account').value,
+                    cardProcessingAccountId: document.getElementById('processing-account').value,
+                };
+
+                // Only include password if it was changed
+                const password = document.getElementById('email-password').value;
+                if (password) {
+                    settings.emailPassword = password;
+                }
+
+                const response = await fetch(`${API_BASE}/admin/settings`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Error al guardar configuración');
+                }
+
+                const result = await response.json();
+                settingsAlert.innerHTML = `<div class="alert alert-success">✅ ${result.message || 'Configuración guardada exitosamente'}</div>`;
+                
+                // Clear password field
+                document.getElementById('email-password').value = '';
+                
+                // Reload settings after 2 seconds
+                setTimeout(() => {
+                    loadSettings();
+                }, 2000);
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                settingsAlert.innerHTML = `<div class="alert alert-error">❌ Error al guardar: ${error.message}</div>`;
+            }
+        }
+
+        async function testEmailSettings() {
+            const settingsAlert = document.getElementById('settings-alert');
+            try {
+                const user = JSON.parse(localStorage.getItem('ll_user') || '{}');
+                const token = user.accessToken || localStorage.getItem('ll_token');
+                
+                if (!token) {
+                    throw new Error('No se encontró token de autenticación');
+                }
+
+                const response = await fetch(`${API_BASE}/admin/settings/test-email`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al probar configuración de email');
+                }
+
+                const result = await response.json();
+                
+                if (result.configured) {
+                    settingsAlert.innerHTML = `
+                        <div class="alert alert-success">
+                            ✅ Email configurado correctamente<br>
+                            <small>Host: ${result.host}<br>
+                            From: ${result.from}<br>
+                            Admin Email: ${result.adminEmail}</small>
+                        </div>
+                    `;
+                } else {
+                    settingsAlert.innerHTML = `
+                        <div class="alert alert-warning">
+                            ⚠️ Email no configurado. Complete los campos requeridos y guarde la configuración.
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error testing email:', error);
+                settingsAlert.innerHTML = `<div class="alert alert-error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
         function logoutAdmin() {
             if (confirm('¿Está seguro que desea cerrar sesión del Panel de Administración?')) {
                 localStorage.removeItem('ll_admin_auth');

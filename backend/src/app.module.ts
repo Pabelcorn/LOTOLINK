@@ -14,9 +14,10 @@ import {
 } from './infrastructure/http/controllers';
 import { PaymentMethodsController } from './infrastructure/http/controllers/payment-methods.controller';
 import { ContactController } from './infrastructure/http/controllers/contact.controller';
+import { SettingsController } from './infrastructure/http/controllers/settings.controller';
 
 // Services
-import { PlayService, UserService, WebhookService, BancaService } from './application/services';
+import { PlayService, UserService, WebhookService, BancaService, SettingsService } from './application/services';
 import { EmailService } from './infrastructure/email';
 
 // Database entities
@@ -26,6 +27,7 @@ import {
   BancaEntity,
   OutgoingRequestEntity,
   WebhookEventEntity,
+  SettingEntity,
 } from './infrastructure/database/entities';
 
 // Repositories
@@ -98,7 +100,7 @@ class MockCachePort {
         username: configService.get<string>('DATABASE_USERNAME', 'lotolink'),
         password: configService.get<string>('DATABASE_PASSWORD', 'password'),
         database: configService.get<string>('DATABASE_NAME', 'lotolink_db'),
-        entities: [PlayEntity, UserEntity, BancaEntity, OutgoingRequestEntity, WebhookEventEntity],
+        entities: [PlayEntity, UserEntity, BancaEntity, OutgoingRequestEntity, WebhookEventEntity, SettingEntity],
         synchronize: configService.get<string>('NODE_ENV') !== 'production',
         logging: configService.get<string>('NODE_ENV') === 'development',
       }),
@@ -110,6 +112,7 @@ class MockCachePort {
       BancaEntity,
       OutgoingRequestEntity,
       WebhookEventEntity,
+      SettingEntity,
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -122,7 +125,7 @@ class MockCachePort {
       inject: [ConfigService],
     }),
   ],
-  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController, PaymentMethodsController, ContactController],
+  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController, PaymentMethodsController, ContactController, SettingsController],
   providers: [
     // Services
     PlayService,
@@ -130,6 +133,7 @@ class MockCachePort {
     WebhookService,
     BancaService,
     EmailService,
+    SettingsService,
     
     // Workers
     PlayWorker,
@@ -180,14 +184,14 @@ class MockCachePort {
     // Payment Gateway - uses Stripe in production, mock in development
     {
       provide: PAYMENT_GATEWAY,
-      useFactory: (configService: ConfigService) => {
+      useFactory: (configService: ConfigService, settingsService: SettingsService) => {
         const useMock = configService.get<string>('USE_MOCK_PAYMENT', 'true') === 'true';
         if (useMock) {
           return new MockPaymentGateway(configService);
         }
-        return new StripePaymentGateway(configService);
+        return new StripePaymentGateway(configService, settingsService);
       },
-      inject: [ConfigService],
+      inject: [ConfigService, SettingsService],
     },
   ],
 })
