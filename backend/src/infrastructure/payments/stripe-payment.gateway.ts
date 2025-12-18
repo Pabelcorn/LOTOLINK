@@ -74,8 +74,31 @@ export class StripePaymentGateway implements PaymentGateway {
       // Get or create Stripe customer
       const customerId = await this.getOrCreateCustomer(request.userId);
 
+      // Calculate commission if configured
+      const commissionPercentage = this.configService.get<number>('COMMISSION_PERCENTAGE', 0);
+      const commissionAccountId = this.configService.get<string>('COMMISSION_STRIPE_ACCOUNT_ID');
+      const cardProcessingAccountId = this.configService.get<string>('CARD_PROCESSING_ACCOUNT_ID');
+      
+      let transferData: any = undefined;
+      let applicationFeeAmount: number | undefined = undefined;
+
+      // If commission account is configured, calculate the commission and set up transfer
+      if (commissionPercentage > 0 && commissionAccountId) {
+        // Commission is taken from the payment amount
+        applicationFeeAmount = Math.round((request.amount * commissionPercentage) / 100 * 100); // in cents
+        
+        // If card processing account is configured, route net payment there
+        if (cardProcessingAccountId) {
+          transferData = {
+            destination: cardProcessingAccountId,
+          };
+        }
+
+        this.logger.log(`Commission configured: ${commissionPercentage}% = ${applicationFeeAmount / 100} ${request.currency}, destination: ${cardProcessingAccountId || 'platform account'}`);
+      }
+
       // Create payment intent with automatic confirmation
-      const paymentIntent = await this.stripe.paymentIntents.create({
+      const paymentIntentParams: Stripe.PaymentIntentCreateParams = {
         amount: Math.round(request.amount * 100), // Stripe uses cents
         currency: request.currency.toLowerCase(),
         customer: customerId,
@@ -87,9 +110,21 @@ export class StripePaymentGateway implements PaymentGateway {
         description: request.description,
         metadata: {
           userId: request.userId,
+          commissionPercentage: commissionPercentage.toString(),
+          commissionAmount: applicationFeeAmount ? (applicationFeeAmount / 100).toString() : '0',
           ...request.metadata,
         },
-      });
+      };
+
+      // Add commission/transfer configuration if available
+      if (applicationFeeAmount) {
+        paymentIntentParams.application_fee_amount = applicationFeeAmount;
+      }
+      if (transferData) {
+        paymentIntentParams.transfer_data = transferData;
+      }
+
+      const paymentIntent = await this.stripe.paymentIntents.create(paymentIntentParams);
       
       this.logger.log(`Charge successful: ${paymentIntent.id}`);
       

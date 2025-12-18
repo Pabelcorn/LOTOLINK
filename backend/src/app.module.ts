@@ -13,9 +13,11 @@ import {
   AdminBancasController,
 } from './infrastructure/http/controllers';
 import { PaymentMethodsController } from './infrastructure/http/controllers/payment-methods.controller';
+import { ContactController } from './infrastructure/http/controllers/contact.controller';
 
 // Services
 import { PlayService, UserService, WebhookService, BancaService } from './application/services';
+import { EmailService } from './infrastructure/email';
 
 // Database entities
 import {
@@ -120,13 +122,14 @@ class MockCachePort {
       inject: [ConfigService],
     }),
   ],
-  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController, PaymentMethodsController],
+  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController, PaymentMethodsController, ContactController],
   providers: [
     // Services
     PlayService,
     UserService,
     WebhookService,
     BancaService,
+    EmailService,
     
     // Workers
     PlayWorker,
