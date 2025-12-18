@@ -67,10 +67,8 @@ const App: React.FC = () => {
           await StatusBar.setStyle({ style: Style.Light });
           await StatusBar.setBackgroundColor({ color: '#0071e3' });
           
-          // Hide splash screen after a delay
-          setTimeout(async () => {
-            await SplashScreen.hide();
-          }, 1000);
+          // Hide splash screen immediately (native splash is disabled in capacitor.config.ts)
+          await SplashScreen.hide();
 
           // Set up push notification listeners
           setupNotificationListeners(
