@@ -3651,7 +3651,7 @@
             {/* Admin Panel Access - Only for admin users */}
             {user?.isAdmin && (
               <button 
-                onClick={() => window.open('admin-panel.html', '_blank')}
+                onClick={() => setShowAdminLoginModal(true)}
                 className="px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 shadow-md flex items-center gap-2"
                 title="Acceder al Panel de Administración"
               >
@@ -4478,6 +4478,7 @@
       const [playModalStake, setPlayModalStake] = useState(10); // Stake amount
       const [showBranchSelector, setShowBranchSelector] = useState(false); // Branch selector in play modal
       const [showAuthModal, setShowAuthModal] = useState(false);
+      const [showAdminLoginModal, setShowAdminLoginModal] = useState(false);
       const [isCartOpen, setIsCartOpen] = useState(false);
       const [theme, setTheme] = useState(() => localStorage.getItem('ll_theme') || 'light');
       const [showInstallGuide, setShowInstallGuide] = useState(null); // 'ios' | 'android' | 'desktop' | null
@@ -6496,6 +6497,87 @@
                 >
                   Cancelar
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Admin Login Modal */}
+          {showAdminLoginModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4">
+              <div className="premium-card w-full max-w-sm p-8 text-center animate-fade-in">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-purple-700 rounded-3xl flex items-center justify-center mx-auto mb-6 text-4xl shadow-lg shadow-purple-500/30">
+                  🔐
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Panel de Administración</h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-6">Ingresa tus credenciales de administrador</p>
+                
+                <input 
+                  id="adminUsername" 
+                  className="w-full border border-gray-200 dark:border-white/10 p-4 rounded-xl mb-4 bg-gray-50 dark:bg-white/5 dark:text-white focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all" 
+                  placeholder="Usuario" 
+                  autoComplete="off"
+                />
+                <input 
+                  id="adminPassword"
+                  className="w-full border border-gray-200 dark:border-white/10 p-4 rounded-xl mb-6 bg-gray-50 dark:bg-white/5 dark:text-white focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all" 
+                  placeholder="Contraseña" 
+                  type="password"
+                  autoComplete="off"
+                />
+                
+                <button 
+                  onClick={() => { 
+                    const username = document.getElementById('adminUsername').value;
+                    const password = document.getElementById('adminPassword').value;
+                    
+                    // Validar credenciales de administrador
+                    // NOTA: Estas credenciales deben ser cambiadas en producción
+                    // y debe implementarse un sistema de autenticación más robusto
+                    const ADMIN_CREDENTIALS = {
+                      username: 'admin',
+                      password: 'lotolink2024'
+                    };
+                    
+                    if(!username || !password) {
+                      alert('Por favor completa todos los campos');
+                      return;
+                    }
+                    
+                    if(username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                      // Credenciales correctas - abrir panel admin
+                      setShowAdminLoginModal(false);
+                      window.open('admin-panel.html', '_blank');
+                      
+                      // Limpiar los campos
+                      document.getElementById('adminUsername').value = '';
+                      document.getElementById('adminPassword').value = '';
+                    } else {
+                      // Credenciales incorrectas
+                      alert('❌ Credenciales incorrectas. Por favor verifica tu usuario y contraseña.');
+                      document.getElementById('adminPassword').value = '';
+                    }
+                  }} 
+                  className="w-full py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-bold hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg"
+                >
+                  Acceder al Panel
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    setShowAdminLoginModal(false);
+                    document.getElementById('adminUsername').value = '';
+                    document.getElementById('adminPassword').value = '';
+                  }} 
+                  className="mt-4 text-gray-500 dark:text-gray-400 text-sm hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                >
+                  Cancelar
+                </button>
+                
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    🔒 Área restringida solo para administradores
+                  </p>
+                </div>
               </div>
             </div>
           )}

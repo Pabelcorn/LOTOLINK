@@ -263,6 +263,23 @@ desktop-app/
 - **Preload Script**: Secure IPC communication
 - **Web Security**: Enabled
 
+### Admin Panel Access
+
+The application includes an admin panel that can be accessed by administrators. 
+
+**To access the admin panel:**
+
+1. Log in with an admin account (email containing `admin@` or `administrador@`)
+2. Go to your Profile (click the 👤 icon)
+3. Click the **"⚙️ Panel Admin"** button (purple button)
+4. Enter admin credentials in the login modal:
+   - **Username**: `admin`
+   - **Password**: `lotolink2024`
+
+**For detailed information about admin credentials and security**, see [ADMIN_CREDENTIALS.md](ADMIN_CREDENTIALS.md).
+
+⚠️ **IMPORTANT**: The default credentials are for development only. **Change them before deploying to production!**
+
 ## 🐛 Troubleshooting
 
 ### White Screen on Startup
