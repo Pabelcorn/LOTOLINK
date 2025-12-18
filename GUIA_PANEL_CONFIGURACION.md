@@ -144,6 +144,7 @@ Cuenta Stripe para procesamiento: acct_1234567890
 - Configuración protegida con autenticación JWT
 - Solo admins pueden acceder
 - Contraseñas enmascaradas en la interfaz
+- **⚠️ IMPORTANTE:** En producción, usa **HTTPS** para proteger las credenciales en tránsito
 
 ### ✅ **Auditable**
 - Cada cambio se registra en la base de datos
@@ -172,6 +173,23 @@ El sistema **sigue siendo compatible** con variables de entorno:
 - Las contraseñas se muestran enmascaradas (`********`)
 - Solo se actualiza la contraseña si se modifica
 - Comunicación segura con JWT
+
+### ⚠️ **Recomendaciones de Seguridad para Producción**
+
+1. **Usa HTTPS siempre:**
+   - Las contraseñas SMTP se transmiten al servidor
+   - HTTPS encripta toda la comunicación
+   - Nunca uses HTTP en producción
+
+2. **Considera encriptar en base de datos:**
+   - Actualmente las contraseñas se almacenan en texto plano en DB
+   - Para mayor seguridad, implementa encriptación en reposo
+   - Usa un servicio de secrets como AWS Secrets Manager o HashiCorp Vault
+
+3. **Audita los accesos:**
+   - Revisa regularmente quién accede al panel
+   - Monitorea cambios en la configuración
+   - Mantén logs de todas las modificaciones
 
 ### Logs del Sistema
 - Todos los cambios se registran

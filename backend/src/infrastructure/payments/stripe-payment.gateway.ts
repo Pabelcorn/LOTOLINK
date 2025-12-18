@@ -89,7 +89,14 @@ export class StripePaymentGateway implements PaymentGateway {
         const dbCommissionAccountId = await this.settingsService.get('commission.stripeAccountId');
         const dbCardProcessingAccountId = await this.settingsService.get('commission.cardProcessingAccountId');
 
-        if (dbCommissionPercentage) commissionPercentage = parseFloat(dbCommissionPercentage);
+        if (dbCommissionPercentage) {
+          const parsed = parseFloat(dbCommissionPercentage);
+          if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+            commissionPercentage = parsed;
+          } else {
+            this.logger.warn(`Invalid commission percentage in database: ${dbCommissionPercentage}`);
+          }
+        }
         if (dbCommissionAccountId) commissionAccountId = dbCommissionAccountId;
         if (dbCardProcessingAccountId) cardProcessingAccountId = dbCardProcessingAccountId;
       } catch (error) {

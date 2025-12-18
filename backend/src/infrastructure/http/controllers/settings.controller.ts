@@ -11,9 +11,12 @@ import { SettingsService } from '../../../application/services/settings.service'
 import { EmailService } from '../../email/email.service';
 import { UpdateSettingsDto } from '../../../application/dtos/settings.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('admin/settings')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin')
 export class SettingsController {
   constructor(
     private readonly settingsService: SettingsService,
