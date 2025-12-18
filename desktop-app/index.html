@@ -4479,6 +4479,9 @@
       const [showBranchSelector, setShowBranchSelector] = useState(false); // Branch selector in play modal
       const [showAuthModal, setShowAuthModal] = useState(false);
       const [showAdminLoginModal, setShowAdminLoginModal] = useState(false);
+      const [adminUsername, setAdminUsername] = useState('');
+      const [adminPassword, setAdminPassword] = useState('');
+      const [adminLoginError, setAdminLoginError] = useState('');
       const [isCartOpen, setIsCartOpen] = useState(false);
       const [theme, setTheme] = useState(() => localStorage.getItem('ll_theme') || 'light');
       const [showInstallGuide, setShowInstallGuide] = useState(null); // 'ios' | 'android' | 'desktop' | null
@@ -6511,25 +6514,86 @@
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Panel de Administración</h3>
                 <p className="text-gray-500 dark:text-gray-400 mb-6">Ingresa tus credenciales de administrador</p>
                 
+                {adminLoginError && (
+                  <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm animate-fade-in">
+                    {adminLoginError}
+                  </div>
+                )}
+                
                 <input 
-                  id="adminUsername" 
+                  value={adminUsername}
+                  onChange={(e) => {
+                    setAdminUsername(e.target.value);
+                    setAdminLoginError('');
+                  }}
                   className="w-full border border-gray-200 dark:border-white/10 p-4 rounded-xl mb-4 bg-gray-50 dark:bg-white/5 dark:text-white focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all" 
                   placeholder="Usuario" 
                   autoComplete="off"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      // Validar credenciales de administrador
+                      const ADMIN_CREDENTIALS = {
+                        username: 'admin',
+                        password: 'lotolink2024'
+                      };
+                      
+                      if(!adminUsername || !adminPassword) {
+                        setAdminLoginError('Por favor completa todos los campos');
+                        return;
+                      }
+                      
+                      if(adminUsername === ADMIN_CREDENTIALS.username && adminPassword === ADMIN_CREDENTIALS.password) {
+                        setShowAdminLoginModal(false);
+                        window.open('admin-panel.html', '_blank');
+                        setAdminUsername('');
+                        setAdminPassword('');
+                        setAdminLoginError('');
+                      } else {
+                        setAdminLoginError('❌ Credenciales incorrectas. Por favor verifica tu usuario y contraseña.');
+                        setAdminPassword('');
+                      }
+                    }
+                  }}
                 />
                 <input 
-                  id="adminPassword"
+                  value={adminPassword}
+                  onChange={(e) => {
+                    setAdminPassword(e.target.value);
+                    setAdminLoginError('');
+                  }}
                   className="w-full border border-gray-200 dark:border-white/10 p-4 rounded-xl mb-6 bg-gray-50 dark:bg-white/5 dark:text-white focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all" 
                   placeholder="Contraseña" 
                   type="password"
                   autoComplete="off"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      // Validar credenciales de administrador
+                      const ADMIN_CREDENTIALS = {
+                        username: 'admin',
+                        password: 'lotolink2024'
+                      };
+                      
+                      if(!adminUsername || !adminPassword) {
+                        setAdminLoginError('Por favor completa todos los campos');
+                        return;
+                      }
+                      
+                      if(adminUsername === ADMIN_CREDENTIALS.username && adminPassword === ADMIN_CREDENTIALS.password) {
+                        setShowAdminLoginModal(false);
+                        window.open('admin-panel.html', '_blank');
+                        setAdminUsername('');
+                        setAdminPassword('');
+                        setAdminLoginError('');
+                      } else {
+                        setAdminLoginError('❌ Credenciales incorrectas. Por favor verifica tu usuario y contraseña.');
+                        setAdminPassword('');
+                      }
+                    }
+                  }}
                 />
                 
                 <button 
                   onClick={() => { 
-                    const username = document.getElementById('adminUsername').value;
-                    const password = document.getElementById('adminPassword').value;
-                    
                     // Validar credenciales de administrador
                     // NOTA: Estas credenciales deben ser cambiadas en producción
                     // y debe implementarse un sistema de autenticación más robusto
@@ -6538,23 +6602,24 @@
                       password: 'lotolink2024'
                     };
                     
-                    if(!username || !password) {
-                      alert('Por favor completa todos los campos');
+                    if(!adminUsername || !adminPassword) {
+                      setAdminLoginError('Por favor completa todos los campos');
                       return;
                     }
                     
-                    if(username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                    if(adminUsername === ADMIN_CREDENTIALS.username && adminPassword === ADMIN_CREDENTIALS.password) {
                       // Credenciales correctas - abrir panel admin
                       setShowAdminLoginModal(false);
                       window.open('admin-panel.html', '_blank');
                       
-                      // Limpiar los campos
-                      document.getElementById('adminUsername').value = '';
-                      document.getElementById('adminPassword').value = '';
+                      // Limpiar los campos y error
+                      setAdminUsername('');
+                      setAdminPassword('');
+                      setAdminLoginError('');
                     } else {
                       // Credenciales incorrectas
-                      alert('❌ Credenciales incorrectas. Por favor verifica tu usuario y contraseña.');
-                      document.getElementById('adminPassword').value = '';
+                      setAdminLoginError('❌ Credenciales incorrectas. Por favor verifica tu usuario y contraseña.');
+                      setAdminPassword('');
                     }
                   }} 
                   className="w-full py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-bold hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg"
@@ -6565,8 +6630,9 @@
                 <button 
                   onClick={() => {
                     setShowAdminLoginModal(false);
-                    document.getElementById('adminUsername').value = '';
-                    document.getElementById('adminPassword').value = '';
+                    setAdminUsername('');
+                    setAdminPassword('');
+                    setAdminLoginError('');
                   }} 
                   className="mt-4 text-gray-500 dark:text-gray-400 text-sm hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
                 >
