@@ -64,7 +64,7 @@ export class EmailService {
 
   async sendEmail(options: EmailOptions): Promise<boolean> {
     if (!this.enabled) {
-      this.logger.debug(`Email sending is disabled. Would have sent to: ${options.to}`);
+      this.logger.debug('Email sending is disabled.');
       return false;
     }
 
@@ -74,18 +74,24 @@ export class EmailService {
     }
 
     try {
-      const info = await this.transporter.sendMail({
+      const mailOptions: any = {
         from: this.from,
         to: options.to,
         subject: options.subject,
         html: options.html,
-        text: options.text,
-      });
+      };
+      
+      // Only include text if provided
+      if (options.text) {
+        mailOptions.text = options.text;
+      }
 
-      this.logger.log(`Email sent successfully to ${options.to}. Message ID: ${info.messageId}`);
+      const info = await this.transporter.sendMail(mailOptions);
+
+      this.logger.log(`Email sent successfully. Message ID: ${info.messageId}`);
       return true;
     } catch (error) {
-      this.logger.error(`Failed to send email to ${options.to}:`, error);
+      this.logger.error(`Failed to send email:`, error);
       return false;
     }
   }

@@ -25,8 +25,8 @@ export class ContactController {
       bankAccount: dto.bankAccount,
     });
 
-    // Send confirmation to user
-    if (dto.email) {
+    // Only send confirmation to user if admin notification was successful
+    if (notificationSent && dto.email) {
       await this.emailService.sendRegistrationConfirmation(dto.email, dto.bancaName);
     }
 

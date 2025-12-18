@@ -85,7 +85,8 @@ export class StripePaymentGateway implements PaymentGateway {
       // If commission account is configured, calculate the commission and set up transfer
       if (commissionPercentage > 0 && commissionAccountId) {
         // Commission is taken from the payment amount
-        applicationFeeAmount = Math.round((request.amount * commissionPercentage) / 100 * 100); // in cents
+        // Convert to cents: amount * percentage / 100 * 100 (for cents conversion)
+        applicationFeeAmount = Math.round(request.amount * commissionPercentage); // already in cents
         
         // If card processing account is configured, route net payment there
         if (cardProcessingAccountId) {
