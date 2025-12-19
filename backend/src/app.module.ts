@@ -2,6 +2,8 @@ import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 // Controllers
 import {
@@ -92,6 +94,11 @@ class MockCachePort {
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
+    // Rate limiting
+    ThrottlerModule.forRoot([{
+      ttl: 60000, // 60 seconds
+      limit: 10, // 10 requests per minute
+    }]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -128,6 +135,12 @@ class MockCachePort {
   ],
   controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController, PaymentMethodsController, ContactController, SettingsController, PublicSettingsController],
   providers: [
+    // Global rate limiting guard
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    
     // Services
     PlayService,
     UserService,
