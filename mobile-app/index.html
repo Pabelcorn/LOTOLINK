@@ -4957,11 +4957,11 @@
       useEffect(() => {
         const fetchAppServiceFee = async () => {
           try {
-            const API_BASE = 'http://localhost:3000/api' || window.API_BASE_URL;
+            const API_BASE = window.API_BASE_URL || 'http://localhost:3000/api';
             const response = await fetch(`${API_BASE}/public/settings/app-service-fee`);
             if (response.ok) {
               const data = await response.json();
-              setAppServiceFeePercentage(data.appServiceFeePercentage || 7);
+              setAppServiceFeePercentage(data.appServiceFeePercentage ?? 7);
             } else {
               console.warn('Failed to fetch app service fee, using default 7%');
             }

@@ -10,7 +10,7 @@ export class PublicSettingsController {
     const settings = await this.settingsService.getSystemSettings();
     
     return {
-      appServiceFeePercentage: settings.commissionPercentage || 7, // Default to 7% if not set
+      appServiceFeePercentage: settings.commissionPercentage ?? 7, // Default to 7% if not set
     };
   }
 }
