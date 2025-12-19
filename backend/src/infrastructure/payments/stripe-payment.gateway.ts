@@ -12,7 +12,7 @@ import {
   TokenizeCardRequest,
 } from './payment-gateway.port';
 import { SettingsService } from '../../application/services/settings.service';
-import { BancaRepository } from '../../domain/repositories/banca.repository';
+import { BancaRepository, BANCA_REPOSITORY } from '../../domain/repositories/banca.repository';
 
 /**
  * Stripe Payment Gateway Adapter
@@ -38,7 +38,7 @@ export class StripePaymentGateway implements PaymentGateway {
     private readonly configService: ConfigService,
     @Inject(forwardRef(() => SettingsService))
     private readonly settingsService: SettingsService,
-    @Inject('BancaRepository')
+    @Inject(BANCA_REPOSITORY)
     private readonly bancaRepository: BancaRepository,
   ) {
     this.secretKey = this.configService.get<string>('STRIPE_SECRET_KEY', '');
@@ -117,12 +117,14 @@ export class StripePaymentGateway implements PaymentGateway {
       }
 
       // If bancaId is provided, try to get banca-specific configuration
+      // NOTE: bancaId is optional and currently not passed by wallet recharge flows.
+      // It should be added when implementing banca-specific play flows.
       if (request.bancaId) {
         try {
           const banca = await this.bancaRepository.findById(request.bancaId);
           if (banca) {
             // Override with banca-specific settings if they exist
-            if (banca.commissionPercentage !== undefined && banca.commissionPercentage !== null) {
+            if (banca.commissionPercentage !== undefined) {
               commissionPercentage = banca.commissionPercentage;
               configSource = 'banca-specific';
             }

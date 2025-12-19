@@ -192,7 +192,7 @@ class MockCachePort {
         }
         return new StripePaymentGateway(configService, settingsService, bancaRepository);
       },
-      inject: [ConfigService, SettingsService, 'BancaRepository'],
+      inject: [ConfigService, SettingsService, BANCA_REPOSITORY],
     },
   ],
 })

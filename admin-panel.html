@@ -1639,7 +1639,12 @@
             const processingAccount = document.getElementById('edit-processing-account').value;
 
             if (commissionPercentage) {
-                formData.commissionPercentage = parseFloat(commissionPercentage);
+                const parsed = parseFloat(commissionPercentage);
+                if (isNaN(parsed) || parsed < 0 || parsed > 100) {
+                    showAlert('edit-banca-alert', `❌ Error: Porcentaje de comisión inválido (debe ser entre 0 y 100)`, 'error');
+                    return;
+                }
+                formData.commissionPercentage = parsed;
             }
             if (commissionAccount) {
                 formData.commissionStripeAccountId = commissionAccount;
