@@ -2,6 +2,8 @@ import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 // Controllers
 import {
@@ -10,12 +12,14 @@ import {
   WebhooksController,
   HealthController,
   AuthController,
+  AdminAuthController,
   AdminBancasController,
 } from './infrastructure/http/controllers';
 import { PaymentMethodsController } from './infrastructure/http/controllers/payment-methods.controller';
 import { ContactController } from './infrastructure/http/controllers/contact.controller';
 import { SettingsController } from './infrastructure/http/controllers/settings.controller';
 import { PublicSettingsController } from './infrastructure/http/controllers/public-settings.controller';
+import { PasswordService } from './infrastructure/security/password.service';
 
 // Services
 import { PlayService, UserService, WebhookService, BancaService, SettingsService } from './application/services';
@@ -92,6 +96,11 @@ class MockCachePort {
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
+    // Rate limiting
+    ThrottlerModule.forRoot([{
+      ttl: 60000, // 60 seconds
+      limit: 10, // 10 requests per minute
+    }]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -126,8 +135,14 @@ class MockCachePort {
       inject: [ConfigService],
     }),
   ],
-  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController, PaymentMethodsController, ContactController, SettingsController, PublicSettingsController],
+  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminAuthController, AdminBancasController, PaymentMethodsController, ContactController, SettingsController, PublicSettingsController],
   providers: [
+    // Global rate limiting guard
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    
     // Services
     PlayService,
     UserService,
@@ -135,6 +150,7 @@ class MockCachePort {
     BancaService,
     EmailService,
     SettingsService,
+    PasswordService,
     
     // Workers
     PlayWorker,

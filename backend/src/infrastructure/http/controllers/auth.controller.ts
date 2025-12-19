@@ -6,6 +6,7 @@ import {
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '../../../application/services/user.service';
@@ -22,23 +23,16 @@ export class AuthController {
     private readonly passwordService: PasswordService,
   ) {}
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 attempts per minute
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
     // Hash the password
     const hashedPassword = await this.passwordService.hashPassword(registerDto.password);
 
-    // Determine role based on email pattern (for backward compatibility during migration)
-    // ⚠️ SECURITY WARNING: This is for development/migration only!
-    // In production, remove this logic and use a separate admin creation endpoint
-    // or manual role assignment by existing admins.
-    let role = UserRole.USER;
-    if (registerDto.email && process.env.NODE_ENV !== 'production') {
-      const emailLower = registerDto.email.toLowerCase();
-      if (emailLower.includes('admin@') || emailLower.includes('administrador@')) {
-        role = UserRole.ADMIN;
-      }
-    }
+    // All new users are created with USER role
+    // Admins must be created through a separate protected endpoint
+    const role = UserRole.USER;
 
     const user = await this.userService.createUser({
       phone: registerDto.phone,
@@ -75,6 +69,7 @@ export class AuthController {
     };
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 attempts per minute
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {

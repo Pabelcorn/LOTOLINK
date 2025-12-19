@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthController } from '../../src/infrastructure/http/controllers/auth.controller';
 import { UserService } from '../../src/application/services/user.service';
+import { PasswordService } from '../../src/infrastructure/security/password.service';
 import { User } from '../../src/domain/entities/user.entity';
 import { UnauthorizedException } from '@nestjs/common';
 
@@ -10,17 +11,20 @@ describe('AuthController', () => {
   let controller: AuthController;
   let userService: jest.Mocked<UserService>;
   let jwtService: jest.Mocked<JwtService>;
+  let passwordService: jest.Mocked<PasswordService>;
 
   const mockUser = new User({
     id: 'user-123',
     phone: '+18091234567',
     email: 'test@example.com',
     name: 'Test User',
+    password: 'hashed_password',
   });
 
   const mockUserService = {
     createUser: jest.fn(),
     getUserById: jest.fn(),
+    getUserByPhone: jest.fn(),
   };
 
   const mockJwtService = {
@@ -33,6 +37,11 @@ describe('AuthController', () => {
       if (key === 'JWT_REFRESH_EXPIRES_IN') return '7d';
       return defaultValue;
     }),
+  };
+
+  const mockPasswordService = {
+    hashPassword: jest.fn(),
+    verifyPassword: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -53,16 +62,22 @@ describe('AuthController', () => {
           provide: ConfigService,
           useValue: mockConfigService,
         },
+        {
+          provide: PasswordService,
+          useValue: mockPasswordService,
+        },
       ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
     userService = module.get(UserService);
     jwtService = module.get(JwtService);
+    passwordService = module.get(PasswordService);
   });
 
   describe('register', () => {
     it('should register a new user and return tokens', async () => {
+      mockPasswordService.hashPassword.mockResolvedValue('hashed_password');
       mockUserService.createUser.mockResolvedValue(mockUser);
       mockJwtService.sign
         .mockReturnValueOnce('access-token-123')
@@ -72,8 +87,10 @@ describe('AuthController', () => {
         phone: '+18091234567',
         email: 'test@example.com',
         name: 'Test User',
+        password: 'testpassword123',
       });
 
+      expect(mockPasswordService.hashPassword).toHaveBeenCalledWith('testpassword123');
       expect(result.user.id).toBe('user-123');
       expect(result.user.phone).toBe('+18091234567');
       expect(result.accessToken).toBe('access-token-123');
@@ -82,6 +99,7 @@ describe('AuthController', () => {
     });
 
     it('should call userService.createUser with correct params', async () => {
+      mockPasswordService.hashPassword.mockResolvedValue('hashed_password');
       mockUserService.createUser.mockResolvedValue(mockUser);
       mockJwtService.sign.mockReturnValue('token');
 
@@ -89,38 +107,46 @@ describe('AuthController', () => {
         phone: '+18091234567',
         email: 'test@example.com',
         name: 'Test User',
+        password: 'testpassword123',
       });
 
-      expect(mockUserService.createUser).toHaveBeenCalledWith({
-        phone: '+18091234567',
-        email: 'test@example.com',
-        name: 'Test User',
-      });
+      expect(mockUserService.createUser).toHaveBeenCalledWith(
+        expect.objectContaining({
+          phone: '+18091234567',
+          email: 'test@example.com',
+          name: 'Test User',
+          password: 'hashed_password',
+        })
+      );
     });
   });
 
   describe('login', () => {
     it('should login user and return tokens', async () => {
-      mockUserService.createUser.mockResolvedValue(mockUser);
+      mockUserService.getUserByPhone.mockResolvedValue(mockUser);
+      mockPasswordService.verifyPassword.mockResolvedValue(true);
       mockJwtService.sign
         .mockReturnValueOnce('access-token-123')
         .mockReturnValueOnce('refresh-token-123');
 
       const result = await controller.login({
         phone: '+18091234567',
+        password: 'testpassword123',
       });
 
+      expect(mockPasswordService.verifyPassword).toHaveBeenCalledWith('testpassword123', 'hashed_password');
       expect(result.user.id).toBe('user-123');
       expect(result.accessToken).toBe('access-token-123');
       expect(result.refreshToken).toBe('refresh-token-123');
     });
 
     it('should throw UnauthorizedException for invalid credentials', async () => {
-      mockUserService.createUser.mockRejectedValue(new Error('User error'));
+      mockUserService.getUserByPhone.mockResolvedValue(null);
 
       await expect(
         controller.login({
           phone: 'invalid',
+          password: 'wrongpassword',
         }),
       ).rejects.toThrow(UnauthorizedException);
     });

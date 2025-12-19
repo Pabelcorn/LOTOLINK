@@ -17,10 +17,25 @@ async function bootstrap() {
   app.use(helmet());
 
   // CORS - configure based on environment
+  const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS');
   app.enableCors({
-    origin: configService.get<string>('CORS_ORIGIN', '*'),
+    origin: allowedOrigins 
+      ? allowedOrigins.split(',').map(o => o.trim())
+      : configService.get<string>('NODE_ENV') === 'production'
+        ? false // In production, require explicit ALLOWED_ORIGINS
+        : '*', // In development, allow all
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Idempotency-Key', 'X-Signature', 'X-Timestamp'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Idempotency-Key',
+      'X-Signature',
+      'X-Timestamp',
+      'X-Request-ID',
+    ],
+    exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
+    maxAge: 86400, // 24 hours
   });
 
   // Global validation pipe
