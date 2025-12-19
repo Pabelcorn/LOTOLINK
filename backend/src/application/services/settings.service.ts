@@ -47,7 +47,7 @@ export class SettingsService {
   async get(key: string, defaultValue?: string): Promise<string | null> {
     // First check cache
     if (this.cache.has(key)) {
-      return this.cache.get(key);
+      return this.cache.get(key) ?? null;
     }
 
     // Then check database
@@ -61,7 +61,7 @@ export class SettingsService {
       this.logger.error(`Failed to get setting ${key}:`, error);
     }
 
-    return defaultValue || null;
+    return defaultValue ?? null;
   }
 
   async set(key: string, value: string, description?: string): Promise<void> {
