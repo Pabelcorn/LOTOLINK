@@ -37,6 +37,10 @@ export interface BancaProps {
   phone?: string;
   email?: string;
   status?: BancaStatus;
+  // Bank account configuration
+  commissionPercentage?: number;
+  commissionStripeAccountId?: string;
+  cardProcessingAccountId?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -57,6 +61,9 @@ export class Banca {
   private _phone?: string;
   private _email?: string;
   private _status: BancaStatus;
+  private _commissionPercentage?: number;
+  private _commissionStripeAccountId?: string;
+  private _cardProcessingAccountId?: string;
   readonly createdAt: Date;
   private _updatedAt: Date;
 
@@ -76,6 +83,9 @@ export class Banca {
     this._phone = props.phone;
     this._email = props.email;
     this._status = props.status || BancaStatus.PENDING;
+    this._commissionPercentage = props.commissionPercentage;
+    this._commissionStripeAccountId = props.commissionStripeAccountId;
+    this._cardProcessingAccountId = props.cardProcessingAccountId;
     this.createdAt = props.createdAt || new Date();
     this._updatedAt = props.updatedAt || new Date();
   }
@@ -128,6 +138,18 @@ export class Banca {
     return this._status;
   }
 
+  get commissionPercentage(): number | undefined {
+    return this._commissionPercentage;
+  }
+
+  get commissionStripeAccountId(): string | undefined {
+    return this._commissionStripeAccountId;
+  }
+
+  get cardProcessingAccountId(): string | undefined {
+    return this._cardProcessingAccountId;
+  }
+
   updateEndpoint(endpoint: string): void {
     this._endpoint = endpoint;
     this._updatedAt = new Date();
@@ -138,6 +160,17 @@ export class Banca {
     if (address) this._address = address;
     if (phone) this._phone = phone;
     if (email) this._email = email;
+    this._updatedAt = new Date();
+  }
+
+  updateBankAccountSettings(
+    commissionPercentage?: number,
+    commissionStripeAccountId?: string,
+    cardProcessingAccountId?: string
+  ): void {
+    if (commissionPercentage !== undefined) this._commissionPercentage = commissionPercentage;
+    if (commissionStripeAccountId !== undefined) this._commissionStripeAccountId = commissionStripeAccountId;
+    if (cardProcessingAccountId !== undefined) this._cardProcessingAccountId = cardProcessingAccountId;
     this._updatedAt = new Date();
   }
 
@@ -198,6 +231,9 @@ export class Banca {
       phone: this._phone,
       email: this._email,
       status: this._status,
+      commissionPercentage: this._commissionPercentage,
+      commissionStripeAccountId: this._commissionStripeAccountId,
+      cardProcessingAccountId: this._cardProcessingAccountId,
       createdAt: this.createdAt,
       updatedAt: this._updatedAt,
     };

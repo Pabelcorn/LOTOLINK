@@ -12,6 +12,7 @@ import {
   TokenizeCardRequest,
 } from './payment-gateway.port';
 import { SettingsService } from '../../application/services/settings.service';
+import { BancaRepository } from '../../domain/repositories/banca.repository';
 
 /**
  * Stripe Payment Gateway Adapter
@@ -37,6 +38,8 @@ export class StripePaymentGateway implements PaymentGateway {
     private readonly configService: ConfigService,
     @Inject(forwardRef(() => SettingsService))
     private readonly settingsService: SettingsService,
+    @Inject('BancaRepository')
+    private readonly bancaRepository: BancaRepository,
   ) {
     this.secretKey = this.configService.get<string>('STRIPE_SECRET_KEY', '');
     this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET', '');
@@ -79,11 +82,14 @@ export class StripePaymentGateway implements PaymentGateway {
       // Get or create Stripe customer
       const customerId = await this.getOrCreateCustomer(request.userId);
 
-      // Calculate commission if configured - check settings first, then env vars
+      // Calculate commission if configured
+      // Priority: 1. Banca-specific config, 2. Global DB settings, 3. Env vars
       let commissionPercentage = this.configService.get<number>('COMMISSION_PERCENTAGE', 0);
       let commissionAccountId = this.configService.get<string>('COMMISSION_STRIPE_ACCOUNT_ID');
       let cardProcessingAccountId = this.configService.get<string>('CARD_PROCESSING_ACCOUNT_ID');
+      let configSource = 'env';
 
+      // Try to get global settings from database
       try {
         const dbCommissionPercentage = await this.settingsService.get('commission.percentage');
         const dbCommissionAccountId = await this.settingsService.get('commission.stripeAccountId');
@@ -93,14 +99,46 @@ export class StripePaymentGateway implements PaymentGateway {
           const parsed = parseFloat(dbCommissionPercentage);
           if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
             commissionPercentage = parsed;
+            configSource = 'global-db';
           } else {
             this.logger.warn(`Invalid commission percentage in database: ${dbCommissionPercentage}`);
           }
         }
-        if (dbCommissionAccountId) commissionAccountId = dbCommissionAccountId;
-        if (dbCardProcessingAccountId) cardProcessingAccountId = dbCardProcessingAccountId;
+        if (dbCommissionAccountId) {
+          commissionAccountId = dbCommissionAccountId;
+          configSource = 'global-db';
+        }
+        if (dbCardProcessingAccountId) {
+          cardProcessingAccountId = dbCardProcessingAccountId;
+          configSource = 'global-db';
+        }
       } catch (error) {
         this.logger.debug('Settings service not available, using env vars for commission');
+      }
+
+      // If bancaId is provided, try to get banca-specific configuration
+      if (request.bancaId) {
+        try {
+          const banca = await this.bancaRepository.findById(request.bancaId);
+          if (banca) {
+            // Override with banca-specific settings if they exist
+            if (banca.commissionPercentage !== undefined && banca.commissionPercentage !== null) {
+              commissionPercentage = banca.commissionPercentage;
+              configSource = 'banca-specific';
+            }
+            if (banca.commissionStripeAccountId) {
+              commissionAccountId = banca.commissionStripeAccountId;
+              configSource = 'banca-specific';
+            }
+            if (banca.cardProcessingAccountId) {
+              cardProcessingAccountId = banca.cardProcessingAccountId;
+              configSource = 'banca-specific';
+            }
+            this.logger.log(`Using ${configSource} configuration for banca: ${banca.name}`);
+          }
+        } catch (error) {
+          this.logger.warn(`Failed to load banca configuration for ${request.bancaId}, using fallback`, error);
+        }
       }
       
       let transferData: any = undefined;
@@ -119,7 +157,7 @@ export class StripePaymentGateway implements PaymentGateway {
           };
         }
 
-        this.logger.log(`Commission configured: ${commissionPercentage}% = ${applicationFeeAmount / 100} ${request.currency}, destination: ${cardProcessingAccountId || 'platform account'}`);
+        this.logger.log(`Commission configured (${configSource}): ${commissionPercentage}% = ${applicationFeeAmount / 100} ${request.currency}, destination: ${cardProcessingAccountId || 'platform account'}`);
       }
 
       // Create payment intent with automatic confirmation

@@ -7,6 +7,7 @@ export interface ChargeRequest {
   currency: 'DOP' | 'USD';
   description: string;
   paymentMethodId?: string; // Stripe payment method ID or similar
+  bancaId?: string; // Optional banca ID for banca-specific account configuration
   metadata?: Record<string, string>;
 }
 

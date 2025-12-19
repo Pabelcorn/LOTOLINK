@@ -76,6 +76,15 @@ export class BancaService {
       banca.updateEndpoint(dto.endpoint);
     }
 
+    // Update bank account settings if provided
+    if (dto.commissionPercentage !== undefined || dto.commissionStripeAccountId !== undefined || dto.cardProcessingAccountId !== undefined) {
+      banca.updateBankAccountSettings(
+        dto.commissionPercentage,
+        dto.commissionStripeAccountId,
+        dto.cardProcessingAccountId
+      );
+    }
+
     const updated = await this.bancaRepository.update(banca);
     return this.toBancaResponseDto(updated);
   }
@@ -172,6 +181,9 @@ export class BancaService {
       status: banca.status,
       isActive: banca.isActive,
       clientId: banca.clientId,
+      commissionPercentage: banca.commissionPercentage,
+      commissionStripeAccountId: banca.commissionStripeAccountId,
+      cardProcessingAccountId: banca.cardProcessingAccountId,
       createdAt: banca.createdAt,
       updatedAt: banca.updatedAt,
     };
