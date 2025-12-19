@@ -16,15 +16,34 @@ import { PasswordService } from '../../security/password.service';
 import { UserRole } from '../../../domain/entities/user.entity';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
+import { IsString, IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+
 class AdminLoginDto {
+  @IsString()
+  @IsNotEmpty()
   username!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
   password!: string;
 }
 
 class CreateAdminDto {
+  @IsString()
+  @IsNotEmpty()
   username!: string;
+
+  @IsEmail()
+  @IsNotEmpty()
   email!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
   password!: string;
+
+  @IsString()
   name?: string;
 }
 

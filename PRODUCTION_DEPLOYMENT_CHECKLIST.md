@@ -125,7 +125,9 @@ psql -h $DATABASE_HOST -U $DATABASE_USERNAME -d $DATABASE_NAME -c "\dt"
 # Option 1: Via psql (recommended for first admin)
 psql -h $DATABASE_HOST -U $DATABASE_USERNAME -d $DATABASE_NAME
 
-# Generate password hash (use bcrypt online tool or node)
+# Generate password hash using Node.js
+# node -e "const crypto = require('crypto'); const password = 'YourSecurePassword123!'; const salt = crypto.randomBytes(16).toString('hex'); crypto.pbkdf2(password, salt, 100000, 64, 'sha512', (err, key) => { console.log(salt + ':' + key.toString('hex')); });"
+
 # Then insert admin user:
 INSERT INTO users (id, phone, email, name, password, role, wallet_balance, created_at, updated_at)
 VALUES (
@@ -133,7 +135,7 @@ VALUES (
   '+18099999999',
   'admin@lotolink.com',
   'Admin User',
-  '$2b$10$hashed_password_here',  -- Replace with actual bcrypt hash
+  'salt:hashedpassword',  -- Replace with actual PBKDF2 hash from above
   'ADMIN',
   0,
   CURRENT_TIMESTAMP,
