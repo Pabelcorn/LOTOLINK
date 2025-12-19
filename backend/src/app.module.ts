@@ -15,6 +15,7 @@ import {
 import { PaymentMethodsController } from './infrastructure/http/controllers/payment-methods.controller';
 import { ContactController } from './infrastructure/http/controllers/contact.controller';
 import { SettingsController } from './infrastructure/http/controllers/settings.controller';
+import { PublicSettingsController } from './infrastructure/http/controllers/public-settings.controller';
 
 // Services
 import { PlayService, UserService, WebhookService, BancaService, SettingsService } from './application/services';
@@ -125,7 +126,7 @@ class MockCachePort {
       inject: [ConfigService],
     }),
   ],
-  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController, PaymentMethodsController, ContactController, SettingsController],
+  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController, PaymentMethodsController, ContactController, SettingsController, PublicSettingsController],
   providers: [
     // Services
     PlayService,

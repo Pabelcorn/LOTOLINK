@@ -4174,8 +4174,9 @@
       const [showTicketConfirmation, setShowTicketConfirmation] = useState(false);
       const [confirmedTicket, setConfirmedTicket] = useState(null);
       
-      // App commission configuration
-      const APP_COMMISSION_RATE = 0.07; // 7% commission
+      // App commission configuration - fetched from backend
+      const [appServiceFeePercentage, setAppServiceFeePercentage] = useState(7); // Default 7%, will be fetched from backend
+      const APP_COMMISSION_RATE = appServiceFeePercentage / 100; // Convert percentage to decimal
 
       // Voice Assistant state - Natural language AI with personality, context memory, and varied responses
       const [isVoiceAssistantOpen, setIsVoiceAssistantOpen] = useState(false);
@@ -4966,6 +4967,26 @@
         }
       }, [view]);
 
+      // Fetch app service fee percentage from backend on mount
+      useEffect(() => {
+        const fetchAppServiceFee = async () => {
+          try {
+            const API_BASE = window.API_BASE_URL || 'http://localhost:3000/api';
+            const response = await fetch(`${API_BASE}/public/settings/app-service-fee`);
+            if (response.ok) {
+              const data = await response.json();
+              setAppServiceFeePercentage(data.appServiceFeePercentage ?? 7);
+            } else {
+              console.warn('Failed to fetch app service fee, using default 7%');
+            }
+          } catch (error) {
+            console.error('Error fetching app service fee:', error);
+            // Keep default value of 7%
+          }
+        };
+        fetchAppServiceFee();
+      }, []); // Run once on mount
+
       const addPlayToCart = (play) => { 
         // Single-banca cart enforcement
         if (!cartBanca) {
@@ -4991,7 +5012,7 @@
         const commission = Math.round(subtotal * APP_COMMISSION_RATE * 100) / 100;
         const total = subtotal + commission;
         return { subtotal, commission, total };
-      }, [cart]);
+      }, [cart, appServiceFeePercentage]); // Added appServiceFeePercentage dependency
       
       // Show payment options before checkout
       const initiateCheckout = () => { 
@@ -6251,7 +6272,7 @@
                         <span className="font-medium dark:text-white">RD$ {cartTotals.subtotal.toLocaleString('es-DO')}</span>
                       </div>
                       <div className="flex justify-between text-orange-600 dark:text-orange-400">
-                        <span>Servicio App (7%):</span>
+                        <span>Servicio App ({appServiceFeePercentage}%):</span>
                         <span className="font-medium">RD$ {cartTotals.commission.toLocaleString('es-DO')}</span>
                       </div>
                       <div className="border-t dark:border-slate-600 pt-2 mt-2">
@@ -6412,7 +6433,7 @@
                         <span className="dark:text-white">RD$ {confirmedTicket.subtotal.toLocaleString('es-DO')}</span>
                       </div>
                       <div className="flex justify-between text-sm text-orange-600 dark:text-orange-400">
-                        <span>Servicio App:</span>
+                        <span>Servicio App ({appServiceFeePercentage}%):</span>
                         <span>RD$ {confirmedTicket.commission.toLocaleString('es-DO')}</span>
                       </div>
                       <div className="flex justify-between text-lg font-bold">
