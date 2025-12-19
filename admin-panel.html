@@ -1152,6 +1152,73 @@
         </main><!-- End main-content -->
     </div><!-- End admin-container -->
 
+    <!-- Edit Banca Modal -->
+    <div id="edit-banca-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar Banca</h2>
+                <span class="close-modal" onclick="closeEditBancaModal()">&times;</span>
+            </div>
+            <div id="edit-banca-alert"></div>
+            <form id="edit-banca-form">
+                <input type="hidden" id="edit-banca-id">
+                
+                <div class="form-group">
+                    <label for="edit-name">Nombre de la Banca</label>
+                    <input type="text" id="edit-name" name="name" readonly disabled>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-email">Email</label>
+                    <input type="email" id="edit-email" name="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-phone">Teléfono</label>
+                    <input type="tel" id="edit-phone" name="phone">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-address">Dirección</label>
+                    <textarea id="edit-address" name="address"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-rnc">RNC</label>
+                    <input type="text" id="edit-rnc" name="rnc">
+                </div>
+
+                <h3 style="margin-top: 24px; margin-bottom: 16px; color: var(--primary);">💳 Configuración de Cuentas Bancarias</h3>
+                
+                <div class="form-group">
+                    <label for="edit-commission-percentage">Porcentaje de Comisión (%)</label>
+                    <input type="number" id="edit-commission-percentage" name="commissionPercentage" 
+                           min="0" max="100" step="0.1" placeholder="5.0">
+                    <small>Porcentaje que se retiene de cada pago (ej: 5.0 para 5%)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-commission-account">ID de Cuenta Stripe - Comisiones (Marca)</label>
+                    <input type="text" id="edit-commission-account" name="commissionStripeAccountId" 
+                           placeholder="acct_xxxxxxxxxx">
+                    <small>ID de cuenta donde se retienen las comisiones de esta banca</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-processing-account">ID de Cuenta Stripe - Pagos Netos (Banca)</label>
+                    <input type="text" id="edit-processing-account" name="cardProcessingAccountId" 
+                           placeholder="acct_xxxxxxxxxx">
+                    <small>ID de cuenta donde se transfieren los pagos netos de esta banca</small>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditBancaModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Credentials Modal -->
     <div id="credentials-modal" class="modal">
         <div class="modal-content">
@@ -1387,6 +1454,7 @@
                         <td>${banca.isActive ? '✅' : '❌'}</td>
                         <td>${new Date(banca.createdAt).toLocaleDateString()}</td>
                         <td>
+                            <button class="btn btn-primary btn-small" onclick="editBanca('${banca.id}')">✏️ Editar</button>
                             ${banca.status === 'active' ? 
                                 `<button class="btn btn-warning btn-small" onclick="suspendBanca('${banca.id}', '${banca.name}')">⏸️ Suspender</button>` :
                                 banca.status === 'suspended' ?
@@ -1520,6 +1588,92 @@
                 alert('✅ Credenciales copiadas al portapapeles');
             });
         }
+
+        // Edit banca
+        async function editBanca(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/${id}`);
+                if (!response.ok) throw new Error('Error al cargar la banca');
+                
+                const banca = await response.json();
+                
+                // Populate form
+                document.getElementById('edit-banca-id').value = banca.id;
+                document.getElementById('edit-name').value = banca.name;
+                document.getElementById('edit-email').value = banca.email || '';
+                document.getElementById('edit-phone').value = banca.phone || '';
+                document.getElementById('edit-address').value = banca.address || '';
+                document.getElementById('edit-rnc').value = banca.rnc || '';
+                document.getElementById('edit-commission-percentage').value = banca.commissionPercentage || '';
+                document.getElementById('edit-commission-account').value = banca.commissionStripeAccountId || '';
+                document.getElementById('edit-processing-account').value = banca.cardProcessingAccountId || '';
+                
+                // Show modal
+                document.getElementById('edit-banca-modal').classList.add('active');
+            } catch (error) {
+                showAlert('all-alert', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Close edit banca modal
+        function closeEditBancaModal() {
+            document.getElementById('edit-banca-modal').classList.remove('active');
+            document.getElementById('edit-banca-alert').innerHTML = '';
+        }
+
+        // Handle edit banca form submission
+        document.getElementById('edit-banca-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('edit-banca-id').value;
+            const formData = {
+                email: document.getElementById('edit-email').value || undefined,
+                phone: document.getElementById('edit-phone').value || undefined,
+                address: document.getElementById('edit-address').value || undefined,
+                rnc: document.getElementById('edit-rnc').value || undefined,
+            };
+
+            // Add bank account fields if they have values
+            const commissionPercentage = document.getElementById('edit-commission-percentage').value;
+            const commissionAccount = document.getElementById('edit-commission-account').value;
+            const processingAccount = document.getElementById('edit-processing-account').value;
+
+            if (commissionPercentage) {
+                const parsed = parseFloat(commissionPercentage);
+                if (isNaN(parsed) || parsed < 0 || parsed > 100) {
+                    showAlert('edit-banca-alert', `❌ Error: Porcentaje de comisión inválido (debe ser entre 0 y 100)`, 'error');
+                    return;
+                }
+                formData.commissionPercentage = parsed;
+            }
+            if (commissionAccount) {
+                formData.commissionStripeAccountId = commissionAccount;
+            }
+            if (processingAccount) {
+                formData.cardProcessingAccountId = processingAccount;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Error al actualizar la banca');
+                }
+
+                showAlert('edit-banca-alert', `✅ Banca actualizada exitosamente`, 'success');
+                setTimeout(() => {
+                    closeEditBancaModal();
+                    loadAllBancas();
+                }, 1500);
+            } catch (error) {
+                showAlert('edit-banca-alert', `❌ Error: ${error.message}`, 'error');
+            }
+        });
 
         // Logout admin
         // ============================================

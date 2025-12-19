@@ -39,7 +39,7 @@ import {
 } from './infrastructure/database/repositories';
 
 // Domain repository tokens
-import { PLAY_REPOSITORY, USER_REPOSITORY, BANCA_REPOSITORY } from './domain/repositories';
+import { PLAY_REPOSITORY, USER_REPOSITORY, BANCA_REPOSITORY, BancaRepository } from './domain/repositories';
 
 // Port tokens
 import { EVENT_PUBLISHER, CACHE_PORT, BANCA_ADAPTER } from './ports/outgoing';
@@ -185,14 +185,14 @@ class MockCachePort {
     // Payment Gateway - uses Stripe in production, mock in development
     {
       provide: PAYMENT_GATEWAY,
-      useFactory: (configService: ConfigService, settingsService: SettingsService) => {
+      useFactory: (configService: ConfigService, settingsService: SettingsService, bancaRepository: BancaRepository) => {
         const useMock = configService.get<string>('USE_MOCK_PAYMENT', 'true') === 'true';
         if (useMock) {
           return new MockPaymentGateway(configService);
         }
-        return new StripePaymentGateway(configService, settingsService);
+        return new StripePaymentGateway(configService, settingsService, bancaRepository);
       },
-      inject: [ConfigService, SettingsService],
+      inject: [ConfigService, SettingsService, BANCA_REPOSITORY],
     },
   ],
 })

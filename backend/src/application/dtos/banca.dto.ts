@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsEnum, IsOptional, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsString, IsEmail, IsEnum, IsOptional, IsNotEmpty, MaxLength, IsNumber, Min, Max } from 'class-validator';
 import { IntegrationType, AuthType, BancaStatus } from '../../domain/entities/banca.entity';
 
 export class CreateBancaDto {
@@ -69,6 +69,20 @@ export class UpdateBancaDto {
   @IsOptional()
   @IsEnum(AuthType)
   authType?: AuthType;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  commissionPercentage?: number;
+
+  @IsOptional()
+  @IsString()
+  commissionStripeAccountId?: string;
+
+  @IsOptional()
+  @IsString()
+  cardProcessingAccountId?: string;
 }
 
 export class ApproveBancaDto {
@@ -94,6 +108,9 @@ export class BancaResponseDto {
   status!: string;
   isActive!: boolean;
   clientId?: string;
+  commissionPercentage?: number;
+  commissionStripeAccountId?: string;
+  cardProcessingAccountId?: string;
   createdAt!: Date;
   updatedAt!: Date;
 }

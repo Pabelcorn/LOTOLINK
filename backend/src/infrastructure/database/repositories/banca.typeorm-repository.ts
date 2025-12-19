@@ -76,6 +76,9 @@ export class TypeOrmBancaRepository implements BancaRepository {
       phone: entity.phone,
       email: entity.email,
       status: entity.status as BancaStatus,
+      commissionPercentage: entity.commissionPercentage,
+      commissionStripeAccountId: entity.commissionStripeAccountId,
+      cardProcessingAccountId: entity.cardProcessingAccountId,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });
@@ -98,6 +101,9 @@ export class TypeOrmBancaRepository implements BancaRepository {
       phone: banca.phone,
       email: banca.email,
       status: banca.status,
+      commissionPercentage: banca.commissionPercentage,
+      commissionStripeAccountId: banca.commissionStripeAccountId,
+      cardProcessingAccountId: banca.cardProcessingAccountId,
     };
   }
 }

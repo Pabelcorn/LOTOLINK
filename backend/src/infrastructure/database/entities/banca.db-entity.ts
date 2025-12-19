@@ -50,6 +50,15 @@ export class BancaEntity {
   @Index()
   status!: string;
 
+  @Column('decimal', { precision: 5, scale: 2, nullable: true, name: 'commission_percentage' })
+  commissionPercentage?: number;
+
+  @Column('varchar', { nullable: true, name: 'commission_stripe_account_id' })
+  commissionStripeAccountId?: string;
+
+  @Column('varchar', { nullable: true, name: 'card_processing_account_id' })
+  cardProcessingAccountId?: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
