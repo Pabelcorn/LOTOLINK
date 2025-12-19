@@ -2,6 +2,8 @@
 
 Documento listo para enviar a una IA de programación o a tu equipo de desarrollo. Contiene: visión general, componentes, endpoints (spec concretas), esquemas JSON, seguridad, DB mínima (Postgres), secuencias, despliegue, CI/CD, tests, y entregables esperados.
 
+> 🚀 **Guía de Despliegue:** Para desplegar LOTOLINK en producción (VPS, servidor, cloud), consulte [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
+
 > 📋 **Evaluación Técnica:** Para un análisis detallado de por qué este stack tecnológico es óptimo y profesional, consulte [docs/TECH_EVALUATION.md](docs/TECH_EVALUATION.md)
 
 > 🏦 **Guía de Integración para Bancas:** Para integrar bancas con Lotolink (API directa o App White-Label), consulte [docs/BANCA_INTEGRATION_GUIDE.md](docs/BANCA_INTEGRATION_GUIDE.md)

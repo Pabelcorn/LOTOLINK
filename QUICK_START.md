@@ -138,4 +138,15 @@ Para más detalles, consulta:
 2. ✅ Apruébala y guarda las credenciales
 3. ✅ Consulta la guía de integración: [docs/BANCA_INTEGRATION_GUIDE.md](docs/BANCA_INTEGRATION_GUIDE.md)
 
+## 🚀 Despliegue en Producción
+
+Una vez que hayas probado el sistema en desarrollo, consulta la **[Guía Completa de Despliegue](DEPLOYMENT_GUIDE.md)** para:
+
+- 📦 Desplegar con Docker Compose
+- 🖥️ Desplegar en VPS/servidor dedicado
+- ☁️ Desplegar en servicios cloud (AWS, DigitalOcean, etc.)
+- 🔒 Configurar HTTPS con certificado SSL
+- 🌐 Configurar dominio personalizado
+- 🛡️ Checklist completo de seguridad
+
 **¡Feliz gestión!** 🎉
