@@ -12,12 +12,14 @@ import {
   WebhooksController,
   HealthController,
   AuthController,
+  AdminAuthController,
   AdminBancasController,
 } from './infrastructure/http/controllers';
 import { PaymentMethodsController } from './infrastructure/http/controllers/payment-methods.controller';
 import { ContactController } from './infrastructure/http/controllers/contact.controller';
 import { SettingsController } from './infrastructure/http/controllers/settings.controller';
 import { PublicSettingsController } from './infrastructure/http/controllers/public-settings.controller';
+import { PasswordService } from './infrastructure/security/password.service';
 
 // Services
 import { PlayService, UserService, WebhookService, BancaService, SettingsService } from './application/services';
@@ -133,7 +135,7 @@ class MockCachePort {
       inject: [ConfigService],
     }),
   ],
-  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminBancasController, PaymentMethodsController, ContactController, SettingsController, PublicSettingsController],
+  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminAuthController, AdminBancasController, PaymentMethodsController, ContactController, SettingsController, PublicSettingsController],
   providers: [
     // Global rate limiting guard
     {
@@ -148,6 +150,7 @@ class MockCachePort {
     BancaService,
     EmailService,
     SettingsService,
+    PasswordService,
     
     // Workers
     PlayWorker,
