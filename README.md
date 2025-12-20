@@ -14,6 +14,8 @@ Documento listo para enviar a una IA de programación o a tu equipo de desarroll
 
 > 🧪 **Guía de Pruebas:** Para probar que el sistema funciona correctamente, consulte [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md)
 
+> ⚖️ **Documentación Legal:** Términos, Política de Privacidad y documentos legales disponibles en [docs/legal/](docs/legal/)
+
 ## 📦 Paquete de Integración para Bancas
 
 Para integrar una banca con Lotolink, descarga el paquete completo:
