@@ -8267,29 +8267,45 @@
   <script>
     // Hide loading screen after app is fully loaded and rendered
     window.addEventListener('load', () => {
-      // Wait for app to be ready and have content
-      const checkAppReady = () => {
-        const root = document.getElementById('root');
-        const loadingScreen = document.getElementById('loading-screen');
-        
-        // Check if root element has children (app is rendered)
-        if (root && root.children.length > 0) {
-          // App is ready, hide loading screen after brief delay
+      const loadingScreen = document.getElementById('loading-screen');
+      const root = document.getElementById('root');
+      let timeoutId;
+      
+      const hideLoadingScreen = () => {
+        if (loadingScreen) {
           setTimeout(() => {
-            if (loadingScreen) {
-              loadingScreen.classList.add('hidden');
-              setTimeout(() => {
-                loadingScreen.remove();
-              }, 500);
-            }
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+              loadingScreen.remove();
+            }, 500);
           }, 300);
-        } else {
-          // App not ready yet, check again
-          setTimeout(checkAppReady, 50);
         }
       };
       
-      checkAppReady();
+      // Check if app is already rendered
+      if (root && root.children.length > 0) {
+        hideLoadingScreen();
+        return;
+      }
+      
+      // Use MutationObserver to watch for app content
+      const observer = new MutationObserver(() => {
+        if (root && root.children.length > 0) {
+          observer.disconnect();
+          clearTimeout(timeoutId);
+          hideLoadingScreen();
+        }
+      });
+      
+      if (root) {
+        observer.observe(root, { childList: true, subtree: true });
+      }
+      
+      // Fallback: hide after 2 seconds if app still hasn't rendered
+      timeoutId = setTimeout(() => {
+        observer.disconnect();
+        hideLoadingScreen();
+      }, 2000);
     });
   </script>
 </body>
