@@ -7250,15 +7250,29 @@
     
     // Hide loading screen after React app is rendered and content is ready
     window.addEventListener('load', () => {
-      setTimeout(() => {
+      // Wait for app to be ready and have content
+      const checkAppReady = () => {
+        const root = document.getElementById('root');
         const loadingScreen = document.getElementById('loading-screen');
-        if (loadingScreen) {
-          loadingScreen.classList.add('hidden');
+        
+        // Check if root element has children (app is rendered)
+        if (root && root.children.length > 0) {
+          // App is ready, hide loading screen after brief delay
           setTimeout(() => {
-            loadingScreen.remove();
-          }, 500);
+            if (loadingScreen) {
+              loadingScreen.classList.add('hidden');
+              setTimeout(() => {
+                loadingScreen.remove();
+              }, 500);
+            }
+          }, 300);
+        } else {
+          // App not ready yet, check again
+          setTimeout(checkAppReady, 50);
         }
-      }, 500); // Show loading screen briefly for smooth transition
+      };
+      
+      checkAppReady();
     });
 
     /* --- MAP INIT LOGIC (Improved from MVP) --- */
