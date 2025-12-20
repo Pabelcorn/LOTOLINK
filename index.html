@@ -7250,6 +7250,10 @@
     
     // Hide loading screen after React app is rendered and content is ready
     window.addEventListener('load', () => {
+      const FALLBACK_TIMEOUT_MS = 2000;
+      const TRANSITION_DELAY_MS = 300;
+      const FADE_OUT_DURATION_MS = 500;
+      
       const loadingScreen = document.getElementById('loading-screen');
       const root = document.getElementById('root');
       let timeoutId;
@@ -7260,8 +7264,8 @@
             loadingScreen.classList.add('hidden');
             setTimeout(() => {
               loadingScreen.remove();
-            }, 500);
-          }, 300);
+            }, FADE_OUT_DURATION_MS);
+          }, TRANSITION_DELAY_MS);
         }
       };
       
@@ -7271,24 +7275,27 @@
         return;
       }
       
-      // Use MutationObserver to watch for app content
-      const observer = new MutationObserver(() => {
-        if (root && root.children.length > 0) {
-          observer.disconnect();
-          clearTimeout(timeoutId);
-          hideLoadingScreen();
-        }
-      });
-      
+      // Use MutationObserver to watch for app content (only if root exists)
       if (root) {
+        const observer = new MutationObserver(() => {
+          if (root.children.length > 0) {
+            observer.disconnect();
+            clearTimeout(timeoutId);
+            hideLoadingScreen();
+          }
+        });
+        
         observer.observe(root, { childList: true, subtree: true });
+        
+        // Fallback: hide after timeout if app still hasn't rendered
+        timeoutId = setTimeout(() => {
+          observer.disconnect();
+          hideLoadingScreen();
+        }, FALLBACK_TIMEOUT_MS);
+      } else {
+        // No root element found, hide loading screen after fallback timeout
+        setTimeout(hideLoadingScreen, FALLBACK_TIMEOUT_MS);
       }
-      
-      // Fallback: hide after 2 seconds if app still hasn't rendered
-      timeoutId = setTimeout(() => {
-        observer.disconnect();
-        hideLoadingScreen();
-      }, 2000);
     });
 
     /* --- MAP INIT LOGIC (Improved from MVP) --- */
