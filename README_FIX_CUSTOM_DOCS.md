@@ -2,7 +2,14 @@
 
 ## 🎯 Quick Summary
 
-This branch fixes the mobile app loading screen issue that occurred after adding legal documentation. The app now loads smoothly with a single, professional loading screen.
+This branch fixes the loading screen issues that occurred after adding legal documentation. 
+
+**Current Status:**
+- ✅ **Mobile App**: Fixed - eliminates duplicate splash screens
+- ⏳ **Web App**: Under investigation
+- ⏳ **Desktop App**: Under investigation
+
+The mobile app now loads smoothly with a single, professional loading screen. Investigation ongoing for web and desktop app issues.
 
 ## 📚 Documentation
 

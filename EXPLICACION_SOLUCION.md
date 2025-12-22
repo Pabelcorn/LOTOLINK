@@ -3,8 +3,12 @@
 ## 🎯 Problema Reportado
 
 **Situación:** 
-- En el branch `copilot/review-admin-functionality` → ✅ La app abría perfecto: mostraba la pantalla de carga y luego abría la app
+- En el branch `copilot/review-admin-functionality` → ✅ Las apps abrían perfecto: mostraban la pantalla de carga y luego abrían la app
 - En el branch `copilot/create-custom-legal-docs` → ❌ Dejó de funcionar: problemas con la pantalla de carga
+
+**Aplicaciones afectadas:** Todas (app móvil, app web, app de escritorio)
+
+**Nota:** Esta solución actualmente enfoca en la app móvil. Se está investigando los problemas específicos de la app web y desktop.
 
 ## 🔍 Análisis del Problema
 

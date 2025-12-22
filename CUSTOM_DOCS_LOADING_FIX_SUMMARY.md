@@ -2,7 +2,9 @@
 
 ## Problem Statement
 
-After adding custom legal documentation to the repository in the `copilot/create-custom-legal-docs` branch, the mobile app stopped loading properly. The loading screen would not transition correctly to the main app.
+After adding custom legal documentation to the repository in the `copilot/create-custom-legal-docs` branch, the apps stopped loading properly. The loading screen would not transition correctly to the main app.
+
+**Note:** This document currently focuses on the mobile app fix. The user has indicated that the web app and desktop app also experienced issues. Investigation is ongoing to determine the specific problems with those apps.
 
 ## Root Cause
 
