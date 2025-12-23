@@ -7906,8 +7906,8 @@
     // Hide loading screen after React app is rendered and content is ready
     // This script runs immediately, outside of Babel transpilation
     (function() {
-      const REACT_RENDER_DELAY_MS = 500; // Increased delay to let Babel + React render
-      const FALLBACK_TIMEOUT_MS = 3000;  // Increased fallback timeout
+      const REACT_RENDER_DELAY_MS = 1000; // Increased delay to let Babel + React render fully
+      const FALLBACK_TIMEOUT_MS = 5000;   // Increased fallback timeout
       const TRANSITION_DELAY_MS = 300;
       const FADE_OUT_DURATION_MS = 500;
       
@@ -7915,12 +7915,18 @@
       const root = document.getElementById('root');
       let timeoutId = null;
       
+      console.log('Loading screen logic initialized');
+      console.log('Root element:', root);
+      console.log('Loading screen element:', loadingScreen);
+      
       const hideLoadingScreen = () => {
         if (loadingScreen) {
+          console.log('Hiding loading screen...');
           setTimeout(() => {
             loadingScreen.classList.add('hidden');
             setTimeout(() => {
               loadingScreen.remove();
+              console.log('Loading screen removed');
             }, FADE_OUT_DURATION_MS);
           }, TRANSITION_DELAY_MS);
         }
@@ -7928,16 +7934,21 @@
       
       // Use setTimeout to check after React has a chance to render
       setTimeout(() => {
+        console.log('Checking if React rendered. Root children count:', root ? root.children.length : 'no root');
+        
         // Check if app is already rendered
         if (root && root.children.length > 0) {
+          console.log('React already rendered, hiding loading screen');
           hideLoadingScreen();
           return;
         }
         
         // Use MutationObserver to watch for app content (only if root exists)
         if (root) {
+          console.log('Setting up MutationObserver to watch for React rendering');
           const observer = new MutationObserver(() => {
             if (root.children.length > 0) {
+              console.log('React rendered detected by MutationObserver');
               observer.disconnect();
               clearTimeout(timeoutId);
               hideLoadingScreen();
@@ -7948,11 +7959,13 @@
           
           // Fallback: hide after timeout if app still hasn't rendered
           timeoutId = setTimeout(() => {
+            console.log('Fallback timeout reached. Root children count:', root.children.length);
             observer.disconnect();
             hideLoadingScreen();
           }, FALLBACK_TIMEOUT_MS);
         } else {
           // No root element found, hide loading screen after fallback timeout
+          console.error('Root element not found!');
           setTimeout(hideLoadingScreen, FALLBACK_TIMEOUT_MS);
         }
       }, REACT_RENDER_DELAY_MS); // Wait for Babel to transpile and React to render
