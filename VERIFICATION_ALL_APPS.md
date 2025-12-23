@@ -82,55 +82,85 @@ timeoutId = setTimeout(() => {
 
 ## ✅ App Web (index.html)
 
+### Problema Identificado y Corregido
+
+**PROBLEMA:** La pantalla de carga no desaparecía (se quedaba congelada).
+
+**Causa Raíz:** 
+El código esperaba el evento `window.addEventListener('load', ...)` que se dispara después de que TODOS los recursos (imágenes, CSS, scripts) terminen de cargar. Para ese momento, React ya había renderizado el contenido, y el MutationObserver se configuraba demasiado tarde para detectarlo.
+
+**Solución Aplicada:**
+Ejecutar la lógica de ocultación inmediatamente después de `ReactDOM.render()` usando un IIFE (Immediately Invoked Function Expression) con un pequeño delay de 100ms para dar tiempo a React de renderizar.
+
 ### Pantalla de Carga
 **Archivo:** `index.html`
 
 ```javascript
-const FALLBACK_TIMEOUT_MS = 2000;
-const TRANSITION_DELAY_MS = 300;
-const FADE_OUT_DURATION_MS = 500;
+ReactDOM.render(<LotoLinkApp />, document.getElementById('root'));
 
-const hideLoadingScreen = () => {
-  if (loadingScreen) {
-    setTimeout(() => {
-      loadingScreen.classList.add('hidden');
+// ANTES (ROTO): 
+// window.addEventListener('load', () => { ... });
+
+// DESPUÉS (CORREGIDO):
+(function() {
+  const FALLBACK_TIMEOUT_MS = 2000;
+  const TRANSITION_DELAY_MS = 300;
+  const FADE_OUT_DURATION_MS = 500;
+  
+  const loadingScreen = document.getElementById('loading-screen');
+  const root = document.getElementById('root');
+  let timeoutId = null;
+  
+  const hideLoadingScreen = () => {
+    if (loadingScreen) {
       setTimeout(() => {
-        loadingScreen.remove();
-      }, FADE_OUT_DURATION_MS);
-    }, TRANSITION_DELAY_MS);
-  }
-};
-
-// Check if app is already rendered
-if (root && root.children.length > 0) {
-  hideLoadingScreen();
-  return;
-}
-
-// Use MutationObserver to watch for app content
-if (root) {
-  const observer = new MutationObserver(() => {
-    if (root.children.length > 0) {
-      observer.disconnect();
-      clearTimeout(timeoutId);
-      hideLoadingScreen();
+        loadingScreen.classList.add('hidden');
+        setTimeout(() => {
+          loadingScreen.remove();
+        }, FADE_OUT_DURATION_MS);
+      }, TRANSITION_DELAY_MS);
     }
-  });
+  };
   
-  observer.observe(root, { childList: true, subtree: true });
-  
-  // Fallback: hide after timeout if app still hasn't rendered
-  timeoutId = setTimeout(() => {
-    observer.disconnect();
-    hideLoadingScreen();
-  }, FALLBACK_TIMEOUT_MS);
-}
+  // Dar 100ms a React para renderizar, luego empezar a observar
+  setTimeout(() => {
+    // Check if app is already rendered
+    if (root && root.children.length > 0) {
+      hideLoadingScreen();
+      return;
+    }
+    
+    // Use MutationObserver to watch for app content
+    if (root) {
+      const observer = new MutationObserver(() => {
+        if (root.children.length > 0) {
+          observer.disconnect();
+          clearTimeout(timeoutId);
+          hideLoadingScreen();
+        }
+      });
+      
+      observer.observe(root, { childList: true, subtree: true });
+      
+      // Fallback: hide after timeout if app still hasn't rendered
+      timeoutId = setTimeout(() => {
+        observer.disconnect();
+        hideLoadingScreen();
+      }, FALLBACK_TIMEOUT_MS);
+    } else {
+      // No root element found, hide loading screen after fallback timeout
+      setTimeout(hideLoadingScreen, FALLBACK_TIMEOUT_MS);
+    }
+  }, 100); // Small delay to let React render
+})();
 ```
 
-**Estado:** ✅ **CORRECTO**
-- Configuración idéntica a la app móvil (web)
-- MutationObserver detecta renderizado de React
-- Fallback de 2 segundos
+**Estado:** ✅ **CORREGIDO** (commit 521a434)
+- Removido `window.addEventListener('load', ...)`
+- Ejecuta inmediatamente usando IIFE
+- Delay de 100ms para dar tiempo a React
+- MutationObserver detecta renderizado
+- Fallback de 2 segundos por seguridad
 - Transición suave
 
 ### HTML de la Pantalla de Carga
@@ -169,20 +199,37 @@ if (root) {
 
 ## ✅ App de Escritorio (desktop-app)
 
+### Problema Identificado y Corregido
+
+**PROBLEMA:** La pantalla de carga no desaparecía (mismo problema que la app web).
+
+**Causa Raíz:** 
+Idéntica a la app web - esperaba `window.addEventListener('load', ...)` después de que React ya había renderizado.
+
+**Solución Aplicada:**
+Misma corrección que la app web - ejecutar inmediatamente con IIFE y delay de 100ms.
+
 ### Pantalla de Carga
 **Archivo:** `desktop-app/index.html`
 
 ```javascript
-const FALLBACK_TIMEOUT_MS = 2000;
-const TRANSITION_DELAY_MS = 300;
-const FADE_OUT_DURATION_MS = 500;
+ReactDOM.render(<LotoLinkApp />, document.getElementById('root'));
 
-// Implementación idéntica a la app web
-// MutationObserver + Fallback timeout
+// ANTES (ROTO): 
+// window.addEventListener('load', () => { ... });
+
+// DESPUÉS (CORREGIDO):
+(function() {
+  // Implementación idéntica a la app web
+  // MutationObserver + Fallback timeout
+  // Ejecuta inmediatamente con delay de 100ms
+})();
 ```
 
-**Estado:** ✅ **CORRECTO**
-- Configuración idéntica a las otras apps
+**Estado:** ✅ **CORREGIDO** (commit 521a434)
+- Removido `window.addEventListener('load', ...)`
+- Ejecuta inmediatamente usando IIFE
+- Delay de 100ms para dar tiempo a React
 - MutationObserver detecta renderizado
 - Fallback de 2 segundos
 - Transición suave
@@ -231,8 +278,24 @@ La app de escritorio también incluye integración con Electron para controles d
 | Aplicación | Configuración | Lógica de Carga | Fallback | Estado |
 |------------|---------------|-----------------|----------|--------|
 | **Móvil** | ✅ `launchShowDuration: 0` | ✅ MutationObserver | ✅ 2000ms | ✅ **CORRECTO** |
-| **Web** | N/A (no usa Capacitor) | ✅ MutationObserver | ✅ 2000ms | ✅ **CORRECTO** |
-| **Escritorio** | N/A (no usa Capacitor) | ✅ MutationObserver | ✅ 2000ms | ✅ **CORRECTO** |
+| **Web** | N/A (no usa Capacitor) | ✅ IIFE + 100ms delay + MutationObserver | ✅ 2000ms | ✅ **CORREGIDO** (521a434) |
+| **Escritorio** | N/A (no usa Capacitor) | ✅ IIFE + 100ms delay + MutationObserver | ✅ 2000ms | ✅ **CORREGIDO** (521a434) |
+
+### Cambios Aplicados en Web y Desktop
+
+**Problema:**
+- La pantalla de carga se quedaba congelada y nunca desaparecía
+
+**Causa:**
+- El código esperaba `window.addEventListener('load', ...)` que se dispara después de cargar TODOS los recursos
+- Para ese momento, React ya había renderizado, y el MutationObserver se configuraba demasiado tarde
+
+**Solución:**
+- Cambiar de `window.addEventListener('load', ...)` a ejecución inmediata con IIFE
+- Agregar delay de 100ms para dar tiempo a React de renderizar
+- Esto permite que el MutationObserver detecte correctamente cuando React añade contenido
+
+**Commit:** `521a434` - "Fix: Loading screen not disappearing in web and desktop apps"
 
 ---
 
@@ -332,6 +395,7 @@ console.log('Root has children:', root && root.children.length);
 
 ---
 
-**Fecha de última actualización:** 2025-12-22
+**Fecha de última actualización:** 2025-12-23
 **Verificado por:** @copilot
 **Branch:** copilot/fix-custom-docs-loading-issue
+**Último commit con correcciones:** 521a434 - Fix loading screen stuck issue in web/desktop apps
