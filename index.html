@@ -7247,12 +7247,55 @@
     }
 
     ReactDOM.render(<LotoLinkApp />, document.getElementById('root'));
-    
+
+    /* --- MAP INIT LOGIC (Improved from MVP) --- */
+    setInterval(() => {
+       const mapContainer = document.getElementById('demo-leaflet-map');
+       if (mapContainer && !mapContainer._leaflet_id) {
+          const map = L.map('demo-leaflet-map').setView([18.4861, -69.9312], 13);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+          DEFAULT_BANKS.forEach(b => {
+             const m = L.marker(b.coords).addTo(map);
+             
+             // Create styled popup with explicit button
+             const popupContent = `
+               <div style="text-align:center; min-width: 150px;">
+                 <div style="font-weight:bold; margin-bottom:4px; font-size:14px;">${b.name}</div>
+                 <div style="font-size:12px; color:#666; margin-bottom:8px;">${b.hours}</div>
+                 <button id="btn-play-${b.id}" style="background-color:#2563EB; color:white; border:none; padding:6px 12px; border-radius:20px; cursor:pointer; font-size:12px; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                   Jugar Aquí 🎟️
+                 </button>
+               </div>
+             `;
+             
+             m.bindPopup(popupContent);
+             
+             // Attach click event after popup opens
+             m.on('popupopen', () => {
+                setTimeout(() => {
+                   const btn = document.getElementById(`btn-play-${b.id}`);
+                   if (btn) {
+                      btn.onclick = (e) => {
+                         e.preventDefault();
+                         if (window.triggerPlayModal) {
+                            window.triggerPlayModal(b.id);
+                         }
+                      };
+                   }
+                }, 50);
+             });
+          });
+       }
+    }, 1000);
+  </script>
+
+  <!-- Loading Screen Hide Logic - Must execute after Babel transpiles React code -->
+  <script>
     // Hide loading screen after React app is rendered and content is ready
-    // Execute immediately, not waiting for window.load event
+    // This script runs immediately, outside of Babel transpilation
     (function() {
-      const REACT_RENDER_DELAY_MS = 100;
-      const FALLBACK_TIMEOUT_MS = 2000;
+      const REACT_RENDER_DELAY_MS = 500; // Increased delay to let Babel + React render
+      const FALLBACK_TIMEOUT_MS = 3000;  // Increased fallback timeout
       const TRANSITION_DELAY_MS = 300;
       const FADE_OUT_DURATION_MS = 500;
       
@@ -7300,48 +7343,8 @@
           // No root element found, hide loading screen after fallback timeout
           setTimeout(hideLoadingScreen, FALLBACK_TIMEOUT_MS);
         }
-      }, REACT_RENDER_DELAY_MS); // Small delay to let React render
+      }, REACT_RENDER_DELAY_MS); // Wait for Babel to transpile and React to render
     })();
-
-    /* --- MAP INIT LOGIC (Improved from MVP) --- */
-    setInterval(() => {
-       const mapContainer = document.getElementById('demo-leaflet-map');
-       if (mapContainer && !mapContainer._leaflet_id) {
-          const map = L.map('demo-leaflet-map').setView([18.4861, -69.9312], 13);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-          DEFAULT_BANKS.forEach(b => {
-             const m = L.marker(b.coords).addTo(map);
-             
-             // Create styled popup with explicit button
-             const popupContent = `
-               <div style="text-align:center; min-width: 150px;">
-                 <div style="font-weight:bold; margin-bottom:4px; font-size:14px;">${b.name}</div>
-                 <div style="font-size:12px; color:#666; margin-bottom:8px;">${b.hours}</div>
-                 <button id="btn-play-${b.id}" style="background-color:#2563EB; color:white; border:none; padding:6px 12px; border-radius:20px; cursor:pointer; font-size:12px; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
-                   Jugar Aquí 🎟️
-                 </button>
-               </div>
-             `;
-             
-             m.bindPopup(popupContent);
-             
-             // Attach click event after popup opens
-             m.on('popupopen', () => {
-                setTimeout(() => {
-                   const btn = document.getElementById(`btn-play-${b.id}`);
-                   if (btn) {
-                      btn.onclick = (e) => {
-                         e.preventDefault();
-                         if (window.triggerPlayModal) {
-                            window.triggerPlayModal(b.id);
-                         }
-                      };
-                   }
-                }, 50);
-             });
-          });
-       }
-    }, 1000);
   </script>
 
   <!-- Vanilla JS Lottery Modal Logic (Enhanced from MVP) -->
