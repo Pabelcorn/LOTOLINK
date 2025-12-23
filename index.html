@@ -7247,56 +7247,6 @@
     }
 
     ReactDOM.render(<LotoLinkApp />, document.getElementById('root'));
-    
-    // Hide loading screen after React app is rendered and content is ready
-    window.addEventListener('load', () => {
-      const FALLBACK_TIMEOUT_MS = 2000;
-      const TRANSITION_DELAY_MS = 300;
-      const FADE_OUT_DURATION_MS = 500;
-      
-      const loadingScreen = document.getElementById('loading-screen');
-      const root = document.getElementById('root');
-      let timeoutId = null;
-      
-      const hideLoadingScreen = () => {
-        if (loadingScreen) {
-          setTimeout(() => {
-            loadingScreen.classList.add('hidden');
-            setTimeout(() => {
-              loadingScreen.remove();
-            }, FADE_OUT_DURATION_MS);
-          }, TRANSITION_DELAY_MS);
-        }
-      };
-      
-      // Check if app is already rendered
-      if (root && root.children.length > 0) {
-        hideLoadingScreen();
-        return;
-      }
-      
-      // Use MutationObserver to watch for app content (only if root exists)
-      if (root) {
-        const observer = new MutationObserver(() => {
-          if (root.children.length > 0) {
-            observer.disconnect();
-            clearTimeout(timeoutId);
-            hideLoadingScreen();
-          }
-        });
-        
-        observer.observe(root, { childList: true, subtree: true });
-        
-        // Fallback: hide after timeout if app still hasn't rendered
-        timeoutId = setTimeout(() => {
-          observer.disconnect();
-          hideLoadingScreen();
-        }, FALLBACK_TIMEOUT_MS);
-      } else {
-        // No root element found, hide loading screen after fallback timeout
-        setTimeout(hideLoadingScreen, FALLBACK_TIMEOUT_MS);
-      }
-    });
 
     /* --- MAP INIT LOGIC (Improved from MVP) --- */
     setInterval(() => {
@@ -8498,6 +8448,61 @@
         // Note: Blob URLs won't work for service workers in production
         // This is a placeholder - in production, use a separate sw.js file
         console.log('LotoLink PWA: Ready for installation');
+      }
+    })();
+  </script>
+  
+  <!-- Loading Screen Hide Logic - Separate from React to ensure it always executes -->
+  <script>
+    // Hide loading screen after React app is rendered and content is ready
+    // This runs independently of React/Babel loading to avoid race conditions
+    (function() {
+      const FALLBACK_TIMEOUT_MS = 2000;
+      const TRANSITION_DELAY_MS = 300;
+      const FADE_OUT_DURATION_MS = 500;
+      
+      const loadingScreen = document.getElementById('loading-screen');
+      const root = document.getElementById('root');
+      let timeoutId = null;
+      
+      const hideLoadingScreen = () => {
+        if (loadingScreen) {
+          setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+              loadingScreen.remove();
+            }, FADE_OUT_DURATION_MS);
+          }, TRANSITION_DELAY_MS);
+        }
+      };
+      
+      // Check if app is already rendered before setting up observers
+      // (handles case where React renders before this script executes)
+      if (root && root.children.length > 0) {
+        hideLoadingScreen();
+        return;
+      }
+      
+      // Use MutationObserver to watch for app content (only if root exists)
+      if (root) {
+        const observer = new MutationObserver(() => {
+          if (root.children.length > 0) {
+            observer.disconnect();
+            clearTimeout(timeoutId);
+            hideLoadingScreen();
+          }
+        });
+        
+        observer.observe(root, { childList: true, subtree: true });
+        
+        // Fallback: hide after timeout if app still hasn't rendered
+        timeoutId = setTimeout(() => {
+          observer.disconnect();
+          hideLoadingScreen();
+        }, FALLBACK_TIMEOUT_MS);
+      } else {
+        // No root element found, hide loading screen after fallback timeout
+        setTimeout(hideLoadingScreen, FALLBACK_TIMEOUT_MS);
       }
     })();
   </script>
