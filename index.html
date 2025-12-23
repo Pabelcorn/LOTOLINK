@@ -8476,7 +8476,8 @@
         }
       };
       
-      // Check if app is already rendered (immediate check)
+      // Check if app is already rendered before setting up observers
+      // (handles case where React renders before this script executes)
       if (root && root.children.length > 0) {
         hideLoadingScreen();
         return;
