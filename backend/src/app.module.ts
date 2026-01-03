@@ -99,11 +99,15 @@ class MockCachePort {
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
-    // Rate limiting
-    ThrottlerModule.forRoot([{
-      ttl: 60000, // 60 seconds
-      limit: 10, // 10 requests per minute
-    }]),
+    // Rate limiting - configurable via environment
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => [{
+        ttl: configService.get<number>('RATE_LIMIT_TTL', 900000), // 15 minutes default (900000ms)
+        limit: configService.get<number>('RATE_LIMIT_MAX', 100), // 100 requests per TTL window
+      }],
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
