@@ -13,12 +13,15 @@ Esta guía te ayudará a desplegar LOTOLINK en producción paso a paso, ya sea e
 5. [Opción 1: Despliegue con Docker Compose](#opción-1-despliegue-con-docker-compose)
 6. [Opción 2: Despliegue Manual en VPS](#opción-2-despliegue-manual-en-vps)
 7. [Configuración de Base de Datos](#-configuración-de-base-de-datos)
-8. [Configuración de Dominio y HTTPS](#-configuración-de-dominio-y-https)
-9. [Configuración de Servicios Externos](#-configuración-de-servicios-externos)
-10. [Despliegue del Frontend](#-despliegue-del-frontend)
-11. [Monitoreo y Mantenimiento](#-monitoreo-y-mantenimiento)
-12. [Troubleshooting](#-troubleshooting)
-13. [Checklist de Producción](#-checklist-de-producción)
+8. [Migraciones de Base de Datos](#-migraciones-de-base-de-datos)
+9. [Backups y Restauración](#-backups-y-restauración)
+10. [Health Checks y Monitoreo](#-health-checks-y-monitoreo)
+11. [Configuración de Dominio y HTTPS](#-configuración-de-dominio-y-https)
+12. [Configuración de Servicios Externos](#-configuración-de-servicios-externos)
+13. [Despliegue del Frontend](#-despliegue-del-frontend)
+14. [Monitoreo y Mantenimiento](#-monitoreo-y-mantenimiento)
+15. [Troubleshooting](#-troubleshooting)
+16. [Checklist de Producción](#-checklist-de-producción)
 
 ---
 
@@ -485,133 +488,447 @@ pm2 status
 
 ## 🗄️ Configuración de Base de Datos
 
-### Migraciones Iniciales
+### Conexión a la Base de Datos
 
-Crea el archivo de migración para las tablas principales:
+La aplicación se conecta a PostgreSQL usando las variables de entorno configuradas en `backend/.env`:
 
 ```bash
+DATABASE_HOST=postgres  # o localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=lotolink
+DATABASE_PASSWORD=tu_password_seguro
+DATABASE_NAME=lotolink_db
+```
+
+### Verificar Conexión
+
+```bash
+# Usando Docker
+docker-compose exec postgres psql -U lotolink -d lotolink_db -c "SELECT version();"
+
+# Usando psql local
+psql -h localhost -U lotolink -d lotolink_db -c "SELECT version();"
+```
+
+---
+
+## 📊 Migraciones de Base de Datos
+
+### ¿Qué son las Migraciones?
+
+Las migraciones son cambios versionados del esquema de base de datos que permiten:
+- Control de versiones del esquema
+- Aplicar cambios de forma consistente en todos los ambientes
+- Revertir cambios si es necesario
+- Documentar la evolución del esquema
+
+### Migraciones Disponibles
+
+LotoLink incluye las siguientes migraciones:
+
+1. **CreateInitialSchema** - Crea las tablas principales:
+   - `users` - Usuarios y autenticación
+   - `bancas` - Configuración de operadores de lotería
+   - `plays` - Registros de jugadas
+   - `outgoing_requests` - Solicitudes a APIs externas
+   - `webhook_events` - Eventos de webhooks
+   - `settings` - Configuración de la aplicación
+
+2. **AddWalletTransactionsTable** - Historial de transacciones de billetera
+3. **AddSucursalesTable** - Sucursales de bancas
+
+### Ejecutar Migraciones en Producción
+
+**⚠️ IMPORTANTE:** Siempre crea un backup antes de ejecutar migraciones en producción.
+
+```bash
+# 1. Crear backup
+./scripts/backup-database.sh
+
+# 2. Ejecutar migraciones
 cd /opt/lotolink/backend
+npm run migration:run
+
+# 3. Verificar el estado
+npm run typeorm migration:show
+
+# En Docker:
+docker-compose exec backend npm run migration:run
 ```
 
-Ejecuta este script SQL directamente en PostgreSQL:
-
-```sql
--- Conectar a la base de datos
-psql -U lotolink -d lotolink_db
-
--- Crear tablas principales
-CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  phone VARCHAR(20) UNIQUE NOT NULL,
-  email VARCHAR(255),
-  name VARCHAR(255),
-  password VARCHAR(255),
-  role VARCHAR(20) DEFAULT 'user',
-  wallet_balance DECIMAL(12, 2) DEFAULT 0,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS plays (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  request_id UUID UNIQUE NOT NULL,
-  user_id UUID REFERENCES users(id),
-  play_data JSONB NOT NULL,
-  amount DECIMAL(12, 2) NOT NULL,
-  currency VARCHAR(3) DEFAULT 'DOP',
-  status VARCHAR(50) DEFAULT 'pending',
-  play_id_banca VARCHAR(255),
-  ticket_code VARCHAR(255),
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS bancas (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(255) NOT NULL,
-  integration_type VARCHAR(50) DEFAULT 'api',
-  endpoint VARCHAR(500),
-  auth_type VARCHAR(50) DEFAULT 'hmac',
-  client_id VARCHAR(255),
-  secret VARCHAR(255),
-  public_key TEXT,
-  sla_ms INTEGER DEFAULT 30000,
-  status VARCHAR(50) DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS outgoing_requests (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  request_id UUID NOT NULL,
-  banca_id UUID REFERENCES bancas(id),
-  path VARCHAR(500),
-  payload JSONB,
-  status VARCHAR(50) DEFAULT 'pending',
-  retries INTEGER DEFAULT 0,
-  last_response JSONB,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS webhook_events (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  source VARCHAR(255),
-  event_type VARCHAR(100),
-  payload JSONB,
-  signature_valid BOOLEAN,
-  processed BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Crear índices
-CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone);
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
-CREATE INDEX IF NOT EXISTS idx_plays_user_id ON plays(user_id);
-CREATE INDEX IF NOT EXISTS idx_plays_status ON plays(status);
-CREATE INDEX IF NOT EXISTS idx_plays_created_at ON plays(created_at);
-CREATE INDEX IF NOT EXISTS idx_bancas_status ON bancas(status);
-CREATE INDEX IF NOT EXISTS idx_outgoing_requests_status ON outgoing_requests(status);
-CREATE INDEX IF NOT EXISTS idx_webhook_events_processed ON webhook_events(processed);
-
-\q
-```
-
-### Backup de Base de Datos
-
-Configura backups automáticos:
+### Comandos Útiles de Migraciones
 
 ```bash
-# Crear script de backup
-sudo nano /usr/local/bin/backup-lotolink-db.sh
+# Ver historial de migraciones
+npm run typeorm migration:show
+
+# Revertir última migración (solo si es necesario)
+npm run migration:revert
+
+# Generar nueva migración desde cambios en entidades
+npm run migration:generate -- -n NombreMigracion
+
+# Crear migración vacía
+npm run migration:create -- -n NombreMigracion
 ```
 
-Contenido:
+### Solución de Problemas con Migraciones
 
 ```bash
+# Si una migración falla, verificar logs
+docker-compose logs backend
+
+# Conectar a la base de datos y verificar estado
+docker-compose exec postgres psql -U lotolink -d lotolink_db
+
+# Ver tabla de migraciones
+SELECT * FROM migrations ORDER BY timestamp DESC;
+
+# Si es necesario, limpiar y reintentar
+npm run migration:revert
+npm run migration:run
+```
+
+📖 **Documentación completa:** Ver [docs/DATABASE_OPERATIONS.md](docs/DATABASE_OPERATIONS.md)
+
+---
+
+## 💾 Backups y Restauración
+
+### Script de Backup Automático
+
+LotoLink incluye un script robusto para backups: `scripts/backup-database.sh`
+
+**Características:**
+- Backups comprimidos con gzip
+- Rotación automática (retención configurable)
+- Logging detallado
+- Soporte para S3 (opcional)
+- Verificación de integridad
+
+### Configurar Variables de Backup
+
+```bash
+# Editar variables en .bashrc o .profile
+export BACKUP_DIR="/var/backups/lotolink/postgres"
+export RETENTION_DAYS="30"
+export DATABASE_PASSWORD="tu_password"
+
+# Opcional: para backup en S3
+export S3_BUCKET="my-lotolink-backups"
+```
+
+### Ejecutar Backup Manual
+
+```bash
+# Backup con configuración por defecto
+./scripts/backup-database.sh
+
+# Con retención personalizada
+RETENTION_DAYS=14 ./scripts/backup-database.sh
+
+# En Docker
+docker-compose exec postgres pg_dump -U lotolink lotolink_db | gzip > backup_$(date +%Y%m%d).sql.gz
+```
+
+### Programar Backups Automáticos
+
+#### Usando Cron (Recomendado para VPS)
+
+```bash
+# Editar crontab
+crontab -e
+
+# Agregar backup diario a las 2 AM
+0 2 * * * /opt/lotolink/scripts/backup-database.sh >> /var/log/lotolink/backup.log 2>&1
+
+# Backup cada 6 horas
+0 */6 * * * /opt/lotolink/scripts/backup-database.sh >> /var/log/lotolink/backup.log 2>&1
+
+# Con variables de entorno
+0 2 * * * RETENTION_DAYS=14 S3_BUCKET=my-backups /opt/lotolink/scripts/backup-database.sh >> /var/log/lotolink/backup.log 2>&1
+```
+
+#### Usando Kubernetes CronJob
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: lotolink-db-backup
+spec:
+  schedule: "0 2 * * *"  # Diario a las 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: postgres:15
+            env:
+            - name: DATABASE_HOST
+              value: "postgres-service"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+            command:
+            - /bin/bash
+            - -c
+            - |
+              pg_dump -h $DATABASE_HOST -U lotolink lotolink_db | \
+              gzip > /backups/backup_$(date +%Y%m%d_%H%M%S).sql.gz
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backups
+          restartPolicy: OnFailure
+```
+
+### Restaurar desde Backup
+
+```bash
+# Usando el script de restauración
+./scripts/restore-database.sh
+
+# O especificar archivo de backup
+./scripts/restore-database.sh /path/to/backup_20260103_020000.sql.gz
+
+# Restauración manual
+gunzip -c backup.sql.gz | psql -U lotolink -d lotolink_db
+
+# En Docker
+docker-compose exec -T postgres psql -U lotolink -d lotolink_db < backup.sql
+```
+
+### Verificar Backups
+
+```bash
+# Listar backups disponibles
+ls -lh /var/backups/lotolink/postgres/
+
+# Verificar integridad de backup comprimido
+gunzip -t /var/backups/lotolink/postgres/latest.sql.gz
+
+# Ver tamaño de backups
+du -sh /var/backups/lotolink/postgres/*
+
+# Probar restauración en base de datos de prueba
+createdb -U lotolink lotolink_db_test
+gunzip -c backup.sql.gz | psql -U lotolink -d lotolink_db_test
+dropdb -U lotolink lotolink_db_test
+```
+
+### Backup a la Nube (Opcional)
+
+```bash
+# AWS S3
+export S3_BUCKET="my-lotolink-backups"
+./scripts/backup-database.sh  # El script subirá automáticamente a S3
+
+# Manual con AWS CLI
+aws s3 cp backup.sql.gz s3://my-lotolink-backups/backups/
+
+# Google Cloud Storage
+gsutil cp backup.sql.gz gs://my-lotolink-backups/postgres/
+```
+
+📖 **Documentación completa:** Ver [docs/DATABASE_OPERATIONS.md](docs/DATABASE_OPERATIONS.md)
+
+---
+
+## 🏥 Health Checks y Monitoreo
+
+### Endpoints de Health Check
+
+LotoLink proporciona endpoints para verificar el estado de la aplicación:
+
+#### GET /health
+
+Endpoint básico de salud que siempre responde (a menos que la aplicación esté completamente caída).
+
+```bash
+curl http://localhost:3000/health
+```
+
+Respuesta:
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-01-03T16:00:00.000Z",
+  "service": "lotolink-backend",
+  "version": "1.0.0",
+  "uptime": 3600,
+  "uptimeHuman": "1h 0m 0s",
+  "checks": {
+    "database": "connected"
+  }
+}
+```
+
+#### GET /health/ready
+
+Endpoint de readiness que verifica que todos los servicios críticos estén disponibles.
+
+```bash
+curl http://localhost:3000/health/ready
+```
+
+Respuesta exitosa (200):
+```json
+{
+  "status": "ready",
+  "timestamp": "2026-01-03T16:00:00.000Z",
+  "checks": {
+    "database": "ok"
+  }
+}
+```
+
+Respuesta con error (503):
+```json
+{
+  "status": "not_ready",
+  "timestamp": "2026-01-03T16:00:00.000Z",
+  "checks": {
+    "database": {
+      "status": "error",
+      "error": "Connection refused"
+    }
+  }
+}
+```
+
+### Usar Health Checks en Producción
+
+#### Docker Compose
+
+```yaml
+services:
+  backend:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+```
+
+#### Kubernetes Probes
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lotolink-backend
+spec:
+  containers:
+  - name: backend
+    image: lotolink-backend:latest
+    # Liveness: ¿La aplicación está viva?
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 3000
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    
+    # Readiness: ¿La aplicación está lista para recibir tráfico?
+    readinessProbe:
+      httpGet:
+        path: /health/ready
+        port: 3000
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+```
+
+#### Nginx Health Check
+
+```nginx
+upstream backend {
+    server backend:3000 max_fails=3 fail_timeout=30s;
+    
+    # Health check (nginx plus)
+    # health_check interval=10s fails=3 passes=2 uri=/health;
+}
+```
+
+### Monitoreo con Scripts
+
+```bash
+# Script simple de monitoreo
 #!/bin/bash
-BACKUP_DIR="/opt/backups/lotolink"
-DATE=$(date +%Y%m%d_%H%M%S)
-mkdir -p $BACKUP_DIR
+HEALTH_URL="http://localhost:3000/health"
+READY_URL="http://localhost:3000/health/ready"
 
-# Backup completo
-pg_dump -U lotolink lotolink_db | gzip > $BACKUP_DIR/lotolink_db_$DATE.sql.gz
+# Verificar health
+if curl -f -s "$HEALTH_URL" > /dev/null; then
+    echo "✅ Aplicación está viva"
+else
+    echo "❌ Aplicación no responde"
+    # Enviar alerta
+fi
 
-# Mantener solo los últimos 7 días
-find $BACKUP_DIR -name "*.sql.gz" -mtime +7 -delete
-
-echo "Backup completado: lotolink_db_$DATE.sql.gz"
+# Verificar readiness
+if curl -f -s "$READY_URL" > /dev/null; then
+    echo "✅ Aplicación está lista"
+else
+    echo "⚠️ Aplicación no está lista (DB desconectada?)"
+    # Enviar alerta
+fi
 ```
 
+### Integración con Monitoreo Externo
+
+#### Uptime Robot
+
 ```bash
-# Dar permisos de ejecución
-sudo chmod +x /usr/local/bin/backup-lotolink-db.sh
+# Configurar en https://uptimerobot.com
+# Monitor Type: HTTP(s)
+# URL: https://api.tu-dominio.com/health
+# Interval: 5 minutos
+# HTTP Method: GET
+# Expected Status Code: 200
+```
 
-# Configurar cron para backup diario a las 2 AM
-sudo crontab -e
+#### Prometheus
 
-# Agregar esta línea:
-0 2 * * * /usr/local/bin/backup-lotolink-db.sh >> /var/log/lotolink-backup.log 2>&1
+```yaml
+scrape_configs:
+  - job_name: 'lotolink-backend'
+    metrics_path: '/health'
+    static_configs:
+      - targets: ['backend:3000']
+```
+
+#### Grafana Alert
+
+```json
+{
+  "alert": "LotoLinkDown",
+  "expr": "up{job=\"lotolink-backend\"} == 0",
+  "for": "2m",
+  "annotations": {
+    "summary": "LotoLink backend is down"
+  }
+}
+```
+
+### Logs de Salud
+
+```bash
+# Ver logs del backend
+docker-compose logs -f backend | grep health
+
+# Ver logs de nginx (health checks)
+tail -f /var/log/nginx/access.log | grep health
+
+# Monitorear en tiempo real
+watch -n 5 'curl -s http://localhost:3000/health | jq'
 ```
 
 ---
@@ -1023,14 +1340,19 @@ Antes de lanzar a producción, verifica:
 
 ### Base de Datos
 - [ ] PostgreSQL corriendo y accesible
-- [ ] Backups automáticos configurados
-- [ ] Migraciones ejecutadas correctamente
+- [ ] Migraciones ejecutadas correctamente (`npm run migration:run`)
+- [ ] Backups automáticos configurados (cron o k8s)
+- [ ] Script de backup probado y funcional
+- [ ] Script de restore probado
 - [ ] Índices creados
 - [ ] Usuario de BD tiene permisos correctos
+- [ ] Backup offsite configurado (S3, etc.)
 
 ### Backend
 - [ ] Backend inicia sin errores
-- [ ] `/health` endpoint responde correctamente
+- [ ] `/health` endpoint responde correctamente (200 OK)
+- [ ] `/health/ready` endpoint verifica conectividad de BD
+- [ ] Health checks configurados en Docker/K8s
 - [ ] USE_MOCK_* están en false
 - [ ] Logs se guardan correctamente
 - [ ] PM2 o Docker configurado para auto-restart
