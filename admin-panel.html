@@ -1252,14 +1252,36 @@
     </div>
 
     <script>
-        // ============================================
-        // CONFIGURACIÓN DEL BACKEND
-        // ============================================
-        // Cambia esta URL si tu backend está en otro puerto o servidor
-        const API_BASE_URL = 'http://localhost:3000/admin/bancas';
+        // Configuration
+        const API_BASE_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000/admin/bancas'
+            : `${window.location.protocol}//${window.location.hostname}:3000/admin/bancas`;
         
         // Extraer la URL base para el health check
         const API_BASE = API_BASE_URL.replace('/admin/bancas', '');
+        
+        // Helper function to get auth headers
+        function getAuthHeaders() {
+            const token = localStorage.getItem('ll_admin_token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : '',
+            };
+        }
+        
+        // Helper function to handle auth errors
+        function handleAuthError(response) {
+            if (response.status === 401) {
+                alert('⛔ Sesión expirada. Por favor, inicie sesión nuevamente.');
+                localStorage.removeItem('ll_admin_token');
+                localStorage.removeItem('ll_admin_refresh');
+                localStorage.removeItem('ll_admin_user');
+                localStorage.removeItem('ll_admin_timestamp');
+                window.location.href = 'admin-login.html';
+                return true;
+            }
+            return false;
+        }
         
         // ============================================
         // CHECK CONNECTION STATUS
@@ -1367,9 +1389,11 @@
             try {
                 const response = await fetch(API_BASE_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify(formData),
                 });
+
+                if (handleAuthError(response)) return;
 
                 if (!response.ok) {
                     const error = await response.json();
@@ -1396,7 +1420,12 @@
             empty.style.display = 'none';
 
             try {
-                const response = await fetch(`${API_BASE_URL}/pending`);
+                const response = await fetch(`${API_BASE_URL}/pending`, {
+                    headers: getAuthHeaders(),
+                });
+                
+                if (handleAuthError(response)) return;
+                
                 if (!response.ok) throw new Error('Error al cargar solicitudes');
                 
                 const bancas = await response.json();
@@ -1439,7 +1468,12 @@
             list.style.display = 'none';
 
             try {
-                const response = await fetch(API_BASE_URL);
+                const response = await fetch(API_BASE_URL, {
+                    headers: getAuthHeaders(),
+                });
+                
+                if (handleAuthError(response)) return;
+                
                 if (!response.ok) throw new Error('Error al cargar bancas');
                 
                 const bancas = await response.json();
@@ -1475,7 +1509,12 @@
         // Load stats
         async function loadStats() {
             try {
-                const response = await fetch(API_BASE_URL);
+                const response = await fetch(API_BASE_URL, {
+                    headers: getAuthHeaders(),
+                });
+                
+                if (handleAuthError(response)) return;
+                
                 if (!response.ok) throw new Error('Error al cargar estadísticas');
                 
                 const bancas = await response.json();
@@ -1496,8 +1535,10 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/${id}/approve`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                 });
+
+                if (handleAuthError(response)) return;
 
                 if (!response.ok) throw new Error('Error al aprobar la banca');
                 
@@ -1524,7 +1565,10 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/${id}/reject`, {
                     method: 'POST',
+                    headers: getAuthHeaders(),
                 });
+
+                if (handleAuthError(response)) return;
 
                 if (!response.ok) throw new Error('Error al rechazar la banca');
                 
@@ -1542,7 +1586,10 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/${id}/suspend`, {
                     method: 'POST',
+                    headers: getAuthHeaders(),
                 });
+
+                if (handleAuthError(response)) return;
 
                 if (!response.ok) throw new Error('Error al suspender la banca');
                 
@@ -1560,7 +1607,10 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/${id}/activate`, {
                     method: 'POST',
+                    headers: getAuthHeaders(),
                 });
+
+                if (handleAuthError(response)) return;
 
                 if (!response.ok) throw new Error('Error al activar la banca');
                 
@@ -1592,7 +1642,12 @@
         // Edit banca
         async function editBanca(id) {
             try {
-                const response = await fetch(`${API_BASE_URL}/${id}`);
+                const response = await fetch(`${API_BASE_URL}/${id}`, {
+                    headers: getAuthHeaders(),
+                });
+                
+                if (handleAuthError(response)) return;
+                
                 if (!response.ok) throw new Error('Error al cargar la banca');
                 
                 const banca = await response.json();
@@ -1656,9 +1711,11 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/${id}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify(formData),
                 });
+
+                if (handleAuthError(response)) return;
 
                 if (!response.ok) {
                     const error = await response.json();
@@ -1675,27 +1732,18 @@
             }
         });
 
-        // Logout admin
         // ============================================
         // SETTINGS FUNCTIONS
         // ============================================
         async function loadSettings() {
             const settingsAlert = document.getElementById('settings-alert');
             try {
-                const user = JSON.parse(localStorage.getItem('ll_user') || '{}');
-                const token = user.accessToken || localStorage.getItem('ll_token');
-                
-                if (!token) {
-                    throw new Error('No se encontró token de autenticación');
-                }
-
                 const response = await fetch(`${API_BASE}/admin/settings`, {
                     method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                    headers: getAuthHeaders(),
                 });
+
+                if (handleAuthError(response)) return;
 
                 if (!response.ok) {
                     throw new Error('Error al cargar configuración');
@@ -1729,13 +1777,6 @@
         async function saveSettings() {
             const settingsAlert = document.getElementById('settings-alert');
             try {
-                const user = JSON.parse(localStorage.getItem('ll_user') || '{}');
-                const token = user.accessToken || localStorage.getItem('ll_token');
-                
-                if (!token) {
-                    throw new Error('No se encontró token de autenticación');
-                }
-
                 const settings = {
                     // Email settings
                     emailEnabled: document.getElementById('email-enabled').checked,
@@ -1759,12 +1800,11 @@
 
                 const response = await fetch(`${API_BASE}/admin/settings`, {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify(settings)
                 });
+
+                if (handleAuthError(response)) return;
 
                 if (!response.ok) {
                     const error = await response.json();
@@ -1790,20 +1830,12 @@
         async function testEmailSettings() {
             const settingsAlert = document.getElementById('settings-alert');
             try {
-                const user = JSON.parse(localStorage.getItem('ll_user') || '{}');
-                const token = user.accessToken || localStorage.getItem('ll_token');
-                
-                if (!token) {
-                    throw new Error('No se encontró token de autenticación');
-                }
-
                 const response = await fetch(`${API_BASE}/admin/settings/test-email`, {
                     method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                    headers: getAuthHeaders(),
                 });
+
+                if (handleAuthError(response)) return;
 
                 if (!response.ok) {
                     throw new Error('Error al probar configuración de email');
@@ -1835,10 +1867,14 @@
 
         function logoutAdmin() {
             if (confirm('¿Está seguro que desea cerrar sesión del Panel de Administración?')) {
-                localStorage.removeItem('ll_admin_auth');
+                // Clear all admin authentication data
+                localStorage.removeItem('ll_admin_token');
+                localStorage.removeItem('ll_admin_refresh');
+                localStorage.removeItem('ll_admin_user');
                 localStorage.removeItem('ll_admin_timestamp');
+                
                 alert('✅ Sesión cerrada correctamente');
-                window.location.href = 'index.html';
+                window.location.href = 'admin-login.html';
             }
         }
 
@@ -1848,30 +1884,39 @@
             console.log('🔗 API Backend:', API_BASE_URL);
             
             // ===== AUTHENTICATION CHECK =====
-            // Verify admin authentication before allowing access
-            const user = JSON.parse(localStorage.getItem('ll_user') || 'null');
-            const isAdminAuth = localStorage.getItem('ll_admin_auth') === 'true';
+            // Verify admin authentication token from backend login
+            const token = localStorage.getItem('ll_admin_token');
+            const adminUser = localStorage.getItem('ll_admin_user');
             const adminTimestamp = localStorage.getItem('ll_admin_timestamp');
             
-            // Check if user is admin and session is valid (24 hours)
-            const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+            // Check if session is valid (8 hours)
+            const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
             const isSessionValid = adminTimestamp && (Date.now() - parseInt(adminTimestamp)) < SESSION_DURATION;
             
-            if (!user || !user.isAdmin || !isAdminAuth || !isSessionValid) {
-                // Not authenticated or session expired
-                alert('⛔ Acceso Denegado\n\nDebe iniciar sesión como administrador en la aplicación principal.\n\nCredenciales:\nUsuario: admin\nContraseña: Admin@LotoLink2024');
-                window.location.href = 'index.html';
+            if (!token || !adminUser || !isSessionValid) {
+                // Not authenticated or session expired - redirect to login
+                alert('⛔ Sesión expirada o no autenticada\n\nDebe iniciar sesión como administrador.');
+                window.location.href = 'admin-login.html';
+                return;
+            }
+            
+            let user;
+            try {
+                user = JSON.parse(adminUser);
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+                localStorage.removeItem('ll_admin_token');
+                localStorage.removeItem('ll_admin_user');
+                window.location.href = 'admin-login.html';
                 return;
             }
             
             // Display admin info
-            const adminNameEl = document.getElementById('admin-name');
             const sidebarAdminNameEl = document.getElementById('sidebar-admin-name');
             const sidebarAvatarEl = document.querySelector('.sidebar-user-avatar');
             
             if (user) {
-                const adminName = user.name || user.email || 'Administrador';
-                if (adminNameEl) adminNameEl.textContent = adminName;
+                const adminName = user.name || user.email || user.phone || 'Administrador';
                 if (sidebarAdminNameEl) sidebarAdminNameEl.textContent = adminName;
                 if (sidebarAvatarEl && adminName) {
                     sidebarAvatarEl.textContent = adminName.charAt(0).toUpperCase();
@@ -1881,7 +1926,7 @@
             // Update last access time
             localStorage.setItem('ll_admin_timestamp', Date.now().toString());
             
-            console.log('✅ Admin autenticado:', user.name || user.email);
+            console.log('✅ Admin autenticado:', user.name || user.email || user.phone);
             
             // Check connection
             await checkConnection();
