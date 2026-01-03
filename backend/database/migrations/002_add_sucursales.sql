@@ -32,7 +32,7 @@ CREATE TRIGGER update_sucursales_updated_at
 -- Add new fields to plays table for enhanced ticket support
 ALTER TABLE plays ADD COLUMN IF NOT EXISTS sucursal_id UUID REFERENCES sucursales(id);
 ALTER TABLE plays ADD COLUMN IF NOT EXISTS sorteo_number VARCHAR(50);
-ALTER TABLE plays ADD COLUMN IF NOT EXISTS sorteo_time TIME;
+ALTER TABLE plays ADD COLUMN IF NOT EXISTS sorteo_time VARCHAR(20);
 ALTER TABLE plays ADD COLUMN IF NOT EXISTS sorteo_name VARCHAR(100);
 ALTER TABLE plays ADD COLUMN IF NOT EXISTS barcode VARCHAR(100);
 ALTER TABLE plays ADD COLUMN IF NOT EXISTS valid_until DATE;
