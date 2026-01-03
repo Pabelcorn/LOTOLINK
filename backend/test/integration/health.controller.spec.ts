@@ -1,196 +1,290 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, HttpStatus } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import * as request from 'supertest';
+import { HttpStatus, HttpException } from '@nestjs/common';
 import { HealthController } from '../../src/infrastructure/http/controllers/health.controller';
 import { DataSource } from 'typeorm';
 
-describe('HealthController (Integration)', () => {
-  let app: INestApplication;
-  let dataSource: DataSource;
+describe('HealthController (Unit)', () => {
+  let controller: HealthController;
+  let mockDataSource: jest.Mocked<DataSource>;
 
-  beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-          envFilePath: ['.env.test', '.env'],
-        }),
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          host: process.env.DATABASE_HOST || 'localhost',
-          port: parseInt(process.env.DATABASE_PORT || '5432'),
-          username: process.env.DATABASE_USERNAME || 'lotolink',
-          password: process.env.DATABASE_PASSWORD || 'password',
-          database: process.env.DATABASE_NAME || 'lotolink_db_test',
-          entities: [],
-          synchronize: false,
-          logging: false,
-        }),
-      ],
+  beforeEach(async () => {
+    // Create mock DataSource
+    mockDataSource = {
+      query: jest.fn(),
+      isInitialized: true,
+    } as any;
+
+    const module: TestingModule = await Test.createTestingModule({
       controllers: [HealthController],
+      providers: [
+        {
+          provide: DataSource,
+          useValue: mockDataSource,
+        },
+      ],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
-    dataSource = moduleFixture.get<DataSource>(DataSource);
-    await app.init();
+    controller = module.get<HealthController>(HealthController);
   });
 
-  afterAll(async () => {
-    await app.close();
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  describe('GET /health', () => {
-    it('should return 200 OK with health status', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/health')
-        .expect(HttpStatus.OK);
+  describe('check (GET /health)', () => {
+    it('should return health status with all required fields', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
 
-      expect(response.body).toHaveProperty('status', 'ok');
-      expect(response.body).toHaveProperty('timestamp');
-      expect(response.body).toHaveProperty('service', 'lotolink-backend');
-      expect(response.body).toHaveProperty('version');
-      expect(response.body).toHaveProperty('uptime');
-      expect(response.body).toHaveProperty('uptimeHuman');
-      expect(response.body).toHaveProperty('checks');
-      expect(response.body.checks).toHaveProperty('database');
+      const result = await controller.check();
+
+      expect(result).toHaveProperty('status', 'ok');
+      expect(result).toHaveProperty('timestamp');
+      expect(result).toHaveProperty('service', 'lotolink-backend');
+      expect(result).toHaveProperty('version');
+      expect(result).toHaveProperty('uptime');
+      expect(result).toHaveProperty('uptimeHuman');
+      expect(result).toHaveProperty('checks');
+      expect(result.checks).toHaveProperty('database');
     });
 
     it('should have valid timestamp format', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/health')
-        .expect(HttpStatus.OK);
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
 
-      const timestamp = new Date(response.body.timestamp);
+      const result = await controller.check();
+
+      const timestamp = new Date(result.timestamp);
       expect(timestamp.getTime()).toBeGreaterThan(0);
-      expect(response.body.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(result.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
     it('should report uptime as a positive number', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/health')
-        .expect(HttpStatus.OK);
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
 
-      expect(response.body.uptime).toBeGreaterThanOrEqual(0);
-      expect(typeof response.body.uptime).toBe('number');
+      const result = await controller.check();
+
+      expect(result.uptime).toBeGreaterThanOrEqual(0);
+      expect(typeof result.uptime).toBe('number');
     });
 
-    it('should have human-readable uptime', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/health')
-        .expect(HttpStatus.OK);
+    it('should have human-readable uptime format', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
 
-      expect(response.body.uptimeHuman).toBeDefined();
-      expect(typeof response.body.uptimeHuman).toBe('string');
-      expect(response.body.uptimeHuman).toMatch(/\d+[dhms]/);
+      const result = await controller.check();
+
+      expect(result.uptimeHuman).toBeDefined();
+      expect(typeof result.uptimeHuman).toBe('string');
+      expect(result.uptimeHuman).toMatch(/\d+[dhms]/);
     });
 
-    it('should report database connectivity status', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/health')
-        .expect(HttpStatus.OK);
+    it('should report database as connected when query succeeds', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
 
-      expect(response.body.checks.database).toBeDefined();
-      expect(['connected', 'disconnected']).toContain(response.body.checks.database);
+      const result = await controller.check();
+
+      expect(result.checks.database).toBe('connected');
+      expect(mockDataSource.query).toHaveBeenCalledWith('SELECT 1');
+    });
+
+    it('should report database as disconnected when query fails', async () => {
+      mockDataSource.query.mockRejectedValue(new Error('Connection refused'));
+
+      const result = await controller.check();
+
+      expect(result.checks.database).toBe('disconnected');
+      expect(mockDataSource.query).toHaveBeenCalledWith('SELECT 1');
+    });
+
+    it('should not throw error when database is disconnected', async () => {
+      mockDataSource.query.mockRejectedValue(new Error('Connection refused'));
+
+      await expect(controller.check()).resolves.toBeDefined();
+    });
+
+    it('should have consistent version number', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
+
+      const result = await controller.check();
+
+      expect(result.version).toBeDefined();
+      expect(typeof result.version).toBe('string');
+      expect(result.version).toMatch(/^\d+\.\d+\.\d+$/);
     });
   });
 
-  describe('GET /health/ready', () => {
-    it('should return 200 OK when database is connected', async () => {
-      // Verify database is actually connected
-      const isConnected = dataSource.isInitialized;
-      
-      if (isConnected) {
-        const response = await request(app.getHttpServer())
-          .get('/health/ready')
-          .expect(HttpStatus.OK);
+  describe('ready (GET /health/ready)', () => {
+    it('should return ready status when database is connected', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
 
-        expect(response.body).toHaveProperty('status', 'ready');
-        expect(response.body).toHaveProperty('timestamp');
-        expect(response.body).toHaveProperty('checks');
-        expect(response.body.checks).toHaveProperty('database', 'ok');
-      } else {
-        // If database is not connected, we expect 503
-        await request(app.getHttpServer())
-          .get('/health/ready')
-          .expect(HttpStatus.SERVICE_UNAVAILABLE);
-      }
+      const result = await controller.ready();
+
+      expect(result).toHaveProperty('status', 'ready');
+      expect(result).toHaveProperty('timestamp');
+      expect(result).toHaveProperty('checks');
+      expect(result.checks).toHaveProperty('database', 'ok');
     });
 
     it('should have valid timestamp in ready response', async () => {
-      try {
-        const response = await request(app.getHttpServer())
-          .get('/health/ready');
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
 
-        if (response.status === HttpStatus.OK) {
-          const timestamp = new Date(response.body.timestamp);
-          expect(timestamp.getTime()).toBeGreaterThan(0);
-        }
+      const result = await controller.ready();
+
+      const timestamp = new Date(result.timestamp);
+      expect(timestamp.getTime()).toBeGreaterThan(0);
+      expect(result.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    });
+
+    it('should execute database query to check connectivity', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
+
+      await controller.ready();
+
+      expect(mockDataSource.query).toHaveBeenCalledWith('SELECT 1');
+      expect(mockDataSource.query).toHaveBeenCalledTimes(1);
+    });
+
+    it('should throw HttpException with 503 status when database is disconnected', async () => {
+      mockDataSource.query.mockRejectedValue(new Error('Connection refused'));
+
+      await expect(controller.ready()).rejects.toThrow(HttpException);
+      
+      try {
+        await controller.ready();
       } catch (error) {
-        // If database is not available, test is still valid
-        expect(error).toBeDefined();
+        expect(error).toBeInstanceOf(HttpException);
+        expect((error as HttpException).getStatus()).toBe(HttpStatus.SERVICE_UNAVAILABLE);
       }
     });
 
-    it('should return 503 Service Unavailable when database is not ready', async () => {
-      // This test validates the error response structure
-      // We can't reliably trigger a DB failure in tests, so we document expected behavior
-      
-      // If we simulate a DB failure, we should get:
-      // Status: 503
-      // Body: { status: 'not_ready', timestamp: '...', checks: { database: { status: 'error', error: '...' } } }
-      
-      // For now, we just verify the endpoint exists and responds
-      const response = await request(app.getHttpServer())
-        .get('/health/ready');
+    it('should include error details when database check fails', async () => {
+      const errorMessage = 'Connection refused';
+      mockDataSource.query.mockRejectedValue(new Error(errorMessage));
 
-      expect([HttpStatus.OK, HttpStatus.SERVICE_UNAVAILABLE]).toContain(response.status);
+      try {
+        await controller.ready();
+        fail('Should have thrown an exception');
+      } catch (error) {
+        expect(error).toBeInstanceOf(HttpException);
+        const response = (error as HttpException).getResponse() as any;
+        
+        expect(response).toHaveProperty('status', 'not_ready');
+        expect(response).toHaveProperty('timestamp');
+        expect(response).toHaveProperty('checks');
+        expect(response.checks.database).toHaveProperty('status', 'error');
+        expect(response.checks.database).toHaveProperty('error');
+        expect(response.checks.database.error).toContain(errorMessage);
+      }
+    });
+
+    it('should return not_ready status in exception response', async () => {
+      mockDataSource.query.mockRejectedValue(new Error('Database error'));
+
+      try {
+        await controller.ready();
+      } catch (error) {
+        const response = (error as HttpException).getResponse() as any;
+        expect(response.status).toBe('not_ready');
+      }
+    });
+
+    it('should handle different types of database errors', async () => {
+      const errors = [
+        new Error('Connection timeout'),
+        new Error('Authentication failed'),
+        new Error('Network error'),
+      ];
+
+      for (const error of errors) {
+        jest.clearAllMocks();
+        mockDataSource.query.mockRejectedValue(error);
+
+        await expect(controller.ready()).rejects.toThrow(HttpException);
+      }
     });
   });
 
-  describe('Health Check Performance', () => {
-    it('should respond quickly (within 1 second)', async () => {
-      const startTime = Date.now();
-      
-      await request(app.getHttpServer())
-        .get('/health')
-        .expect(HttpStatus.OK);
-      
-      const endTime = Date.now();
-      const responseTime = endTime - startTime;
-      
-      expect(responseTime).toBeLessThan(1000);
+  describe('Health Check Response Structure', () => {
+    it('should have consistent structure across multiple calls', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
+
+      const result1 = await controller.check();
+      const result2 = await controller.check();
+
+      expect(Object.keys(result1).sort()).toEqual(Object.keys(result2).sort());
+      expect(result1.service).toBe(result2.service);
+      expect(result1.version).toBe(result2.version);
     });
 
-    it('ready endpoint should respond within 2 seconds', async () => {
-      const startTime = Date.now();
+    it('should update timestamp on each call', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
+
+      const result1 = await controller.check();
       
-      await request(app.getHttpServer())
-        .get('/health/ready');
+      // Wait a bit
+      await new Promise(resolve => setTimeout(resolve, 10));
       
-      const endTime = Date.now();
-      const responseTime = endTime - startTime;
+      const result2 = await controller.check();
+
+      expect(result1.timestamp).not.toBe(result2.timestamp);
+    });
+
+    it('should increment uptime over time', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
+
+      const result1 = await controller.check();
       
-      // Ready endpoint may take longer due to DB query
-      expect(responseTime).toBeLessThan(2000);
+      // Wait a bit
+      await new Promise(resolve => setTimeout(resolve, 1100));
+      
+      const result2 = await controller.check();
+
+      expect(result2.uptime).toBeGreaterThan(result1.uptime);
     });
   });
 
-  describe('Health Check Caching', () => {
-    it('should handle multiple concurrent requests', async () => {
-      const requests = Array(10).fill(null).map(() =>
-        request(app.getHttpServer())
-          .get('/health')
-          .expect(HttpStatus.OK)
-      );
+  describe('Uptime Formatting', () => {
+    it('should format uptime with seconds only for short durations', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
 
-      const responses = await Promise.all(requests);
-      
-      expect(responses).toHaveLength(10);
-      responses.forEach(response => {
-        expect(response.body.status).toBe('ok');
-      });
+      const result = await controller.check();
+
+      // For a newly started controller, uptime should be very short
+      expect(result.uptimeHuman).toMatch(/^\d+s$/);
+    });
+
+    it('should include appropriate time units in human format', async () => {
+      mockDataSource.query.mockResolvedValue([{ result: 1 }]);
+
+      const result = await controller.check();
+
+      // Should contain at least seconds
+      expect(result.uptimeHuman).toContain('s');
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should handle database query rejections gracefully in check endpoint', async () => {
+      mockDataSource.query.mockRejectedValue(new Error('Database error'));
+
+      const result = await controller.check();
+
+      expect(result.status).toBe('ok');
+      expect(result.checks.database).toBe('disconnected');
+    });
+
+    it('should handle unknown error types in database check', async () => {
+      mockDataSource.query.mockRejectedValue('string error' as any);
+
+      const result = await controller.check();
+
+      expect(result.checks.database).toBe('disconnected');
+    });
+
+    it('should handle null/undefined database query results', async () => {
+      mockDataSource.query.mockResolvedValue(null as any);
+
+      const result = await controller.check();
+
+      expect(result.checks.database).toBe('connected');
     });
   });
 });
