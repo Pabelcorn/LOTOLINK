@@ -139,4 +139,36 @@ describe('Play Entity', () => {
       expect(json).toHaveProperty('createdAt');
     });
   });
+
+  describe('new ticket fields', () => {
+    it('should handle sucursal and ticket details', () => {
+      const props = {
+        ...createValidPlayProps(),
+        sucursalId: 'suc_001',
+        sorteoNumber: '#18331',
+        sorteoTime: '13:00:00',
+        sorteoName: 'Loto Real',
+        barcode: 'BAR123456789',
+        validUntil: new Date('2024-03-01'),
+        operatorUserId: '020611062',
+        modality: 'Quiniela',
+      };
+
+      const play = new Play(props);
+
+      expect(play.sucursalId).toBe('suc_001');
+      expect(play.sorteoNumber).toBe('#18331');
+      expect(play.sorteoTime).toBe('13:00:00');
+      expect(play.sorteoName).toBe('Loto Real');
+      expect(play.barcode).toBe('BAR123456789');
+      expect(play.validUntil).toEqual(new Date('2024-03-01'));
+      expect(play.operatorUserId).toBe('020611062');
+      expect(play.modality).toBe('Quiniela');
+
+      const json = play.toJSON();
+      expect(json).toHaveProperty('sucursalId', 'suc_001');
+      expect(json).toHaveProperty('sorteoNumber', '#18331');
+      expect(json).toHaveProperty('barcode', 'BAR123456789');
+    });
+  });
 });
