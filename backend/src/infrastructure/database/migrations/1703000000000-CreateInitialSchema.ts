@@ -2,6 +2,9 @@ import { MigrationInterface, QueryRunner, Table, TableIndex, TableForeignKey } f
 
 export class CreateInitialSchema1703000000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // Enable uuid extension
+    await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
+
     // Create users table
     await queryRunner.createTable(
       new Table({
