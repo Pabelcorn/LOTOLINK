@@ -2,9 +2,6 @@ import { MigrationInterface, QueryRunner, Table, TableIndex, TableForeignKey } f
 
 export class AddWalletTransactionsTable1704000000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Enable uuid extension if not already enabled
-    await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
-
     // Create wallet_transactions table
     await queryRunner.createTable(
       new Table({
