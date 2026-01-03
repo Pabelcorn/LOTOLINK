@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, ConflictException } from '@nestjs/common';
 import { Sucursal, TicketConfig } from '../../domain/entities/sucursal.entity';
 import { SucursalRepository, SUCURSAL_REPOSITORY } from '../../domain/repositories/sucursal.repository';
 import { CreateSucursalDto, UpdateSucursalDto, SucursalResponseDto } from '../dtos/sucursal.dto';

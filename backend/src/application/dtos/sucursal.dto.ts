@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNotEmpty, IsBoolean, IsObject, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty, IsObject, MaxLength } from 'class-validator';
 
 export class CreateSucursalDto {
   @IsNotEmpty()
