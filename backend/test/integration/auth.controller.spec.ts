@@ -119,6 +119,24 @@ describe('AuthController', () => {
         })
       );
     });
+
+    it('should always create user with USER role, never ADMIN', async () => {
+      mockPasswordService.hashPassword.mockResolvedValue('hashed_password');
+      mockUserService.createUser.mockResolvedValue(mockUser);
+      mockJwtService.sign.mockReturnValue('token');
+
+      await controller.register({
+        phone: '+18091234567',
+        email: 'admin@lotolink.com', // Even with admin email
+        name: 'Test User',
+        password: 'testpassword123',
+      });
+
+      // Verify USER role is used, not ADMIN - no auto-elevation
+      const createUserCall = mockUserService.createUser.mock.calls[0][0];
+      expect(createUserCall.role).toBeDefined();
+      expect(createUserCall.role).not.toBe('admin');
+    });
   });
 
   describe('login', () => {
