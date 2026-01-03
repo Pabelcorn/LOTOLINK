@@ -212,6 +212,9 @@
         const API_BASE_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000'
             : `${window.location.protocol}//${window.location.hostname}:3000`;
+        
+        // IMPORTANT: Must match SESSION_DURATION in admin-panel.html
+        const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
 
         const loginForm = document.getElementById('login-form');
         const alertEl = document.getElementById('alert');
@@ -284,7 +287,6 @@
             const timestamp = localStorage.getItem('ll_admin_timestamp');
             
             if (token && timestamp) {
-                const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
                 if (Date.now() - parseInt(timestamp) < SESSION_DURATION) {
                     window.location.href = 'admin-panel.html';
                     return;
