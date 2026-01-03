@@ -38,6 +38,12 @@ export class PlayService {
       currency: dto.currency,
       payment,
       bancaId: dto.bancaId,
+      sucursalId: dto.sucursalId,
+      sorteoNumber: dto.sorteoNumber,
+      sorteoTime: dto.sorteoTime,
+      sorteoName: dto.sorteoName,
+      modality: dto.modality,
+      operatorUserId: dto.operatorUserId,
     });
 
     const savedPlay = await this.playRepository.save(play);
@@ -152,6 +158,15 @@ export class PlayService {
       playIdBanca: play.playIdBanca,
       ticketCode: play.ticketCode,
       bancaId: play.bancaId,
+      sucursalId: play.sucursalId,
+      sorteoNumber: play.sorteoNumber,
+      sorteoTime: play.sorteoTime,
+      sorteoName: play.sorteoName,
+      barcode: play.barcode,
+      validUntil: play.validUntil,
+      operatorUserId: play.operatorUserId,
+      modality: play.modality,
+      receiptPrintedAt: play.receiptPrintedAt,
       createdAt: play.createdAt,
       updatedAt: play.updatedAt,
     };

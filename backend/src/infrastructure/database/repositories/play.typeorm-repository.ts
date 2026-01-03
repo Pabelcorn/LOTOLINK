@@ -60,6 +60,15 @@ export class TypeOrmPlayRepository implements PlayRepository {
     entity.playIdBanca = play.playIdBanca;
     entity.ticketCode = play.ticketCode;
     entity.bancaId = play.bancaId;
+    entity.sucursalId = play.sucursalId;
+    entity.sorteoNumber = play.sorteoNumber;
+    entity.sorteoTime = play.sorteoTime;
+    entity.sorteoName = play.sorteoName;
+    entity.barcode = play.barcode;
+    entity.validUntil = play.validUntil;
+    entity.operatorUserId = play.operatorUserId;
+    entity.modality = play.modality;
+    entity.receiptPrintedAt = play.receiptPrintedAt;
     entity.createdAt = play.createdAt;
     entity.updatedAt = play.updatedAt;
     return entity;
@@ -86,6 +95,15 @@ export class TypeOrmPlayRepository implements PlayRepository {
       playIdBanca: entity.playIdBanca,
       ticketCode: entity.ticketCode,
       bancaId: entity.bancaId,
+      sucursalId: entity.sucursalId,
+      sorteoNumber: entity.sorteoNumber,
+      sorteoTime: entity.sorteoTime,
+      sorteoName: entity.sorteoName,
+      barcode: entity.barcode,
+      validUntil: entity.validUntil,
+      operatorUserId: entity.operatorUserId,
+      modality: entity.modality,
+      receiptPrintedAt: entity.receiptPrintedAt,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });

@@ -14,6 +14,7 @@ import {
   AuthController,
   AdminAuthController,
   AdminBancasController,
+  SucursalesController,
 } from './infrastructure/http/controllers';
 import { PaymentMethodsController } from './infrastructure/http/controllers/payment-methods.controller';
 import { ContactController } from './infrastructure/http/controllers/contact.controller';
@@ -22,7 +23,7 @@ import { PublicSettingsController } from './infrastructure/http/controllers/publ
 import { PasswordService } from './infrastructure/security/password.service';
 
 // Services
-import { PlayService, UserService, WebhookService, BancaService, SettingsService } from './application/services';
+import { PlayService, UserService, WebhookService, BancaService, SettingsService, SucursalService } from './application/services';
 import { EmailService } from './infrastructure/email';
 
 // Database entities
@@ -30,6 +31,7 @@ import {
   PlayEntity,
   UserEntity,
   BancaEntity,
+  SucursalEntity,
   OutgoingRequestEntity,
   WebhookEventEntity,
   SettingEntity,
@@ -40,10 +42,11 @@ import {
   TypeOrmPlayRepository,
   TypeOrmUserRepository,
   TypeOrmBancaRepository,
+  TypeOrmSucursalRepository,
 } from './infrastructure/database/repositories';
 
 // Domain repository tokens
-import { PLAY_REPOSITORY, USER_REPOSITORY, BANCA_REPOSITORY, BancaRepository } from './domain/repositories';
+import { PLAY_REPOSITORY, USER_REPOSITORY, BANCA_REPOSITORY, SUCURSAL_REPOSITORY, BancaRepository } from './domain/repositories';
 
 // Port tokens
 import { EVENT_PUBLISHER, CACHE_PORT, BANCA_ADAPTER } from './ports/outgoing';
@@ -110,7 +113,7 @@ class MockCachePort {
         username: configService.get<string>('DATABASE_USERNAME', 'lotolink'),
         password: configService.get<string>('DATABASE_PASSWORD', 'password'),
         database: configService.get<string>('DATABASE_NAME', 'lotolink_db'),
-        entities: [PlayEntity, UserEntity, BancaEntity, OutgoingRequestEntity, WebhookEventEntity, SettingEntity],
+        entities: [PlayEntity, UserEntity, BancaEntity, SucursalEntity, OutgoingRequestEntity, WebhookEventEntity, SettingEntity],
         synchronize: configService.get<string>('NODE_ENV') !== 'production',
         logging: configService.get<string>('NODE_ENV') === 'development',
       }),
@@ -120,6 +123,7 @@ class MockCachePort {
       PlayEntity,
       UserEntity,
       BancaEntity,
+      SucursalEntity,
       OutgoingRequestEntity,
       WebhookEventEntity,
       SettingEntity,
@@ -135,7 +139,7 @@ class MockCachePort {
       inject: [ConfigService],
     }),
   ],
-  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminAuthController, AdminBancasController, PaymentMethodsController, ContactController, SettingsController, PublicSettingsController],
+  controllers: [PlaysController, UsersController, WebhooksController, HealthController, AuthController, AdminAuthController, AdminBancasController, SucursalesController, PaymentMethodsController, ContactController, SettingsController, PublicSettingsController],
   providers: [
     // Global rate limiting guard
     {
@@ -150,6 +154,7 @@ class MockCachePort {
     BancaService,
     EmailService,
     SettingsService,
+    SucursalService,
     PasswordService,
     
     // Workers
@@ -171,6 +176,10 @@ class MockCachePort {
     {
       provide: BANCA_REPOSITORY,
       useClass: TypeOrmBancaRepository,
+    },
+    {
+      provide: SUCURSAL_REPOSITORY,
+      useClass: TypeOrmSucursalRepository,
     },
     
     // Banca Adapter - uses mock by default, switch to ApiBancaAdapter for production

@@ -3,3 +3,4 @@ export * from './user.dto';
 export * from './webhook.dto';
 export * from './auth.dto';
 export * from './banca.dto';
+export * from './sucursal.dto';
