@@ -13,6 +13,10 @@ export interface UserProps {
   password?: string;
   role?: UserRole;
   walletBalance?: number;
+  dateOfBirth?: Date;
+  googleId?: string;
+  appleId?: string;
+  facebookId?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -25,6 +29,10 @@ export class User {
   private _password?: string;
   private _role: UserRole;
   private _walletBalance: number;
+  private _dateOfBirth?: Date;
+  private _googleId?: string;
+  private _appleId?: string;
+  private _facebookId?: string;
   readonly createdAt: Date;
   private _updatedAt: Date;
 
@@ -36,6 +44,10 @@ export class User {
     this._password = props.password;
     this._role = props.role || UserRole.USER;
     this._walletBalance = props.walletBalance || 0;
+    this._dateOfBirth = props.dateOfBirth;
+    this._googleId = props.googleId;
+    this._appleId = props.appleId;
+    this._facebookId = props.facebookId;
     this.createdAt = props.createdAt || new Date();
     this._updatedAt = props.updatedAt || new Date();
   }
@@ -66,6 +78,34 @@ export class User {
 
   get isAdmin(): boolean {
     return this._role === UserRole.ADMIN;
+  }
+
+  get dateOfBirth(): Date | undefined {
+    return this._dateOfBirth;
+  }
+
+  get googleId(): string | undefined {
+    return this._googleId;
+  }
+
+  get appleId(): string | undefined {
+    return this._appleId;
+  }
+
+  get facebookId(): string | undefined {
+    return this._facebookId;
+  }
+
+  get age(): number | undefined {
+    if (!this._dateOfBirth) return undefined;
+    const today = new Date();
+    const birthDate = new Date(this._dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
   }
 
   updateProfile(name?: string, email?: string): void {
@@ -112,6 +152,8 @@ export class User {
       role: this._role,
       isAdmin: this.isAdmin,
       walletBalance: this._walletBalance,
+      dateOfBirth: this._dateOfBirth,
+      age: this.age,
       createdAt: this.createdAt,
       updatedAt: this._updatedAt,
     };

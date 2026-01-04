@@ -27,13 +27,28 @@ export class TypeOrmUserRepository implements UserRepository {
     // Include password field for authentication
     const entity = await this.repository.findOne({ 
       where: { phone },
-      select: ['id', 'phone', 'email', 'name', 'password', 'role', 'walletBalance', 'createdAt', 'updatedAt']
+      select: ['id', 'phone', 'email', 'name', 'password', 'role', 'walletBalance', 'dateOfBirth', 'googleId', 'appleId', 'facebookId', 'createdAt', 'updatedAt']
     });
     return entity ? this.toDomain(entity) : null;
   }
 
   async findByEmail(email: string): Promise<User | null> {
     const entity = await this.repository.findOne({ where: { email } });
+    return entity ? this.toDomain(entity) : null;
+  }
+
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    const entity = await this.repository.findOne({ where: { googleId } });
+    return entity ? this.toDomain(entity) : null;
+  }
+
+  async findByAppleId(appleId: string): Promise<User | null> {
+    const entity = await this.repository.findOne({ where: { appleId } });
+    return entity ? this.toDomain(entity) : null;
+  }
+
+  async findByFacebookId(facebookId: string): Promise<User | null> {
+    const entity = await this.repository.findOne({ where: { facebookId } });
     return entity ? this.toDomain(entity) : null;
   }
 
@@ -52,6 +67,10 @@ export class TypeOrmUserRepository implements UserRepository {
     entity.password = user.password;
     entity.role = user.role;
     entity.walletBalance = user.walletBalance;
+    entity.dateOfBirth = user.dateOfBirth;
+    entity.googleId = user.googleId;
+    entity.appleId = user.appleId;
+    entity.facebookId = user.facebookId;
     entity.createdAt = user.createdAt;
     entity.updatedAt = user.updatedAt;
     return entity;
@@ -66,6 +85,10 @@ export class TypeOrmUserRepository implements UserRepository {
       password: entity.password,
       role: entity.role as any,
       walletBalance: Number(entity.walletBalance),
+      dateOfBirth: entity.dateOfBirth,
+      googleId: entity.googleId,
+      appleId: entity.appleId,
+      facebookId: entity.facebookId,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });

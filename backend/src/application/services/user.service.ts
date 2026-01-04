@@ -23,6 +23,10 @@ export class UserService {
       name: dto.name,
       password: dto.password,
       role: dto.role as UserRole || UserRole.USER,
+      dateOfBirth: dto.dateOfBirth,
+      googleId: dto.googleId,
+      appleId: dto.appleId,
+      facebookId: dto.facebookId,
     });
 
     return this.userRepository.save(user);
@@ -38,6 +42,19 @@ export class UserService {
 
   async getUserByPhone(phone: string): Promise<User | null> {
     return this.userRepository.findByPhone(phone);
+  }
+
+  async getUserByOAuthId(provider: 'google' | 'apple' | 'facebook', oauthId: string): Promise<User | null> {
+    switch (provider) {
+      case 'google':
+        return this.userRepository.findByGoogleId(oauthId);
+      case 'apple':
+        return this.userRepository.findByAppleId(oauthId);
+      case 'facebook':
+        return this.userRepository.findByFacebookId(oauthId);
+      default:
+        return null;
+    }
   }
 
   async chargeWallet(userId: string, dto: ChargeWalletDto): Promise<WalletResponseDto> {

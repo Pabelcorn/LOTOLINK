@@ -5,6 +5,9 @@ export interface UserRepository {
   findById(id: string): Promise<User | null>;
   findByPhone(phone: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
+  findByGoogleId(googleId: string): Promise<User | null>;
+  findByAppleId(appleId: string): Promise<User | null>;
+  findByFacebookId(facebookId: string): Promise<User | null>;
   update(user: User): Promise<User>;
 }
 

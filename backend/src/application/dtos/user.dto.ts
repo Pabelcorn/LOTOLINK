@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, IsEmail, Min } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsEmail, Min, IsDateString, IsISO8601 } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -19,6 +19,21 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   role?: string;
+
+  @IsOptional()
+  dateOfBirth?: Date;
+
+  @IsOptional()
+  @IsString()
+  googleId?: string;
+
+  @IsOptional()
+  @IsString()
+  appleId?: string;
+
+  @IsOptional()
+  @IsString()
+  facebookId?: string;
 }
 
 export class ChargeWalletDto {
