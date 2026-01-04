@@ -10,6 +10,12 @@
 
 Este documento contiene los comandos y procedimientos exactos para validar el sistema después del merge del PR de seguridad y readiness.
 
+**⚠️ IMPORTANTE - Antes de empezar:**
+- Reemplaza `<tu-host>` con tu dominio real en todos los comandos (ejemplo: `lotolink.com`, `api.lotolink.com`, o `localhost:3000` para pruebas locales)
+- Reemplaza `<tu-dominio.com>` con tu dominio permitido en CORS
+- Reemplaza `/ruta/a/LOTOLINK` con la ruta real donde está clonado el repositorio
+- Los comandos asumen que tienes permisos de ejecución adecuados (usa `sudo` donde sea necesario)
+
 ---
 
 ## 1. 🚀 Staging / Preproducción
@@ -885,14 +891,34 @@ LOG_FILE="/var/log/lotolink/monitoring.log"
 ALERT_EMAIL="admin@lotolink.com"
 BACKEND_URL="https://<tu-host>"
 
+# Check dependencies
+command -v curl >/dev/null 2>&1 || { echo "Error: curl is required but not installed."; exit 1; }
+
+# Function to send alert (fallback if mail is not configured)
+send_alert() {
+  local subject="$1"
+  local message="$2"
+  
+  # Try mail command first
+  if command -v mail >/dev/null 2>&1; then
+    echo "$message" | mail -s "$subject" "$ALERT_EMAIL"
+  else
+    # Fallback: just log
+    echo "[ALERT] $subject: $message" >> "$LOG_FILE"
+    # Optional: Add webhook notification here
+    # curl -X POST "https://hooks.slack.com/services/YOUR/WEBHOOK/URL" \
+    #   -H "Content-Type: application/json" \
+    #   -d "{\"text\":\"$subject: $message\"}"
+  fi
+}
+
 while true; do
   # Check health
   HEALTH_STATUS=$(curl -s -w "%{http_code}" -o /dev/null "$BACKEND_URL/health")
   
   if [ "$HEALTH_STATUS" != "200" ]; then
     echo "[CRITICAL] Backend health check failed: HTTP $HEALTH_STATUS" | tee -a "$LOG_FILE"
-    # Enviar alerta
-    echo "Backend health check failed" | mail -s "ALERT: Backend Down" "$ALERT_EMAIL"
+    send_alert "ALERT: Backend Down" "Backend health check failed with status $HEALTH_STATUS"
   fi
   
   # Check readiness
@@ -902,10 +928,13 @@ while true; do
     echo "[WARNING] Backend not ready: HTTP $READY_STATUS" | tee -a "$LOG_FILE"
   fi
   
-  # Check response time
+  # Check response time (using awk for better portability instead of bc)
   RESPONSE_TIME=$(curl -s -w "%{time_total}" -o /dev/null "$BACKEND_URL/health")
   
-  if (( $(echo "$RESPONSE_TIME > 2.0" | bc -l) )); then
+  # Compare using awk (more portable than bc)
+  IS_SLOW=$(awk -v rt="$RESPONSE_TIME" 'BEGIN { print (rt > 2.0) ? 1 : 0 }')
+  
+  if [ "$IS_SLOW" = "1" ]; then
     echo "[WARNING] High response time: ${RESPONSE_TIME}s" | tee -a "$LOG_FILE"
   fi
   
