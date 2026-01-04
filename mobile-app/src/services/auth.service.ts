@@ -10,13 +10,22 @@ import { STORAGE_KEYS } from '../constants';
 export interface LoginCredentials {
   phone: string;
   password: string;
+  adminCode?: string;
 }
 
 export interface RegisterData {
-  name: string;
+  name?: string;
   phone: string;
   password: string;
   email?: string;
+  dateOfBirth: string;
+}
+
+export interface OAuthLoginData {
+  provider: 'google' | 'apple' | 'facebook';
+  token: string;
+  phone?: string;
+  dateOfBirth?: string;
 }
 
 export interface AuthResponse {
@@ -132,4 +141,24 @@ export const isAuthenticated = async (): Promise<boolean> => {
 export const getToken = async (): Promise<string | null> => {
   const { value } = await Preferences.get({ key: STORAGE_KEYS.JWT_TOKEN });
   return value;
+};
+
+/**
+ * OAuth login
+ */
+export const oauthLogin = async (data: OAuthLoginData): Promise<AuthResponse> => {
+  const response = await apiClient.post<AuthResponse>('/auth/oauth/login', data);
+  
+  // Store tokens
+  await Preferences.set({
+    key: STORAGE_KEYS.JWT_TOKEN,
+    value: response.data.access_token,
+  });
+  
+  await Preferences.set({
+    key: STORAGE_KEYS.USER_ID,
+    value: response.data.user.id,
+  });
+  
+  return response.data;
 };

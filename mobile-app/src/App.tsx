@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import {
   IonApp,
@@ -39,6 +39,8 @@ import './theme/custom.css';
 import './theme/responsive.css';
 
 /* Pages */
+import Splash from './pages/Splash';
+import Auth from './pages/Auth';
 import Home from './pages/Home';
 import Lotteries from './pages/Lotteries';
 import Bancas from './pages/Bancas';
@@ -49,6 +51,9 @@ import PaymentMethods from './pages/PaymentMethods';
 /* Services */
 import { setupNotificationListeners } from './services/notifications.service';
 
+/* Context */
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+
 setupIonicReact({
   mode: 'ios', // Use iOS mode for consistent design
   swipeBackEnabled: true,
@@ -57,7 +62,10 @@ setupIonicReact({
   hardwareBackButton: true
 });
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const [showSplash, setShowSplash] = useState(true);
+  const { isAuthenticated, isLoading } = useAuth();
+
   useEffect(() => {
     // Initialize mobile-specific features
     const initializeApp = async () => {
@@ -67,7 +75,7 @@ const App: React.FC = () => {
           await StatusBar.setStyle({ style: Style.Light });
           await StatusBar.setBackgroundColor({ color: '#0071e3' });
           
-          // Hide splash screen immediately (native splash is disabled in capacitor.config.ts)
+          // Hide native splash screen immediately
           await SplashScreen.hide();
 
           // Set up push notification listeners
@@ -110,57 +118,81 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Show splash screen
+  if (showSplash) {
+    return <Splash onComplete={() => setShowSplash(false)} />;
+  }
+
+  // Show loading or auth check
+  if (isLoading) {
+    return <Splash onComplete={() => {}} />;
+  }
+
+  // Show auth screen if not authenticated
+  if (!isAuthenticated) {
+    return <Auth />;
+  }
+
+  // Show main app
+  return (
+    <IonReactRouter>
+      <IonTabs>
+        <IonRouterOutlet>
+          <Route exact path="/home">
+            <Home />
+          </Route>
+          <Route exact path="/lotteries">
+            <Lotteries />
+          </Route>
+          <Route path="/play/:lotteryId">
+            <Play />
+          </Route>
+          <Route exact path="/bancas">
+            <Bancas />
+          </Route>
+          <Route exact path="/profile">
+            <Profile />
+          </Route>
+          <Route exact path="/payment-methods">
+            <PaymentMethods />
+          </Route>
+          <Route exact path="/">
+            <Redirect to="/home" />
+          </Route>
+        </IonRouterOutlet>
+        <IonTabBar slot="bottom" className="tab-bar-custom">
+          <IonTabButton tab="home" href="/home" aria-label="Página de inicio">
+            <IonIcon aria-hidden="true" icon={home} />
+            <IonLabel>Inicio</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="lotteries" href="/lotteries" aria-label="Ver loterías disponibles">
+            <IonIcon aria-hidden="true" icon={trophy} />
+            <IonLabel>Loterías</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="play" href="/lotteries" className="tab-play-button" aria-label="Jugar ahora">
+            <IonIcon aria-hidden="true" icon={ticket} size="large" />
+            <IonLabel>Jugar</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="bancas" href="/bancas" aria-label="Ver bancas cercanas">
+            <IonIcon aria-hidden="true" icon={storefront} />
+            <IonLabel>Bancas</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="profile" href="/profile" aria-label="Ver perfil de usuario">
+            <IonIcon aria-hidden="true" icon={personCircle} />
+            <IonLabel>Perfil</IonLabel>
+          </IonTabButton>
+        </IonTabBar>
+      </IonTabs>
+    </IonReactRouter>
+  );
+};
+
+const App: React.FC = () => {
   return (
     <IonApp>
-      <IonReactRouter>
-        <IonTabs>
-          <IonRouterOutlet>
-            <Route exact path="/home">
-              <Home />
-            </Route>
-            <Route exact path="/lotteries">
-              <Lotteries />
-            </Route>
-            <Route path="/play/:lotteryId">
-              <Play />
-            </Route>
-            <Route exact path="/bancas">
-              <Bancas />
-            </Route>
-            <Route exact path="/profile">
-              <Profile />
-            </Route>
-            <Route exact path="/payment-methods">
-              <PaymentMethods />
-            </Route>
-            <Route exact path="/">
-              <Redirect to="/home" />
-            </Route>
-          </IonRouterOutlet>
-          <IonTabBar slot="bottom" className="tab-bar-custom">
-            <IonTabButton tab="home" href="/home" aria-label="Página de inicio">
-              <IonIcon aria-hidden="true" icon={home} />
-              <IonLabel>Inicio</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="lotteries" href="/lotteries" aria-label="Ver loterías disponibles">
-              <IonIcon aria-hidden="true" icon={trophy} />
-              <IonLabel>Loterías</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="play" href="/lotteries" className="tab-play-button" aria-label="Jugar ahora">
-              <IonIcon aria-hidden="true" icon={ticket} size="large" />
-              <IonLabel>Jugar</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="bancas" href="/bancas" aria-label="Ver bancas cercanas">
-              <IonIcon aria-hidden="true" icon={storefront} />
-              <IonLabel>Bancas</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="profile" href="/profile" aria-label="Ver perfil de usuario">
-              <IonIcon aria-hidden="true" icon={personCircle} />
-              <IonLabel>Perfil</IonLabel>
-            </IonTabButton>
-          </IonTabBar>
-        </IonTabs>
-      </IonReactRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </IonApp>
   );
 };
