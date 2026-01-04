@@ -26,6 +26,21 @@ export class UserEntity {
   @Column('decimal', { name: 'wallet_balance', precision: 12, scale: 2, default: 0 })
   walletBalance!: number;
 
+  @Column('date', { name: 'date_of_birth', nullable: true })
+  dateOfBirth?: Date;
+
+  @Column('varchar', { name: 'google_id', nullable: true, unique: true })
+  @Index()
+  googleId?: string;
+
+  @Column('varchar', { name: 'apple_id', nullable: true, unique: true })
+  @Index()
+  appleId?: string;
+
+  @Column('varchar', { name: 'facebook_id', nullable: true, unique: true })
+  @Index()
+  facebookId?: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

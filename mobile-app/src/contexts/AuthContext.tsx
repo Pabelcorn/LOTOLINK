@@ -7,12 +7,21 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import * as AuthService from '../services/auth.service';
 import { User } from '../services/auth.service';
 
+interface RegisterData {
+  name?: string;
+  phone: string;
+  password: string;
+  email?: string;
+  dateOfBirth: string;
+}
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (phone: string, password: string) => Promise<void>;
-  register: (name: string, phone: string, password: string, email?: string) => Promise<void>;
+  login: (phone: string, password: string, adminCode?: string) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
+  oauthLogin: (provider: 'google' | 'apple' | 'facebook', token: string, phone?: string, dateOfBirth?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -63,10 +72,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (phone: string, password: string) => {
+  const login = async (phone: string, password: string, adminCode?: string) => {
     setIsLoading(true);
     try {
-      const response = await AuthService.login({ phone, password });
+      const response = await AuthService.login({ phone, password, adminCode });
       setUser(response.user);
       setIsAuthenticated(true);
     } catch (error) {
@@ -77,14 +86,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const register = async (name: string, phone: string, password: string, email?: string) => {
+  const register = async (data: RegisterData) => {
     setIsLoading(true);
     try {
-      const response = await AuthService.register({ name, phone, password, email });
+      const response = await AuthService.register(data);
       setUser(response.user);
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Registration failed:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const oauthLogin = async (provider: 'google' | 'apple' | 'facebook', token: string, phone?: string, dateOfBirth?: string) => {
+    setIsLoading(true);
+    try {
+      const response = await AuthService.oauthLogin({ provider, token, phone, dateOfBirth });
+      setUser(response.user);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('OAuth login failed:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -120,6 +143,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     register,
+    oauthLogin,
     logout,
     refreshUser,
   };

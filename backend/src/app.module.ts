@@ -24,6 +24,9 @@ import { PasswordService } from './infrastructure/security/password.service';
 
 // Services
 import { PlayService, UserService, WebhookService, BancaService, SettingsService, SucursalService } from './application/services';
+import { AgeVerificationService } from './application/services/age-verification.service';
+import { AdminCodeService } from './application/services/admin-code.service';
+import { OAuthService } from './application/services/oauth.service';
 import { EmailService } from './infrastructure/email';
 
 // Database entities
@@ -160,6 +163,9 @@ class MockCachePort {
     SettingsService,
     SucursalService,
     PasswordService,
+    AgeVerificationService,
+    AdminCodeService,
+    OAuthService,
     
     // Workers
     PlayWorker,
