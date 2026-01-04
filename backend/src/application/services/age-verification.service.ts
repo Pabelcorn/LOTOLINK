@@ -6,7 +6,7 @@ export class AgeVerificationService {
 
   /**
    * Validates that a user meets the minimum age requirement
-   * @param dateOfBirth - Date of birth in ISO string format
+   * @param dateOfBirth - Date of birth in ISO string format (YYYY-MM-DD)
    * @throws BadRequestException if user is under 18
    */
   validateAge(dateOfBirth: string): void {
@@ -15,7 +15,9 @@ export class AgeVerificationService {
     
     // Check if date is valid
     if (isNaN(birthDate.getTime())) {
-      throw new BadRequestException('Invalid date of birth format');
+      throw new BadRequestException(
+        'Invalid date of birth format. Please use YYYY-MM-DD format (e.g., 1990-12-31)'
+      );
     }
 
     // Check if date is in the future

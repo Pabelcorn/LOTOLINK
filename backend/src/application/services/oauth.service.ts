@@ -48,29 +48,36 @@ export class OAuthService {
    */
   async validateAppleToken(token: string): Promise<OAuthUserInfo> {
     try {
-      // Apple uses JWT tokens that need to be decoded and verified
-      // For now, we'll use a simple approach - in production, use apple-auth library
-      const parts = token.split('.');
-      if (parts.length !== 3) {
-        throw new Error('Invalid token format');
-      }
-
-      const payload = JSON.parse(
-        Buffer.from(parts[1], 'base64').toString('utf-8')
+      // TODO: CRITICAL SECURITY - Implement proper Apple JWT verification
+      // This requires:
+      // 1. Fetching Apple's public keys from https://appleid.apple.com/auth/keys
+      // 2. Verifying the JWT signature using the public key
+      // 3. Validating claims (iss, aud, exp, etc.)
+      // Consider using a library like 'apple-auth' or 'jsonwebtoken' with proper verification
+      
+      // For now, throw an error to prevent insecure usage
+      throw new UnauthorizedException(
+        'Apple OAuth is not fully configured. Please contact support.'
       );
-
-      // Verify the token is for our app
-      const clientId = this.configService.get<string>('APPLE_CLIENT_ID');
-      if (payload.aud !== clientId) {
-        throw new Error('Token audience mismatch');
-      }
-
-      return {
-        id: payload.sub,
-        email: payload.email,
-        name: payload.name,
-        provider: 'apple',
-      };
+      
+      // PLACEHOLDER CODE (DO NOT USE IN PRODUCTION):
+      // const parts = token.split('.');
+      // if (parts.length !== 3) {
+      //   throw new Error('Invalid token format');
+      // }
+      // const payload = JSON.parse(
+      //   Buffer.from(parts[1], 'base64').toString('utf-8')
+      // );
+      // const clientId = this.configService.get<string>('APPLE_CLIENT_ID');
+      // if (payload.aud !== clientId) {
+      //   throw new Error('Token audience mismatch');
+      // }
+      // return {
+      //   id: payload.sub,
+      //   email: payload.email,
+      //   name: payload.name,
+      //   provider: 'apple',
+      // };
     } catch (error) {
       console.error('Apple token validation error:', error);
       throw new UnauthorizedException('Invalid Apple token');
