@@ -5209,6 +5209,11 @@
       useEffect(() => localStorage.setItem("ll_cart", JSON.stringify(cart)), [cart]);
       useEffect(() => localStorage.setItem("ll_cart_banca", JSON.stringify(cartBanca)), [cartBanca]);
       
+      // Check authentication on component mount
+      useEffect(() => {
+        checkAuth(setUser);
+      }, []);
+      
       // Re-render lotteries when view changes to "loterias"
       useEffect(() => {
         if (view === 'loterias') {
@@ -6430,7 +6435,7 @@
                       onClick={() => alert('OAuth con Facebook - Implementación pendiente\n\nPor favor contacta al administrador para habilitar esta funcionalidad.')}
                       className="w-full border border-gray-200 dark:border-gray-700 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
                     >
-                      <span className="text-xl">🔵</span> Facebook
+                      <span className="text-xl">📘</span> Facebook
                     </button>
                   </div>
                 </div>
